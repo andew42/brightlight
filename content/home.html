@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+    <title>Bright Lights</title>
+    <link rel="stylesheet" type="text/css" href="/BrWeb.css" />
+</head>
+
+<script>
+    //    document.addEventListener('touchmove', function (e) { if (e.target.id != 'slider') { e.preventDefault(); } }, false);
+
+    function sliderChanged(value) {
+        var v = parseInt(value);
+        v = (v * 65536) + (v * 256) + v;
+        allLights(v.toString(16));
+    }
+
+    function allLights(colour) {
+        console.log(colour);
+        var req = new XMLHttpRequest();
+        req.open('PUT', '/AllLights/' + colour, true);
+        req.send();
+    }
+
+    function animation(name) {
+        var req = new XMLHttpRequest();
+        req.open('PUT', '/Animation/' + name, true);
+        req.send();
+    }
+
+</script>
+
+<body>
+    <table style="width:100%">
+        <tr>
+            <td>
+                <button style="background-color:darkgray; color:whitesmoke" onclick="allLights('000000')">Off</button>
+            </td>
+            <td>
+                <button style="background-color: whitesmoke; color: darkgray" onclick="allLights('ffffff')">Full</button>
+            </td>
+            <td>
+                <button style="background-color: #d71e1e" onclick="allLights('d71e1e')">d71e1e</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <button onclick="allLights('e0e0e0')">High</button>
+            </td>
+            <td>
+                <button onclick="allLights('808080')">Mid</button>
+            </td>
+            <td>
+                <button style="background-color: #21ded3" onclick="allLights('21ded3')">21ded3</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <button onclick="allLights('3f3f3f')">Low</button>
+            <td>
+                <button onclick="allLights('101010')">V Low</button>
+            </td>
+            <td>
+                <button style="background-color: #6f16d4" onclick="allLights('6f16d4')">21ded3</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <button onclick="allLights('3f3f3f')">Low</button>
+            </td>
+            <td>
+            </td>
+            <td>
+                <button style="background-color: #c8721f" onclick="allLights('c8721f')">21ded3</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <button onclick="animation('runner')">Runner</button>
+            </td>
+            <td>
+            </td>
+            <td>
+                <button onclick="animation('cylon')">Cylon</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="3">
+                <input type="range" name="points" min="0" max="255" id="slider" onchange="sliderChanged(this.value)"
+                       style="width:100%; height:50px" />
+            </td>
+        </tr>
+    </table>
+    <a href="./virtual.html">Virtual</a>
+    <a href="./config.html">Config</a>
+</body>
+</html>
