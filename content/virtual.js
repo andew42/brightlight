@@ -58,7 +58,7 @@ function init() {
         }
         html += '</table>'
 
-        // writeHtmlToScreen(html);
+        // writeHtmlToScreen(evt.data);
         frameBuffer.innerHTML = html;
 
         // ws.close();

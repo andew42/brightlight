@@ -1,11 +1,8 @@
 package main
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"encoding/json"
 	"fmt"
-	"github.com/andew42/brightlight/animations"
-	"github.com/andew42/brightlight/controller"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,6 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"runtime"
+	"code.google.com/p/go.net/websocket"
+	"github.com/andew42/brightlight/animations"
+	"github.com/andew42/brightlight/controller"
 )
 
 // The controller's frame buffer
@@ -83,7 +83,6 @@ func sendFrameBufferToWebSocket(ws *websocket.Conn) error {
 
 // Handle HTTP requests to set all lights to a specific colour
 func allLightsHandler(w http.ResponseWriter, r *http.Request) {
-
 	fmt.Println("allLightsHandler Called")
 
 	// Colour value follows request path
@@ -99,8 +98,7 @@ func allLightsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fb.SetColour(colourValue)
-	fb.SignalChanged()
+	animations.AnimateStaticColour(controller.NewRgbFromInt(int(colourValue)))
 }
 
 // Handle HTTP requests to run a named animation
@@ -124,11 +122,6 @@ func animationHandler(w http.ResponseWriter, r *http.Request) {
 
 // Handle web socket requests (web socket is closed when we return)
 func frameBufferSocketHandler(ws *websocket.Conn) {
-	processSocket(ws)
-}
-
-// Process a web socket request (each request in own go routine)
-func processSocket(ws *websocket.Conn) {
 	for {
 		fb.Mutex.Lock()
 		// Fails if the client has disappeared
@@ -148,7 +141,7 @@ var contentCache = make(map[string][]byte)
 
 func main() {
 	// What are we running on?
-	fmt.Printf("%v %v %v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("environment: %v %v %v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 
 	// Figure out where the content directory is GOPATH may contain : separated paths
 	goPath := strings.Split(os.Getenv("GOPATH"), ":")
@@ -166,10 +159,11 @@ func main() {
 		fmt.Println(k, len(v))
 	}
 
-	// Send frame buffer changes over to Teensy controller
-	//go processTeensyUpdate()
-	go controller.TeensyDriver(fb)
+	// Start serial and animation drivers
+	controller.StartDriver(fb)
+	animations.StartDriver(fb)
 
+	// Start web handlers
 	http.HandleFunc("/", staticContentHandler)
 	http.HandleFunc("/AllLights/", allLightsHandler)
 	http.HandleFunc("/Animation/", animationHandler)
@@ -179,5 +173,5 @@ func main() {
 		log.Println("ListenAndServe: " + err.Error())
 	}
 
-	fmt.Print("done")
+	fmt.Print("main exiting")
 }

@@ -2,17 +2,10 @@ package controller
 
 import "math/rand"
 
-// Maximum led strip length (determined by controller)
+// Maximum led strip length (determined by teensy firmware)
 const (
 	maxLedStripLen = 12
 )
-
-// Single LED colour
-type Rgb struct {
-	Red   byte
-	Green byte
-	Blue  byte
-}
 
 // Led Strip
 type LedStrip struct {
@@ -20,7 +13,7 @@ type LedStrip struct {
 	Leds        []Rgb
 }
 
-// Create a new Led strip
+// Led strip constructor
 func NewLedStrip(leftToRight bool, len int) *LedStrip {
 	var s LedStrip
 	s.LeftToRight = leftToRight

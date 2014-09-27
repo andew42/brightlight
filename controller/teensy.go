@@ -8,11 +8,20 @@ import (
 	"time"
 )
 
-// Monitors changes to the frame buffer and update Teensy via USB
-func TeensyDriver(fb *FrameBuffer) {
+var driverStarted bool
 
+// Run driver as a go routine
+func StartDriver(fb *FrameBuffer) {
+	if driverStarted {
+		panic("Teensy Driver started twice")
+	}
+	driverStarted = true
+	go teensyDriver(fb)
+}
+
+// Monitors changes to frame buffer and update Teensy via USB
+func teensyDriver(fb *FrameBuffer) {
 	for {
-		// Open the port
 		f := openUsbPort()
 
 		// Push frame buffer changes to Teensy
@@ -51,7 +60,7 @@ func TeensyDriver(fb *FrameBuffer) {
 func openUsbPort() *os.File {
 	errorLogged := false
 	for {
-		// Open the serial port
+		// Open the serial port (raspberry pi or OSX)
 		port := "/dev/ttyACM0"
 		if runtime.GOOS == "darwin" {
 			port = "/dev/cu.usbmodem103101"
