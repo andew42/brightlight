@@ -18,13 +18,6 @@ function init() {
         output.appendChild(pre);
     }
 
-    // REMOVE
-    var writeHtmlToScreen = function (html) {
-        var pre = document.createElement("div");
-        pre.innerHTML = html;
-        output.appendChild(pre);
-    }
-
     var numberToColourCode = function (n) {
         var c = n.toString(16);
         while (c.length < 6)
@@ -32,37 +25,32 @@ function init() {
         return c;
     }
 
-    // Test web socket
     var ws = new WebSocket(wsUri, "P1");
+
     ws.onopen = function (evt) {
-        var message = "WebSocket rocks";
         writeToScreen("CONNECTED");
-        writeToScreen("SENT: " + message);
-        ws.send(message);
     };
+
     ws.onclose = function (evt) {
         writeToScreen("DISCONNECTED");
     };
+
     ws.onmessage = function (evt) {
         // writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
-
         var html = '<table>'
         var strips = JSON.parse(evt.data).Strips;
-        for (s in strips) {
+        for (var s in strips) {
             html += '<tr>';
             var leds = strips[s].Leds;
-            for (l in leds) {
+            for (var l in leds) {
                 html += ('<td><div style="background-color:#' + numberToColourCode(leds[l]) + ';width:10px;height:10px"></div></td>');
             }
             html += '</tr>';
         }
         html += '</table>'
-
-        // writeHtmlToScreen(evt.data);
         frameBuffer.innerHTML = html;
-
-        // ws.close();
     };
+
     ws.onerror = function (evt) {
         writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
     };

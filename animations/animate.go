@@ -23,21 +23,24 @@ func AnimateStaticColour(colour controller.Rgb) {
 
 // High level request to play an animation from web UI
 func Animate(animationName string) error {
-	var animator animator
+	animations := make([]animation, 0)
 	switch {
 	case animationName == "runner":
 		var r runner
-		animator = &r
+		animations = append(animations, newAnimation(&r, allLeds))
 	case animationName == "cylon":
-		var c cylon
-		animator = &c
+		animations = append(animations, newAnimation(newStaticColour(controller.NewRgbFromInt(0)), allLeds))
+		var c1 cylon
+		seg := NewLogSegment(allLeds, 8, 20)
+		animations = append(animations, newAnimation(&c1, seg))
+		var c2 cylon
+		seg = NewLogSegment(allLeds, 30, 20)
+		animations = append(animations, newAnimation(&c2, seg))
 	default:
 		return ErrInvalidAnimationName
 	}
 
 	// Send the (possibly) new animation to driver
-	animations := make([]animation, 0)
-	animations = append(animations, newAnimation(animator, allLeds))
 	animationDriverChan <- animations
 	return nil
 }

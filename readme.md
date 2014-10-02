@@ -7,3 +7,8 @@ https://www.pjrc.com/teensy/td_libs_OctoWS2811.html
 
 A web site interface to control one or more Teensy boards via USB. This is written in GO for
 running on a raspberry pi or similar
+
+TODO:
+Show if serial port is connected
+Show log tail
+Rainbow animation

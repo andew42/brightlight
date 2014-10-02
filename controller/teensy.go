@@ -28,12 +28,14 @@ func teensyDriver(fb *FrameBuffer) {
 		for {
 			fb.Mutex.Lock()
 
-			// Send the frame buffer TODO:3
+			// Send the frame buffer TODO:Initial size
 			var data []byte = make([]byte, 0)
 			data = append(data, 0x20, 0x20, 0x20, 0x20)
-			for l := 0; l < 3; l++ {
-				rgb := fb.Strips[0].Leds[l]
-				data = append(data, rgb.Red, rgb.Green, rgb.Blue)
+			for s := 0; s < len(fb.Strips); s++ {
+				for l := 0; l < MaxLedStripLen; l++ {
+					rgb := fb.Strips[s].Leds[l]
+					data = append(data, rgb.Red, rgb.Green, rgb.Blue)
+				}
 			}
 			// fmt.Print(data)
 			n, err := f.Write(data)

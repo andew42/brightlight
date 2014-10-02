@@ -16,9 +16,16 @@ func NewFrameBuffer() *FrameBuffer {
 	fb.Cond = sync.NewCond(&fb.Mutex)
 
 	// TODO: Make this more dynamic?
-	fb.Strips = make([]LedStrip, 0, 2)
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 10))
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 8))
+	fb.Strips = make([]LedStrip, 0, 8)
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	// fb.Strips = append(fb.Strips, *NewLedStrip(false, 28))
 
 	return &fb
 }

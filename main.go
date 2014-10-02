@@ -103,7 +103,6 @@ func allLightsHandler(w http.ResponseWriter, r *http.Request) {
 
 // Handle HTTP requests to run a named animation
 func animationHandler(w http.ResponseWriter, r *http.Request) {
-
 	fmt.Println("animationHandler Called")
 
 	// Animation name follows request path
@@ -120,7 +119,48 @@ func animationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Handle web socket requests (web socket is closed when we return)
+// Handle HTTP requests to update configuration
+func configHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("configHandler Called")
+
+	// Strip index, length follows request path
+	extIndex := strings.LastIndex(r.URL.Path, `/`)
+	if extIndex == -1 {
+		http.Error(w, "No configuration specified", 406)
+		return
+	}
+
+	// index and length
+	config := strings.Split(r.URL.Path[extIndex+1:], ",")
+	index, err := strconv.ParseInt(config[0], 10, 32)
+	if (err != nil || index < 0 || index > int64(len(fb.Strips))) {
+		http.Error(w, "Invalid index specified", 406)
+		return
+	}
+	length, err := strconv.ParseInt(config[1], 10, 32)
+	if err != nil || length < 0 || length > controller.MaxLedStripLen {
+		http.Error(w, "Invalid length specified", 406)
+		return
+	}
+
+	// Turn off animations TODO
+
+	// Light up strip for length
+	testColour := controller.NewRgb(128, 128, 128)
+	backgroundColour := controller.NewRgb(0, 0, 0)
+	for s := 0; s < len(fb.Strips); s++ {
+		for l := 0; l < controller.MaxLedStripLen; l++ {
+			if int64(s) == index && int64(l) < length {
+				fb.Strips[s].Leds[l] = testColour
+			} else {
+				fb.Strips[s].Leds[l] = backgroundColour
+			}
+		}
+	}
+	fb.Flush()
+}
+
+// Handle frame buffer web socket requests (web socket is closed when we return)
 func frameBufferSocketHandler(ws *websocket.Conn) {
 	for {
 		fb.Mutex.Lock()
@@ -167,6 +207,7 @@ func main() {
 	http.HandleFunc("/", staticContentHandler)
 	http.HandleFunc("/AllLights/", allLightsHandler)
 	http.HandleFunc("/Animation/", animationHandler)
+	http.HandleFunc("/Config/", configHandler)
 	http.Handle("/FrameBuffer", websocket.Handler(frameBufferSocketHandler))
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
