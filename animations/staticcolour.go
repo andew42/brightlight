@@ -3,20 +3,23 @@ package animations
 import "github.com/andew42/brightlight/controller"
 
 type staticColour struct {
+	seg    controller.Segment
 	colour controller.Rgb
+	done   bool
 }
 
-func newStaticColour(colour controller.Rgb) *staticColour {
+func newStaticColour(seg controller.Segment, colour controller.Rgb) *staticColour {
 	var sc staticColour
+	sc.seg = seg
 	sc.colour = colour
 	return &sc
 }
 
-func (r *staticColour) animateBegin(seg controller.Segment) {
-	for s := uint(0); s < seg.Len(); s++ {
-		seg.Set(s, r.colour)
+func (sc *staticColour) animateNextFrame() {
+	if !sc.done {
+		for s := uint(0); s < sc.seg.Len(); s++ {
+			sc.seg.Set(s, sc.colour)
+		}
+		sc.done = true
 	}
-}
-
-func (r *staticColour) animateNextFrame() {
 }

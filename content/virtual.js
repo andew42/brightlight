@@ -42,7 +42,12 @@ function init() {
         for (var s in strips) {
             html += '<tr>';
             var leds = strips[s].Leds;
+            // ****** Limit displayed LEDs for performance reasons *****
+            // Can performance be improved by just changing style on static HTML?
+            var limitStripCount = 30
             for (var l in leds) {
+                if (limitStripCount-- <= 0)
+                    break;
                 html += ('<td><div style="background-color:#' + numberToColourCode(leds[l]) + ';width:10px;height:10px"></div></td>');
             }
             html += '</tr>';

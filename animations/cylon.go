@@ -8,27 +8,28 @@ type cylon struct {
 	dir bool
 }
 
-func (r *cylon) animateBegin(seg controller.Segment) {
-	r.seg = seg
-	r.pos = 0
+func newCylon(seg controller.Segment) *cylon {
+	var c cylon
+	c.seg = seg
+	return &c
 }
 
-func (r *cylon) animateNextFrame() {
-	r.seg.Set(r.pos, controller.NewRgb(0, 0, 0))
+func (c *cylon) animateNextFrame() {
+	c.seg.Set(c.pos, controller.NewRgb(0, 0, 0))
 
-	if r.dir {
-		if r.pos == r.seg.Len() - 1 {
-			r.dir = false
+	if c.dir {
+		if c.pos == c.seg.Len()-1 {
+			c.dir = false
 		} else {
-			r.pos++
+			c.pos++
 		}
 	} else {
-		if r.pos == 0 {
-			r.dir = true
+		if c.pos == 0 {
+			c.dir = true
 		} else {
-			r.pos--
+			c.pos--
 		}
 	}
 
-	r.seg.Set(r.pos, controller.NewRgb(255, 0, 0))
+	c.seg.Set(c.pos, controller.NewRgb(255, 0, 0))
 }

@@ -5,8 +5,8 @@ import "github.com/andew42/brightlight/controller"
 // A logical segment is a slice of another segment
 type LogSegment struct {
 	baseSeg controller.Segment
-	start uint
-	len uint
+	start   uint
+	len     uint
 }
 
 // Constructor
@@ -15,7 +15,7 @@ func NewLogSegment(baseSeg controller.Segment, start uint, len uint) LogSegment 
 	if start >= baseLen {
 		panic("invalid segment start")
 	}
-	if start + len >= baseLen {
+	if start+len > baseLen {
 		panic("invalid segment length")
 	}
 	var x LogSegment
@@ -37,5 +37,5 @@ func (seg LogSegment) Set(pos uint, colour controller.Rgb) {
 		panic("position out of range")
 	}
 	// Set at position within segment
-	seg.baseSeg.Set(seg.start + pos, colour)
+	seg.baseSeg.Set(seg.start+pos, colour)
 }

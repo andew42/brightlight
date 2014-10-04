@@ -1,19 +1,19 @@
 package main
 
 import (
+	"code.google.com/p/go.net/websocket"
 	"encoding/json"
 	"fmt"
+	"github.com/andew42/brightlight/animations"
+	"github.com/andew42/brightlight/controller"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"runtime"
 	"strconv"
 	"strings"
-	"runtime"
-	"code.google.com/p/go.net/websocket"
-	"github.com/andew42/brightlight/animations"
-	"github.com/andew42/brightlight/controller"
 )
 
 // The controller's frame buffer
@@ -133,7 +133,7 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	// index and length
 	config := strings.Split(r.URL.Path[extIndex+1:], ",")
 	index, err := strconv.ParseInt(config[0], 10, 32)
-	if (err != nil || index < 0 || index > int64(len(fb.Strips))) {
+	if err != nil || index < 0 || index > int64(len(fb.Strips)) {
 		http.Error(w, "Invalid index specified", 406)
 		return
 	}

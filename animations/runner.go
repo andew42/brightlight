@@ -3,17 +3,20 @@ package animations
 import "github.com/andew42/brightlight/controller"
 
 type runner struct {
-	seg controller.Segment
-	pos uint
+	seg    controller.Segment
+	colour controller.Rgb
+	pos    uint
 }
 
-func (r *runner) animateBegin(seg controller.Segment) {
+func newRunner(seg controller.Segment, colour controller.Rgb) *runner {
+	var r runner
 	r.seg = seg
-	r.pos = 0
+	r.colour = colour
+	return &r
 }
 
 func (r *runner) animateNextFrame() {
-	r.seg.Set(r.pos, controller.NewRgb(0, 0, 0)) // OFF then next RED
+	r.seg.Set(r.pos, controller.NewRgb(0, 0, 0))
 	r.pos = nextPos(r.pos, r.seg.Len())
-	r.seg.Set(r.pos, controller.NewRgb(255, 0, 0)) // OFF then next RED
+	r.seg.Set(r.pos, r.colour)
 }
