@@ -1,6 +1,5 @@
-window.onload = init;
+window.onload = function init() {
 
-function init() {
     var output = document.getElementById("output");
     var frameBuffer = document.getElementById("frameBuffer");
 

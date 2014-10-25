@@ -2,14 +2,17 @@ package animations
 
 import (
 	"errors"
-	"github.com/andew42/brightlight/controller"
 	"time"
+	"github.com/andew42/brightlight/controller"
+	"github.com/andew42/brightlight/stats"
 )
 
-const frameRateMs = 20
+// Frame rate as duration 20ms -> 50Hz
+const frameRate time.Duration = 20 * time.Millisecond
 
 var (
 	allLeds                 controller.Segment
+	curtainLeds				controller.Segment
 	animationDriverChan     chan []animator
 	ErrInvalidAnimationName = errors.New("invalid animation name")
 )
@@ -34,7 +37,10 @@ func Animate(animationName string) error {
 		animations = append(animations, newCylon(NewLogSegment(allLeds, controller.MaxLedStripLen, 20)))
 
 	case animationName == "rainbow":
-		animations = append(animations, newRainbow(NewLogSegment(allLeds, 0, 28), 10000))
+		animations = append(animations, newRainbow(curtainLeds, time.Second * 5))
+
+	case animationName == "sweetshop":
+		animations = append(animations, newSweetshop(allLeds, time.Second * 5))
 
 	default:
 		return ErrInvalidAnimationName
@@ -46,30 +52,42 @@ func Animate(animationName string) error {
 }
 
 // Start animate driver
-func StartDriver(fb *controller.FrameBuffer) {
+func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
 	if animationDriverChan != nil {
 		panic("StartAnimateDriver called twice")
 	}
 	// All 8 strips as a single long segment
+	// TODO: Make this a config file
 	allLeds = controller.NewPhySegment(fb.Strips)
+	x := make([]controller.LedStrip, 2)
+	x[0] = fb.Strips[3]
+	x[1] = fb.Strips[7]
+	curtainLeds = controller.NewPhySegment(x)
+
 	animationDriverChan = make(chan []animator)
-	go animateDriver(animationDriverChan, fb)
+	go animateDriver(animationDriverChan, fb, statistics)
 }
 
 // The animation GO routine
-func animateDriver(newAnimations chan []animator, fb *controller.FrameBuffer) {
-	frameSync := time.Tick(frameRateMs * time.Millisecond)
+func animateDriver(newAnimations chan []animator, fb *controller.FrameBuffer, statistics *stats.Stats) {
+	frameSync := time.Tick(frameRate)
 	currentAnimations := make([]animator, 0)
+	nextFrameTime := time.Now().Add(frameRate)
 	for {
 		select {
 		case <-frameSync:
 			// Wait for a frame tick
+			started := time.Now()
+			jitter := started.Sub(nextFrameTime)
+			nextFrameTime = started.Add(frameRate)
 			for _, value := range currentAnimations {
 				value.animateNextFrame()
 			}
 			fb.Flush()
+			statistics.AddAnimation(time.Since(started), jitter)
 
 		case currentAnimations = <-newAnimations:
+			statistics.Reset()
 		}
 	}
 }

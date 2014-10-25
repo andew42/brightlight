@@ -9,10 +9,26 @@ function allLights(colour) {
     var req = new XMLHttpRequest();
     req.open('PUT', '/AllLights/' + colour, true);
     req.send();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            setConnectionStatus(req.responseText)
+            req = null
+        }
+    }
 }
 
 function animation(name) {
     var req = new XMLHttpRequest();
     req.open('PUT', '/Animation/' + name, true);
     req.send();
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            setConnectionStatus(req.responseText)
+            req = null
+        }
+    }
+}
+
+function setConnectionStatus(status) {
+    document.getElementById("status").innerHTML =  JSON.parse(status) ? "OK" : "Not Connected";
 }

@@ -45,7 +45,7 @@ const int ledsPerStrip = 175;
 
 DMAMEM int displayMemory[ledsPerStrip*6];
 int drawingMemory[ledsPerStrip*6];
-const int config = WS2811_GRB | WS2811_800kHz;
+const int config = WS2811_GRB | WS2811_400kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
 void setup() {

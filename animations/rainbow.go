@@ -1,7 +1,9 @@
 package animations
 
-import "fmt"
-import "github.com/andew42/brightlight/controller"
+import (
+	"time"
+	"github.com/andew42/brightlight/controller"
+)
 
 type rainbow struct {
 	seg             controller.Segment
@@ -9,13 +11,12 @@ type rainbow struct {
 	startDegree     float32
 }
 
-// periodMs is the number of ms for a complete cycle of the rainbow
-func newRainbow(seg controller.Segment, periodMs uint) *rainbow {
+// period is the duration for a complete cycle of the rainbow
+func newRainbow(seg controller.Segment, period time.Duration) *rainbow {
 	var r rainbow
 	r.seg = seg
-	framesPerPeriod := float32(periodMs) / float32(frameRateMs)
+	framesPerPeriod := float32(period) / float32(frameRate)
 	r.degreesPerFrame = 360.0 / framesPerPeriod
-	fmt.Printf("%v %v %v", r.seg, r.degreesPerFrame, r.startDegree)
 	return &r
 }
 

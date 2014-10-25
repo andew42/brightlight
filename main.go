@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
+	"github.com/andew42/brightlight/stats"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 
 // The controller's frame buffer
 var fb = controller.NewFrameBuffer()
+var Statistics stats.Stats = stats.NewStats()
 
 // Read each file's content, in the content directory, into memory against its relative path
 func cacheContentDirectory(path string, basePathLen int, cache map[string][]byte) error {
@@ -99,6 +101,9 @@ func allLightsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	animations.AnimateStaticColour(controller.NewRgbFromInt(int(colourValue)))
+
+	d, _ := json.Marshal(controller.IsDriverConnected())
+	w.Write(d)
 }
 
 // Handle HTTP requests to run a named animation
@@ -116,7 +121,11 @@ func animationHandler(w http.ResponseWriter, r *http.Request) {
 	err := animations.Animate(animationName)
 	if err != nil {
 		http.Error(w, err.Error()+" "+animationName, 406)
+		return
 	}
+
+	d, _ := json.Marshal(controller.IsDriverConnected())
+	w.Write(d)
 }
 
 // Handle HTTP requests to update configuration
@@ -176,6 +185,32 @@ func frameBufferSocketHandler(ws *websocket.Conn) {
 	}
 }
 
+// Handle stats web socket requests (web socket is closed when we return)
+func statsSocketHandler(ws *websocket.Conn) {
+	for {
+		fb.Mutex.Lock()
+
+		// Report stats for last second every second (50 frames)
+		if Statistics.FrameCount >= 50 {
+			// Render the stats as JSON (fails if the client has disappeared)
+			rc, err := json.MarshalIndent(Statistics, "", " ")
+			if err == nil {
+				_, err = ws.Write(rc)
+			}
+			if err != nil {
+				fb.Mutex.Unlock()
+				log.Println(err)
+				return
+			}
+			Statistics.Reset()
+		}
+
+		// Wait for next frame buffer update
+		fb.Cond.Wait()
+		fb.Mutex.Unlock()
+	}
+}
+
 // HTTP content cache
 var contentCache = make(map[string][]byte)
 
@@ -200,8 +235,8 @@ func main() {
 	}
 
 	// Start serial and animation drivers
-	controller.StartDriver(fb)
-	animations.StartDriver(fb)
+	controller.StartDriver(fb, &Statistics)
+	animations.StartDriver(fb, &Statistics)
 
 	// Start web handlers
 	http.HandleFunc("/", staticContentHandler)
@@ -209,6 +244,7 @@ func main() {
 	http.HandleFunc("/Animation/", animationHandler)
 	http.HandleFunc("/Config/", configHandler)
 	http.Handle("/FrameBuffer", websocket.Handler(frameBufferSocketHandler))
+	http.Handle("/Stats", websocket.Handler(statsSocketHandler))
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Println("ListenAndServe: " + err.Error())
