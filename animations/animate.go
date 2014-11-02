@@ -40,7 +40,7 @@ func Animate(animationName string) error {
 		animations = append(animations, newRainbow(curtainLeds, time.Second * 5))
 
 	case animationName == "sweetshop":
-		animations = append(animations, newSweetshop(allLeds, time.Second * 5))
+		animations = append(animations, newSweetshop(allLeds, time.Second * 1))
 
 	default:
 		return ErrInvalidAnimationName

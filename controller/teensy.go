@@ -38,17 +38,19 @@ func teensyDriver(fb *FrameBuffer, statistics *stats.Stats) {
 			fb.Mutex.Lock()
 
 			started := time.Now()
-			// Send the frame buffer TODO:Initial size
+
+			// Send the frame buffer
 			var data []byte = make([]byte, 0)
-			data = append(data, 0x20, 0x20, 0x20, 0x20)
+			data = append(data, 0xff, 0xff, 0xff, 0xff)
 			for s := 0; s < len(fb.Strips); s++ {
 				for l := 0; l < MaxLedStripLen; l++ {
 					if l >= len(fb.Strips[s].Leds) {
 						// Pad frame buffer as strip is < MaxLedStripLen
-						data = append(data, 0, 0, 0)
+						data = append(data, 0, 0, 0, 0)
 					} else {
+						// Colours are sent as 4 bytes with leading 0x00
 						rgb := fb.Strips[s].Leds[l]
-						data = append(data, rgb.Red, rgb.Green, rgb.Blue)
+						data = append(data, 0, rgb.Red, rgb.Green, rgb.Blue)
 					}
 				}
 			}
@@ -80,7 +82,7 @@ func openUsbPort() *os.File {
 		// Open the serial port (raspberry pi or OSX)
 		port := "/dev/ttyACM0"
 		if runtime.GOOS == "darwin" {
-// TODO			port = "/dev/cu.usbmodem103101"
+// TODO		port = "/dev/cu.usbmodem103101"
 			port = "/dev/cu.usbmodem103721"
 		}
 

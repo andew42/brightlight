@@ -12,7 +12,7 @@ running on a raspberry pi or similar
 ssh pi@192.168.0.44
 
 // pi: clean
-killall -q -9 brightlight
+sudo killall -q -9 brightlight
 rm -f -r /home/pi/go
 rm -f /home/pi/brightlight.log
 mkdir -p /home/pi/go/src
@@ -26,5 +26,6 @@ cd /home/pi/go/src/github.com/andew42/brightlight
 go install
 
 // pi: run
+stty -F /dev/ttyACM0 raw
 export GOPATH=/home/pi/go
 /home/pi/go/bin/brightlight

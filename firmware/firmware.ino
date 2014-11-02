@@ -1,5 +1,5 @@
 /*
- Bright Light Teensy 3 firmware
+ Bright Light Teensy 3.x firmware
  Copyright (c) 2014 Andrew Hartland, Leading Edge Designs Ltd
  
  Requires library:
@@ -32,7 +32,7 @@
  pin 8:  LED strip #4    A 100 ohm resistor should used
  pin 6:  LED strip #5    between each Teensy pin and the
  pin 20: LED strip #6    wire to the LED strip, to minimize
- pin 21: LED strip #7    high frequency ringining & noise.
+ pin 21: LED strip #7    high frequency ringing & noise.
  pin 5:  LED strip #8
  pin 15 & 16 - Connect together, but do not use
  pin 4 - Do not use
@@ -41,45 +41,80 @@
 
 #include <OctoWS2811.h>
 
-const int ledsPerStrip = 175;
+// Must be synchronised with controller
+const int LEDS_PER_STRIP = 175;
 
-DMAMEM int displayMemory[ledsPerStrip*6];
-int drawingMemory[ledsPerStrip*6];
+DMAMEM int displayMemory[LEDS_PER_STRIP * 6];
+int drawingMemory[LEDS_PER_STRIP * 6];
+// Run at lower speed
 const int config = WS2811_GRB | WS2811_400kHz;
-OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
+OctoWS2811 leds(LEDS_PER_STRIP, displayMemory, drawingMemory, config);
 
+// Called on reset
 void setup() {
-  leds.begin();
-  leds.show();
-  Serial.begin(9600);
+    leds.begin();
+    set_all_leds(0);
+    // 9600 is arbitrary, always runs at 12Mb on Teensy
+    Serial.begin(9600);
 }
 
-// Reads a byte from the serial port, wait forever
-int serial_read()
-{
-  if (Serial.available() > 0)
-    return Serial.read();
+// Sets entire frame buffer to colour and updates LEDS
+void set_all_leds(int colour) {
+    for (int i = 0; i < (LEDS_PER_STRIP * 8); i++)
+        leds.setPixel(i, colour);
+    leds.show();
 }
 
-// TODO: This is flawed as its possible to get this in data
-void sync()
-{
-  // Wait for 4 0x20
-  int count = 0;
-  while (count < 4)
-    count = (serial_read() == 0x20) ? count + 1 : 0;
+// Reads a byte from the serial port, fail after a bit (-1)
+int serial_read() {
+    // Tried using elapsedMillis here but it seems to take
+    // an age to return slowing everything down so went with
+    // counting number of reties instead
+    for (int i = 0; i < 100000; i++) {
+        if (Serial.available()) {
+            return Serial.read();
+        }
+    }
+    return -1;
 }
 
-int read_colour()
-{
-  return (serial_read() << 16) + (serial_read() << 8) + serial_read();
+// Look for four 0xff not possible in frame data
+int sync() {
+    int count = 0;
+    while (count < 4) {
+        int c = serial_read();
+        if (c == -1) return 0;
+        count = (c == 0xff) ? count + 1 : 0;
+    }
+    return 1;
 }
 
-void loop()
-{
-  sync();
-  for (int i = 0; i < (ledsPerStrip * 8); i++)
-    leds.setPixel(i, read_colour());
-  leds.show();
+// Colours are transported as four bytes with 0x00 initial value
+int read_colour() {
+    if (serial_read() != 0) return -1;
+
+    int red = serial_read();
+    if (red == -1) return -1;
+
+    int green = serial_read();
+    if (green == -1) return -1;
+
+    int blue = serial_read();
+    if (blue == -1) return -1;
+
+    return (red << 16) + (green << 8) + blue;
 }
 
+// Called repeatedly from main()
+void loop() {
+    if (!sync()) {
+        set_all_leds(0);
+        return;
+    }
+    for (int i = 0; i < (LEDS_PER_STRIP * 8); i++) {
+        int colour = read_colour();
+        if (colour == -1) return;
+        leds.setPixel(i, colour);
+    }
+    leds.show();
+}
