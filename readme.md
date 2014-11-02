@@ -8,7 +8,23 @@ https://www.pjrc.com/teensy/td_libs_OctoWS2811.html
 A web site interface to control one or more Teensy boards via USB. This is written in GO for
 running on a raspberry pi or similar
 
-TODO:
-Show if serial port is connected
-Show log tail
-Rainbow animation
+// OSX: Connecting to raspberry pi fom OSX terminal session
+ssh pi@192.168.0.44
+
+// pi: clean
+killall -q -9 brightlight
+rm -f -r /home/pi/go
+rm -f /home/pi/brightlight.log
+mkdir -p /home/pi/go/src
+
+// OSX: copy latest source
+scp -r /Users/andrew/Dropbox/go/src pi@192.168.0.44:/home/pi/go
+
+// pi: build
+export GOPATH=/home/pi/go
+cd /home/pi/go/src/github.com/andew42/brightlight
+go install
+
+// pi: run
+export GOPATH=/home/pi/go
+/home/pi/go/bin/brightlight
