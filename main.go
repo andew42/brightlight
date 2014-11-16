@@ -191,7 +191,7 @@ func statsSocketHandler(ws *websocket.Conn) {
 		fb.Mutex.Lock()
 
 		// Report stats for last second every second (50 frames)
-		if Statistics.FrameCount >= 50 {
+		if Statistics.FrameCount == stats.ResetFrame {
 			// Render the stats as JSON (fails if the client has disappeared)
 			rc, err := json.MarshalIndent(Statistics, "", " ")
 			if err == nil {
@@ -199,10 +199,9 @@ func statsSocketHandler(ws *websocket.Conn) {
 			}
 			if err != nil {
 				fb.Mutex.Unlock()
-				log.Println(err)
+				log.Println("Stats socket handler %v", err)
 				return
 			}
-			Statistics.Reset()
 		}
 
 		// Wait for next frame buffer update

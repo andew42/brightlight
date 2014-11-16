@@ -1,12 +1,15 @@
-Brightlight is a lighting controller for pixel addressable LED strips.
+Brightlight is a lighting controller for pixel addressable LED strips,
+intended for domestic mood lighting.
 
-It has two parts, a low level controller responsible for generating the LED strip waveforms,
-written in Arduino C and using the Teensy 3.0 controller.
+It has two parts. A low level controller responsible for generating the LED strip waveforms,
+written in Arduino C using the Teensy 3.x controller.
 
 https://www.pjrc.com/teensy/td_libs_OctoWS2811.html
 
-A web site interface to control one or more Teensy boards via USB. This is written in GO for
-running on a raspberry pi or similar
+A web site interface to control one or more Teensy boards via USB. This is written in GO and
+runs on a raspberry pi or similar.
+
+Scripts
 
 // OSX: Connecting to raspberry pi fom OSX terminal session
 ssh pi@192.168.0.44

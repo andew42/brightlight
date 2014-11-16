@@ -2,6 +2,9 @@ package stats
 
 import "time"
 
+// Statistics reset after every 50 frames
+const ResetFrame = 50
+
 // Statistics on animation frame times and serial send times
 type Stats struct {
 	// Animation
@@ -50,6 +53,10 @@ func (stats *Stats) Reset() {
 // Adds a sample point for animation frame
 func (stats *Stats) AddAnimation(frameTime time.Duration, jitter time.Duration) {
 
+	// Reset statistics every 50 frames, socket listeners should have update after last frame
+	if stats.FrameCount == ResetFrame {
+		stats.Reset()
+	}
 	stats.FrameCount++
 
 	// Duration statistics
