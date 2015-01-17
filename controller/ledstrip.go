@@ -4,6 +4,7 @@ import "math/rand"
 
 // Maximum led strip length (must match teensy firmware)
 const MaxLedStripLen = 175
+const StripsPerTeensy = 8
 
 type LedStrip struct {
 	LeftToRight bool

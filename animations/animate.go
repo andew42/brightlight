@@ -53,22 +53,27 @@ func Animate(animationName string) error {
 
 // Start animate driver
 func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
+
 	if animationDriverChan != nil {
 		panic("StartAnimateDriver called twice")
 	}
-	// All 8 strips as a single long segment
+
 	// TODO: Make this a config file
+	// All frame buffer strips as a single long segment
 	allLeds = controller.NewPhySegment(fb.Strips)
+
+	// Two physical strips above curtains
 	x := make([]controller.LedStrip, 2)
 	x[0] = fb.Strips[3]
 	x[1] = fb.Strips[7]
 	curtainLeds = controller.NewPhySegment(x)
 
+	// Start the animator go routine
 	animationDriverChan = make(chan []animator)
 	go animateDriver(animationDriverChan, fb, statistics)
 }
 
-// The animation GO routine
+// The animation go routine
 func animateDriver(newAnimations chan []animator, fb *controller.FrameBuffer, statistics *stats.Stats) {
 	frameSync := time.Tick(frameRate)
 	currentAnimations := make([]animator, 0)

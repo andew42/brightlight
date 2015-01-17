@@ -13,11 +13,15 @@ var driverStarted bool
 
 // Run driver as a go routine
 func StartDriver(fb *FrameBuffer, statistics *stats.Stats) {
+
 	if driverStarted {
 		panic("Teensy Driver started twice")
 	}
 	driverStarted = true
-	go teensyDriver(fb, statistics)
+
+	// Start 2 drivers (16 channels)
+	go teensyDriver(0, fb, statistics)
+	go teensyDriver(1, fb, statistics)
 }
 
 func IsDriverConnected() bool {
@@ -27,10 +31,17 @@ func IsDriverConnected() bool {
 var usbConnected bool
 
 // Monitors changes to frame buffer and update Teensy via USB
-func teensyDriver(fb *FrameBuffer, statistics *stats.Stats) {
+func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
+
+	port := getPortName(driverIndex)
+	if port == "" {
+		log.Printf("unknown port name for driver index %v", driverIndex)
+		return
+	}
+
 	for {
 		usbConnected = false
-		f := openUsbPort()
+		f := openUsbPort(port)
 		usbConnected = true
 
 		// Push frame buffer changes to Teensy
@@ -42,7 +53,8 @@ func teensyDriver(fb *FrameBuffer, statistics *stats.Stats) {
 			// Send the frame buffer
 			var data []byte = make([]byte, 0)
 			data = append(data, 0xff, 0xff, 0xff, 0xff)
-			for s := 0; s < len(fb.Strips); s++ {
+			startStrip := driverIndex * 8
+			for s := startStrip; s < startStrip + 8 ; s++ {
 				for l := 0; l < MaxLedStripLen; l++ {
 					if l >= len(fb.Strips[s].Leds) {
 						// Pad frame buffer as strip is < MaxLedStripLen
@@ -76,18 +88,13 @@ func teensyDriver(fb *FrameBuffer, statistics *stats.Stats) {
 }
 
 // Retry port open until it succeeds
-func openUsbPort() *os.File {
+func openUsbPort(port string) *os.File {
+
 	errorLogged := false
 	for {
-		// Open the serial port (raspberry pi or OSX)
-		port := "/dev/ttyACM0"
-		if runtime.GOOS == "darwin" {
-// TODO		port = "/dev/cu.usbmodem103101"
-			port = "/dev/cu.usbmodem103721"
-		}
-
 		f, err := os.Create(port)
 		if err == nil {
+			log.Printf(port + " connected")
 			return f
 		}
 
@@ -99,4 +106,25 @@ func openUsbPort() *os.File {
 		// Try again in a second
 		time.Sleep(1000 * time.Millisecond)
 	}
+}
+
+// Determine port name based on index and OS
+func getPortName(index int) string {
+
+	if runtime.GOOS == "darwin" {
+		// OSX
+		switch index {
+		case 0: return "/dev/cu.usbmodem103721"
+		// Teensy 3.1  "/dev/cu.usbmodem103101"
+		}
+	} else {
+		// Raspberry pi
+		switch index {
+		case 0:
+			return "/dev/ttyACM0"
+		case 1:
+			return "/dev/ttyACM1"
+		}
+	}
+	return ""
 }
