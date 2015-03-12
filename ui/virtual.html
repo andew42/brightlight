@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="./css/common.css">
+    <title>Bright Light Virtual</title>
+</head>
+
+<body>
+<div class="status-bar"></div>
+<div id='container' style="font-size: large"></div>
+<script id='template' type='text/html'>
+    <table>
+        {{#leds}}
+        <tr>
+            {{#.}}
+            <td>
+                <div style="background-color:#{{.}};width:10px;height:10px"></div>
+            </td>
+            {{/}}
+        </tr>
+        {{/leds}}
+    </table>
+    <div class="back-button"><div class="button-content" id="btnGoBack" on-tap="btnGoBack"></div></div>
+</script>
+</body>
+
+<script src="./thirdparty/ractive.js"></script>
+<script src="./thirdparty/ractive-events-tap.js"></script>
+<script src="./js/common.js"></script>
+<script src="./js/virtual.js"></script>
+
+</html>

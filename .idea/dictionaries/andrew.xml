@@ -2,16 +2,33 @@
   <dictionary name="andrew">
     <words>
       <w>arduino</w>
+      <w>brightlight</w>
+      <w>colourpicker</w>
       <w>cylon</w>
       <w>dmamem</w>
+      <w>ffffff</w>
       <w>gopath</w>
       <w>hartland</w>
       <w>leds</w>
       <w>noninfringement</w>
       <w>octo</w>
+      <w>onclose</w>
+      <w>onerror</w>
+      <w>onload</w>
+      <w>onmessage</w>
+      <w>onopen</w>
       <w>onreadystatechange</w>
+      <w>ontouchstart</w>
       <w>pjrc</w>
+      <w>ractive</w>
+      <w>resetables</w>
       <w>stoffregen</w>
+      <w>teensy</w>
+      <w>thirdparty</w>
+      <w>touchmove</w>
+      <w>touchstart</w>
+      <w>usbmodem</w>
+      <w>webapp</w>
     </words>
   </dictionary>
 </component>

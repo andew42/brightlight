@@ -158,7 +158,7 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	testColour := controller.NewRgb(128, 128, 128)
 	backgroundColour := controller.NewRgb(0, 0, 0)
 	for s := 0; s < len(fb.Strips); s++ {
-		for l := 0; l < controller.MaxLedStripLen; l++ {
+		for l := 0; l < controller.MaxLedStripLen && l < len(fb.Strips[s].Leds) ; l++ {
 			if int64(s) == index && int64(l) < length {
 				fb.Strips[s].Leds[l] = testColour
 			} else {
@@ -219,7 +219,7 @@ func main() {
 
 	// Figure out where the content directory is GOPATH may contain : separated paths
 	goPath := strings.Split(os.Getenv("GOPATH"), ":")
-	contentPath := path.Join(goPath[0], "src/github.com/andew42/brightlight/content")
+	contentPath := path.Join(goPath[0], "src/github.com/andew42/brightlight/ui")
 
 	// Create an in memory cache of the content directory
 	err := cacheContentDirectory(contentPath, len(contentPath), contentCache)

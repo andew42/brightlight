@@ -114,8 +114,9 @@ func getPortName(index int) string {
 	if runtime.GOOS == "darwin" {
 		// OSX
 		switch index {
-		case 0: return "/dev/cu.usbmodem103721"
-		// Teensy 3.1  "/dev/cu.usbmodem103101"
+		case 0: return "/dev/cu.usbmodem288181"
+		// Teensy 3.0 "/dev/cu.usbmodem103721"
+		// Teensy 3.1 "/dev/cu.usbmodem103101"
 		}
 	} else {
 		// Raspberry pi
