@@ -6,16 +6,54 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
     <link rel="stylesheet" type="text/css" href="./css/common.css">
+    <link rel="stylesheet" type="text/css" href="./css/colourpicker.css">
     <title>Bright Light Colour</title>
 </head>
 <body>
-<div class="colour-picker-sample"></div>
-<div style="width: 100px;height: 350px" class="colour-picker-hue"></div>
-<div class="colour-picker-saturation"><input></div>
-<div class="colour-picker-Brightness"></div>
+<!-- full-page-container is required to 'extend' body for scroll disable -->
+<div class="full-page-container" style="background-color: #000000">
+    <div id='container'></div>
+    <script id='template' type='text/html'>
+        <div class="status-bar"></div>
+
+        <div class="cp-sample" style="background: {{colour}}"></div>
+        <!--<div class="cp-sample-anno">{{asHsv}} {{asRgb}}</div>-->
+
+        <div class="cp-sliders">
+            <div class="cp-slider">
+                <div class="cp-slider-track cp-slider-track-hue">
+                    <div class="cp-slider-thumb-container" style="top:{{(360 - hue) / 3.6}}%">
+                        <div class="cp-slider-thumb"></div>
+                        <div class="cp-slider-thumb-anno">{{hue.toFixed(0)}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cp-slider">
+                <div class="cp-slider-track cp-slider-track-saturation" style="background-color: {{hueColour}}">
+                    <div class="cp-slider-thumb-container" style="top:{{100 - saturation}}%">
+                        <div class="cp-slider-thumb"></div>
+                        <div class="cp-slider-thumb-anno">{{saturation.toFixed(0)}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cp-slider-thin">
+                <div class="cp-slider-track cp-slider-track-value"
+                     style="background-color: {{hueColour}}">
+                    <div class="cp-slider-thumb-container" style="top:{{100 - value}}%">
+                        <div class="cp-slider-thumb"></div>
+                        <div class="cp-slider-thumb-anno">{{value.toFixed(0)}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+</div>
 </body>
 <script src="./thirdparty/ractive.js"></script>
 <script src="./thirdparty/ractive-events-tap.js"></script>
+<script src="./thirdparty/tinycolor.js"></script>
 <script src="./js/common.js"></script>
 <script src="./js/colourpicker.js"></script>
 </html>

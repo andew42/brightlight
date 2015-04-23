@@ -1,0 +1,31 @@
+.stats-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.stats-table-row-frame {
+    background-color: papayawhip;
+}
+
+.stats-table-row-jitter {
+    background-color: mistyrose;
+}
+
+.stats-table-row-serial {
+    background-color: lightcyan;
+}
+
+.stats-table-annotation-text {
+    color: gray;
+}
+
+.stats-table-value-text {
+    text-align: right;
+    width: 30%;
+}
+
+.stats-light-controller-error {
+    text-align: center;
+    color: darkorange;
+    width: 100%;
+}

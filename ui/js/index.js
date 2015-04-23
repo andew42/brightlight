@@ -1,7 +1,6 @@
 // Ractive data binding object
 var dto = {
-    buttons : undefined,
-    editMode : false
+    buttons : undefined
 };
 
 // Page initialisation
@@ -10,32 +9,20 @@ var init = function() {
     dto.buttons = {
         leftColumn : [
             {name:"OFF", action:"allLights", params:"000000"},
-            {name:"6f16d4", action:"allLights", params:"6f16d4"},
-            {name:"c8721f", action:"allLights", params:"c8721f"},
-            {name:"d71e1e", action:"allLights", params:"d71e1e"}
+            {name:"Buttons RO", action:"action-navigate", params:"./buttons.html"},
+            {name:"Virtual", action:"action-navigate", params:"./virtual.html"}
         ],
         midColumn : [
-            {name:"Full", action:"allLights", params:"ffffff"},
             {name:"High", action:"allLights", params:"e0e0e0"},
-            {name:"Mid", action:"allLights", params:"808080"},
-            {name:"Low", action:"allLights", params:"3f3f3f"},
-            {name:"Very Low", action:"allLights", params:"101010"},
-            {name:"Nearly Off", action:"allLights", params:"020202"}
+            {name:"Buttons RW", action:"action-navigate", params:"./buttons.html?rw=true"},
+            {name:"Config", action:"action-navigate", params:"./config.html"}
         ],
         rightColumn : [
-            {name:"Sweet Shop", action:"sweetshop", params:""},
-            {name:"Runner", action:"runner", params:""},
+            {name:"Purple", action:"allLights", params:"6f16d4"},
             {name:"Rainbow", action:"rainbow", params:""},
-            {name:"Cylon", action:"cylon", params:""}
+            {name:"Stats", action:"action-navigate", params:"./stats.html"}
         ]
     };
-
-    // Read write mode gets OK and Edit buttons
-    var isReadWrite = location.search.split('rw=')[1];
-    if (isReadWrite) {
-        dto.buttons.leftColumn.push({name:"EDIT", action:"action-edit", params:0, editMode:false});
-        dto.buttons.rightColumn.push({name:"OK", action:"action-back", params:0, editMode:false});
-    }
 
     var ractive = new Ractive({
         // The `el` option can be a node, an ID, or a CSS selector.
@@ -53,27 +40,13 @@ var init = function() {
     ractive.on( 'buttonHandler', function ( event ) {
         var action = event.node.attributes["button-action"].value;
         var params = event.node.attributes["button-params"].value;
-        if (action == "action-edit") {
-            dto.editMode = !dto.editMode;
-            ractive.set(dto);
+        if (action == "action-navigate") {
+            window.location.href = params;
         }
-        else if (action == "action-back") {
-            window.location.href = "./index.html";
-        }
-        else if (action == "allLights") {
-            if (dto.editMode) {
-                // TODO
-                window.location.href = "./colourpicker.html";
-            }
-            else
-                lights.allLights(params);
-        }
-        else {
-            if (dto.editMode) {
-                // TODO
-            }
-            else
-                lights.animation(action);
+        if (action == "allLights") {
+            lights.allLights(params);
+        } else {
+            lights.animation(action);
         }
     });
 

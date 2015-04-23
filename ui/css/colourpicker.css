@@ -1,0 +1,91 @@
+.cp-sample {
+    height: 106px;
+    margin: 20px;
+}
+
+.cp-sample-anno {
+    margin: 2px;
+    color: #808080;
+    font-size: xx-small;
+}
+
+.cp-sliders {
+    position: fixed;
+    top: 150px;
+    bottom: 50px;
+}
+
+.cp-slider {
+    float: left;
+    width: 80px;
+    height: 100%;
+    margin: 20px;
+}
+
+.cp-slider-thin {
+    float: left;
+    width: 30px;
+    height: 100%;
+    margin: 20px;
+}
+
+.cp-slider-track {
+    height: 100%;
+}
+
+.cp-slider-thumb-container {
+    position: relative;
+    left: 100%;
+}
+
+.cp-slider-thumb {
+    position: absolute;
+    margin-top: -7.5px;
+    margin-left: 3px;
+    border-style: solid;
+    border-width: 7.5px 13.0px 7.5px 0;
+    border-color: transparent #808080 transparent transparent;
+}
+
+.cp-slider-thumb-anno {
+    position: absolute;
+    margin-top: 7px;
+    margin-left: 3px;
+    font-size: xx-small;
+    color: grey;
+}
+
+/* 0 - 360 in 60 degree stops http://en.wikipedia.org/wiki/HSL_and_HSV */
+.cp-slider-track-hue {
+    background-image: linear-gradient(
+            to top,
+            #ff0000,
+            #ffff00,
+            #00ff00,
+            #00ffff,
+            #0000ff,
+            #ff00ff,
+            #ff0000
+    );
+}
+
+.cp-slider-track-saturation {
+    background-image: linear-gradient(to top, #fff, rgba(204, 154, 129, 0));
+}
+
+.cp-slider-track-value {
+    background-image: linear-gradient(to top, #000, rgba(204, 154, 129, 0));
+}
+
+@media only screen
+and (min-device-width : 375px)
+and (max-device-width : 667px)
+and (orientation : portrait) {
+    /* Make fat sliders a bit fatter on iPhone6 */
+    .cp-slider {
+        float: left;
+        width: 105px;
+        height: 100%;
+        margin: 20px;
+    }
+}

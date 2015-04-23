@@ -1,6 +1,7 @@
 <component name="ProjectDictionaryState">
   <dictionary name="andrew">
     <words>
+      <w>anno</w>
       <w>arduino</w>
       <w>brightlight</w>
       <w>colourpicker</w>
@@ -10,6 +11,9 @@
       <w>gopath</w>
       <w>hartland</w>
       <w>leds</w>
+      <w>mousedown</w>
+      <w>mousemove</w>
+      <w>mouseup</w>
       <w>noninfringement</w>
       <w>octo</w>
       <w>onclose</w>
@@ -25,6 +29,7 @@
       <w>stoffregen</w>
       <w>teensy</w>
       <w>thirdparty</w>
+      <w>tinycolor</w>
       <w>touchmove</w>
       <w>touchstart</w>
       <w>usbmodem</w>
