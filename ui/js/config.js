@@ -1,47 +1,66 @@
-// Ractive binding object
-var dto = {
-    stripIndex: 0,
-    stripLength: 100
-};
+/* global require */
+// Paths are relative to config.html
+require([
+        "./require/domReady!",
+        "../js/ractive/ractive.js",
+        "../js/ractive/ractive-events-tap.js",
+        "../js/lib/controls.js",
+        "../js/lib/scroll"],
+    function(doc,R,tap,controls,scroll) {
+        'use strict';
 
-function init() {
+        // Ractive binding object
+        var dto = {
+            stripIndex: 0,
+            stripLength: 100
+        };
 
-    var updateConfig = function() {
-        var req = new XMLHttpRequest();
-        req.open('PUT', '/Config/' + dto.stripIndex + ',' + dto.stripLength, true);
-        req.send();
-    };
+        function init() {
 
-    var ractive = new Ractive({
-        // The `el` option can be a node, an ID, or a CSS selector.
-        el: 'container',
+            var updateConfig = function () {
+                var req = new XMLHttpRequest();
+                req.open('PUT', '/Config/' + dto.stripIndex + ',' + dto.stripLength, true);
+                req.send();
+            };
 
-        // We could pass in a string, but for the sake of convenience
-        // we're passing the ID of the <script> tag above.
-        template: '#template',
+            var ractive = new R({
+                // Attach tap handler extension
+                events: {tap: tap },
 
-        // Here, we're passing in some initial data
-        data: dto
+                // The `el` option can be a node, an ID, or a CSS selector.
+                el: 'container',
+
+                // We could pass in a string, but for the sake of convenience
+                // we're passing the ID of the <script> tag above.
+                template: '#template',
+
+                // Here, we're passing in some initial data
+                data: dto
+            });
+
+            // Track user changes and update lights
+            ractive.observe('stripIndex', updateConfig);
+            ractive.observe('stripLength', updateConfig);
+
+            // Wire up touch sliders to adjust index and length
+            controls.touchSlider(document.getElementById("si"),
+                function (v) {
+                    dto.stripIndex = v;
+                    ractive.set(dto);
+                },
+                dto.stripIndex, 0, 15);
+            controls.touchSlider(document.getElementById("sl"),
+                function (v) {
+                    dto.stripLength = v;
+                    ractive.set(dto);
+                },
+                dto.stripLength, 0, 1000);
+
+            // Wire up the OK button
+            controls.setOnTapNavigationMapping(ractive, 'btnGoBack', 'OK', './index.html');
+
+            // Disable scrolling on everything
+            scroll.disable(document.body);
+        }
+        init();
     });
-
-    // Track user changes and update lights
-    ractive.observe('stripIndex', updateConfig);
-    ractive.observe('stripLength', updateConfig);
-
-    // Wire up touch sliders to adjust index and length
-    buttons.touchSlider(document.getElementById("si"),
-        function(v) {dto.stripIndex = v; ractive.set(dto);},
-        dto.stripIndex, 0, 15);
-    buttons.touchSlider(document.getElementById("sl"),
-        function(v) {dto.stripLength = v; ractive.set(dto);},
-        dto.stripLength, 0, 1000);
-
-    // Wire up the OK button
-    buttons.setOnTapNavigationMapping(ractive, 'btnGoBack', 'OK', './index.html');
-
-    // Disable scrolling on everything
-    //scroll.disable(document.body);
-}
-
-// Wait to page load to initialise
-window.onload = init();

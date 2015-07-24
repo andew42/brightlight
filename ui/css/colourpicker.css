@@ -12,12 +12,12 @@
 .cp-sliders {
     position: fixed;
     top: 150px;
-    bottom: 50px;
+    bottom: 80px;
 }
 
 .cp-slider {
     float: left;
-    width: 80px;
+    width: 82px;
     height: 100%;
     margin: 20px;
 }
@@ -40,10 +40,10 @@
 
 .cp-slider-thumb {
     position: absolute;
-    margin-top: -7.5px;
+    margin-top: -7px;
     margin-left: 3px;
     border-style: solid;
-    border-width: 7.5px 13.0px 7.5px 0;
+    border-width: 7px 13px 7px 0;
     border-color: transparent #808080 transparent transparent;
 }
 
@@ -53,6 +53,29 @@
     margin-left: 3px;
     font-size: xx-small;
     color: grey;
+}
+
+.cp-ok-cancel {
+    position: fixed;
+    height: 42px;
+    width: 100%;
+    bottom: 0;
+    background-color: #f6f6f6;
+    font-family: HelveticaNeue, sans-serif;
+}
+
+.cp-ok-button {
+    color: #0072fa;
+    float: right;
+    padding-top: 10px;
+    padding-right: 14px;
+}
+
+.cp-cancel-button {
+    color: #0072fa;
+    float: left;
+    padding-top: 10px;
+    padding-left: 14px;
 }
 
 /* 0 - 360 in 60 degree stops http://en.wikipedia.org/wiki/HSL_and_HSV */

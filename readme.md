@@ -42,3 +42,11 @@ export GOPATH=/home/pi/go
 External Libraries breaks in project when new go version is installed:
 Create a new project
 Copy misc.xml from hidden .idea directory to same directory in brightlight project
+
+##To Do
+Button edits should persist
+Support editing button names
+Support editing animations
+Doesn't support landscape well (as home screen app)
+Doesn't support on call bar well (as home screen app)
+Colour picker doesn't display colour and doesn't adjust the room lights
