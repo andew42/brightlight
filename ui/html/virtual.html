@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="../css/common.css">
+    <link rel="shortcut icon" href="../img/favicon.png">
+    <title>Bright Light Virtual</title>
+</head>
+
+<body>
+<div class="status-bar"></div>
+<div id='container' style="font-size: xx-small"></div>
+<script id='template' type='text/html'>
+    <div class="white-background"></div>
+    <table>
+        {{#leds:i}}
+        <tr>
+            <td>
+                <div>{{i}}</div>
+            </td>
+            {{#.}}
+            <td>
+                <div style="background-color:#{{.}};width:10px;height:10px"></div>
+            </td>
+            {{/}}
+            {{^.}}
+            <td colspan="10">
+                <div>Disabled</div>
+            </td>
+            {{/}}
+        </tr>
+        {{/leds}}
+    </table>
+    <div class="back-button"><div class="button-content" id="btnGoBack" on-tap="btnGoBack"></div></div>
+</script>
+</body>
+
+<script data-main="../js/virtual.js" src="../js/require/require.js"></script>
+
+</html>

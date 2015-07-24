@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="../css/common.css">
+    <link rel="stylesheet" type="text/css" href="../css/colourpicker.css">
+    <link rel="shortcut icon" href="../img/favicon.png">
+    <title>Bright Light Colour</title>
+</head>
+
+<body>
+<!-- full-page-container is required to 'extend' body for scroll disable -->
+<div class="full-page-container" style="background-color: #000000">
+    <div id='container'></div>
+    <script id='template' type='text/html'>
+        <div class="status-bar"></div>
+
+        <!--<div class="cp-sample-anno">{{asHsv}} {{asRgb}}</div>-->
+
+        <div class="cp-sample" style="background:#{{colour}}"></div>
+
+        <div class="cp-sliders">
+            <div class="cp-slider">
+                <div class="cp-slider-track cp-slider-track-hue">
+                    <div class="cp-slider-thumb-container" style="top:{{(360 - hue) / 3.6}}%">
+                        <div class="cp-slider-thumb"></div>
+                        <div class="cp-slider-thumb-anno">{{hue.toFixed(0)}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cp-slider">
+                <div class="cp-slider-track cp-slider-track-saturation" style="background-color:{{hueColour}}">
+                    <div class="cp-slider-thumb-container" style="top:{{100 - saturation}}%">
+                        <div class="cp-slider-thumb"></div>
+                        <div class="cp-slider-thumb-anno">{{saturation.toFixed(0)}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cp-slider-thin">
+                <div class="cp-slider-track cp-slider-track-value"
+                     style="background-color:{{hueColour}}">
+                    <div class="cp-slider-thumb-container" style="top:{{100 - value}}%">
+                        <div class="cp-slider-thumb"></div>
+                        <div class="cp-slider-thumb-anno">{{value.toFixed(0)}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cp-ok-cancel">
+            <div class="cp-cancel-button" on-tap="cancelButtonHandler">Cancel</div>
+            <div class="cp-ok-button" on-tap="okButtonHandler">Done</div>
+        </div>
+    </script>
+</div>
+</body>
+
+<script data-main="../js/colourpicker.js" src="../js/require/require.js"></script>
+
+</html>
