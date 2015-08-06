@@ -76,9 +76,9 @@ func animationHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(d)
 }
 
-// Handle HTTP requests to update configuration
-func configHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("configHandler Called")
+// Handle HTTP requests to show strip lengths of room lights
+func stripLengthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("stripLengthHandler Called")
 
 	// Strip index, length follows request path
 	extIndex := strings.LastIndex(r.URL.Path, `/`)
@@ -100,21 +100,8 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Turn off animations TODO
-
-	// Light up strip for length
-	testColour := controller.NewRgb(128, 128, 128)
-	backgroundColour := controller.NewRgb(0, 0, 0)
-	for s := 0; s < len(fb.Strips); s++ {
-		for l := 0; l < controller.MaxLedStripLen && l < len(fb.Strips[s].Leds) ; l++ {
-			if int64(s) == index && int64(l) < length {
-				fb.Strips[s].Leds[l] = testColour
-			} else {
-				fb.Strips[s].Leds[l] = backgroundColour
-			}
-		}
-	}
-	fb.Flush()
+	// TODO: Turn off animations idiomatic casting one of dual return
+	animations.AnimateStripLength(uint(index), uint(length))
 }
 
 // Handle frame buffer web socket requests (web socket is closed when we return)
@@ -173,16 +160,22 @@ func main() {
 	// Set up web routes (first static content)
 	fs := http.FileServer(http.Dir(contentPath))
 	http.Handle("/", fs)
+
 	// Requests to turn on all lights
 	http.HandleFunc("/AllLights/", allLightsHandler)
+
 	// Requests to run an animation
 	http.HandleFunc("/Animation/", animationHandler)
-	// Requests to show a configuration on the room lights
-	http.HandleFunc("/Config/", configHandler)
+
+	// Requests to show a strip length on the room lights
+	http.HandleFunc("/StripLength/", stripLengthHandler)
+
 	// Push frame buffer changes over a web socket
 	http.Handle("/FrameBuffer", websocket.Handler(frameBufferSocketHandler))
+
 	// Push stats info over a web socket
 	http.Handle("/Stats", websocket.Handler(statsSocketHandler))
+
 	// Start web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Println("ListenAndServe: " + err.Error())

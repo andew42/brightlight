@@ -19,7 +19,7 @@ require([
 
             var updateConfig = function () {
                 var req = new XMLHttpRequest();
-                req.open('PUT', '/Config/' + dto.stripIndex + ',' + dto.stripLength, true);
+                req.open('PUT', '/StripLength/' + dto.stripIndex + ',' + dto.stripLength, true);
                 req.send();
             };
 

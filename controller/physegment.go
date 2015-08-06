@@ -7,9 +7,7 @@ type PhySegment struct {
 
 // Constructor
 func NewPhySegment(strips []LedStrip) PhySegment {
-	var x PhySegment
-	x.Strips = strips
-	return x
+	return PhySegment{Strips: strips}
 }
 
 // Number of LEDs in the segment

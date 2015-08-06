@@ -11,22 +11,51 @@ import (
 const frameRate time.Duration = 20 * time.Millisecond
 
 var (
+	// All physical strips in a single segment
 	allLeds                 controller.Segment
-	curtainLeds				controller.Segment
+
+	// One segment for each physical strip (i.e. 8 per Teensy)
+	physicalStrips            []controller.Segment
+
+	// A segment representing the strips above the curtain
+	curtainLeds                controller.Segment
+
+	// Communicate next animation to driver
 	animationDriverChan     chan []animator
+
+	// Unknown animation error
 	ErrInvalidAnimationName = errors.New("invalid animation name")
 )
 
 // High level request to play a static colour animation
 func AnimateStaticColour(colour controller.Rgb) {
-	animations := make([]animator, 0)
-	animations = append(animations, newStaticColour(allLeds, colour))
+	animationDriverChan <- []animator{newStaticColour(allLeds, colour)}
+}
+
+// High level request to light the first stripLength LEDs of a physical strip
+func AnimateStripLength(stripIndex uint, stripLength uint) {
+
+	animations := make([]animator, 1, 2)
+
+	// Turn off all leds
+	animations[0] = newStaticColour(allLeds, controller.NewRgb(0, 0, 0))
+
+	// Check request fits physical strip
+	if stripIndex < uint(len(physicalStrips)) && stripLength <= physicalStrips[stripIndex].Len() {
+		// Turn on test strip, if a strip is revers direction then this may not
+		// show up on the virtual display which shows only the FIRST 20 LEDs
+		animations = append(animations, newStaticColour(
+				controller.NewSubSegment(physicalStrips[stripIndex], 0, stripLength),
+				controller.NewRgb(128, 128, 128)))
+	}
+
 	animationDriverChan <- animations
 }
 
 // High level request to play an animation from web UI
 func Animate(animationName string) error {
-	animations := make([]animator, 0)
+
+	animations := make([]animator, 0, 1)
 	switch {
 	case animationName == "runner":
 		animations = append(animations, newRunner(allLeds, controller.NewRgb(0, 0, 255)))
@@ -37,10 +66,10 @@ func Animate(animationName string) error {
 		animations = append(animations, newCylon(NewLogSegment(allLeds, controller.MaxLedStripLen, 20)))
 
 	case animationName == "rainbow":
-		animations = append(animations, newRainbow(curtainLeds, time.Second * 5))
+		animations = append(animations, newRainbow(curtainLeds, time.Second*5))
 
 	case animationName == "sweetshop":
-		animations = append(animations, newSweetshop(allLeds, time.Second * 1))
+		animations = append(animations, newSweetshop(allLeds, time.Second*1))
 
 	default:
 		return ErrInvalidAnimationName
@@ -61,6 +90,12 @@ func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
 	// TODO: Make this a config file
 	// All frame buffer strips as a single long segment
 	allLeds = controller.NewPhySegment(fb.Strips)
+
+	// Each frame buffer strip as its own segment
+	physicalStrips = make([]controller.Segment, len(fb.Strips))
+	for i, _ := range fb.Strips {
+		physicalStrips[i] = controller.NewPhySegment(fb.Strips[i:i+1])
+	}
 
 	// Two physical strips above curtains
 	x := make([]controller.LedStrip, 2)
@@ -85,9 +120,9 @@ func animateDriver(newAnimations chan []animator, fb *controller.FrameBuffer, st
 			started := time.Now()
 			jitter := started.Sub(nextFrameTime)
 			nextFrameTime = started.Add(frameRate)
-			for _, value := range currentAnimations {
-				value.animateNextFrame()
-			}
+		for _, value := range currentAnimations {
+			value.animateNextFrame()
+		}
 			fb.Flush()
 			statistics.AddAnimation(time.Since(started), jitter)
 

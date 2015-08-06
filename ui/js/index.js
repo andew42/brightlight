@@ -26,7 +26,7 @@ require([
                 midColumn : [
                     {name:"High", action:"allLights", params:"e0e0e0"},
                     {name:"Buttons RW", action:"action-navigate", params:"./buttons.html?rw=true"},
-                    {name:"Config", action:"action-navigate", params:"./config.html"}
+                    {name:"Strip Length", action:"action-navigate", params:"./striplength.html"}
                 ],
                 rightColumn : [
                     {name:"Purple", action:"allLights", params:"6f16d4"},
@@ -81,3 +81,4 @@ require([
         // Initialise the page (domReady! ensures the dom is ready at this point)
         init();
     });
+
