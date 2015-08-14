@@ -2,11 +2,11 @@ package controller
 
 import (
 	"io"
-	"log"
 	"os"
 	"runtime"
 	"time"
 	"github.com/andew42/brightlight/stats"
+	log "github.com/Sirupsen/logrus"
 )
 
 var driverStarted bool
@@ -15,7 +15,7 @@ var driverStarted bool
 func StartDriver(fb *FrameBuffer, statistics *stats.Stats) {
 
 	if driverStarted {
-		panic("Teensy Driver started twice")
+		log.Panic("Teensy driver started twice")
 	}
 	driverStarted = true
 
@@ -25,6 +25,7 @@ func StartDriver(fb *FrameBuffer, statistics *stats.Stats) {
 }
 
 func IsDriverConnected() bool {
+
 	return usbConnected
 }
 
@@ -35,7 +36,7 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 
 	port := getPortName(driverIndex)
 	if port == "" {
-		log.Printf("unknown port name for driver index %v", driverIndex)
+		log.WithField("driverIndex", driverIndex).Warn("teensyDriver unknown port name")
 		return
 	}
 
@@ -54,7 +55,7 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 			var data []byte = make([]byte, 0)
 			data = append(data, 0xff, 0xff, 0xff, 0xff)
 			startStrip := driverIndex * 8
-			for s := startStrip; s < startStrip + 8 ; s++ {
+			for s := startStrip; s < startStrip+8 ; s++ {
 				for l := 0; l < MaxLedStripLen; l++ {
 					if l >= len(fb.Strips[s].Leds) {
 						// Pad frame buffer as strip is < MaxLedStripLen
@@ -72,7 +73,7 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 			}
 			if err != nil {
 				fb.Mutex.Unlock()
-				log.Printf(err.Error())
+				log.WithField("err", err).Warn("teensyDriver")
 				f.Close()
 
 				// Try and reconnect
@@ -94,12 +95,12 @@ func openUsbPort(port string) *os.File {
 	for {
 		f, err := os.Create(port)
 		if err == nil {
-			log.Printf(port + " connected")
+			log.WithField("port", port).Info("openUsbPort connected")
 			return f
 		}
 
 		if !errorLogged {
-			log.Printf(err.Error())
+			log.WithField("err", err).Warn("openUsbPort")
 			errorLogged = true
 		}
 
@@ -115,8 +116,8 @@ func getPortName(index int) string {
 		// OSX
 		switch index {
 		case 0: return "/dev/cu.usbmodem288181"
-		// Teensy 3.0 "/dev/cu.usbmodem103721"
-		// Teensy 3.1 "/dev/cu.usbmodem103101"
+			// Teensy 3.0 "/dev/cu.usbmodem103721"
+			// Teensy 3.1 "/dev/cu.usbmodem103101"
 		}
 	} else {
 		// Raspberry pi

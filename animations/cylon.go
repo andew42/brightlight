@@ -3,18 +3,19 @@ package animations
 import "github.com/andew42/brightlight/controller"
 
 type cylon struct {
+
 	seg controller.Segment
 	pos uint
 	dir bool
 }
 
 func newCylon(seg controller.Segment) *cylon {
-	var c cylon
-	c.seg = seg
-	return &c
+
+	return &cylon{seg, 0, false}
 }
 
 func (c *cylon) animateNextFrame() {
+
 	c.seg.Set(c.pos, controller.NewRgb(0, 0, 0))
 
 	if c.dir {

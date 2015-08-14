@@ -5,6 +5,7 @@ import (
 	"time"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/stats"
+	log "github.com/Sirupsen/logrus"
 )
 
 // Frame rate as duration 20ms -> 50Hz
@@ -12,44 +13,50 @@ const frameRate time.Duration = 20 * time.Millisecond
 
 var (
 	// All physical strips in a single segment
-	allLeds                 controller.Segment
+	allLeds controller.Segment
 
 	// One segment for each physical strip (i.e. 8 per Teensy)
-	physicalStrips            []controller.Segment
+	physicalStrips []controller.Segment
 
 	// A segment representing the strips above the curtain
-	curtainLeds                controller.Segment
+	curtainLeds controller.Segment
 
 	// Communicate next animation to driver
-	animationDriverChan     chan []animator
+	animationDriverChan chan []animator
 
-	// Unknown animation error
-	ErrInvalidAnimationName = errors.New("invalid animation name")
+	// Bad parameters
+	ErrInvalidParameter = errors.New("invalid parameters")
 )
 
 // High level request to play a static colour animation
 func AnimateStaticColour(colour controller.Rgb) {
+
 	animationDriverChan <- []animator{newStaticColour(allLeds, colour)}
 }
 
 // High level request to light the first stripLength LEDs of a physical strip
-func AnimateStripLength(stripIndex uint, stripLength uint) {
-
-	animations := make([]animator, 1, 2)
-
-	// Turn off all leds
-	animations[0] = newStaticColour(allLeds, controller.NewRgb(0, 0, 0))
+func AnimateStripLength(stripIndex uint, stripLength uint) error {
 
 	// Check request fits physical strip
 	if stripIndex < uint(len(physicalStrips)) && stripLength <= physicalStrips[stripIndex].Len() {
-		// Turn on test strip, if a strip is revers direction then this may not
-		// show up on the virtual display which shows only the FIRST 20 LEDs
-		animations = append(animations, newStaticColour(
-				controller.NewSubSegment(physicalStrips[stripIndex], 0, stripLength),
-				controller.NewRgb(128, 128, 128)))
-	}
+		// Turn off all leds
+		animations := make([]animator, 2)
+		animations[0] = newStaticColour(allLeds, controller.NewRgb(0, 0, 0))
 
-	animationDriverChan <- animations
+		// Turn on test strip, if a strip is reverse direction then this may not
+		// show up on the virtual display which shows only the FIRST 20 LEDs
+		animations[1] = newStaticColour(
+			controller.NewSubSegment(physicalStrips[stripIndex], 0, stripLength),
+			controller.NewRgb(128, 128, 128))
+		animationDriverChan <- animations
+		return nil
+	} else {
+		// Turn all leds red (for error)
+		animations := make([]animator, 1)
+		animations[0] = newStaticColour(allLeds, controller.NewRgb(128, 0, 0))
+		animationDriverChan <- animations
+		return ErrInvalidParameter
+	}
 }
 
 // High level request to play an animation from web UI
@@ -72,7 +79,7 @@ func Animate(animationName string) error {
 		animations = append(animations, newSweetshop(allLeds, time.Second*1))
 
 	default:
-		return ErrInvalidAnimationName
+		return ErrInvalidParameter
 	}
 
 	// Send the (possibly) new animation to driver
@@ -84,7 +91,7 @@ func Animate(animationName string) error {
 func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
 
 	if animationDriverChan != nil {
-		panic("StartAnimateDriver called twice")
+		log.Panic("StartAnimateDriver called twice")
 	}
 
 	// TODO: Make this a config file
@@ -110,6 +117,7 @@ func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
 
 // The animation go routine
 func animateDriver(newAnimations chan []animator, fb *controller.FrameBuffer, statistics *stats.Stats) {
+
 	frameSync := time.Tick(frameRate)
 	currentAnimations := make([]animator, 0)
 	nextFrameTime := time.Now().Add(frameRate)

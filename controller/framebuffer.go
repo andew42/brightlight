@@ -3,11 +3,13 @@ package controller
 import (
 	"sync"
 	"strconv"
+	log "github.com/Sirupsen/logrus"
 )
 
 // Frame buffer is a slice of strips A Mutex
 // and Cond are used to broadcast changes
 type FrameBuffer struct {
+
 	sync.Mutex
 	*sync.Cond
 	Strips []LedStrip
@@ -15,6 +17,7 @@ type FrameBuffer struct {
 
 // Create a frame buffer
 func NewFrameBuffer() *FrameBuffer {
+
 	var fb FrameBuffer
 	fb.Cond = sync.NewCond(&fb.Mutex)
 
@@ -54,14 +57,15 @@ func NewFrameBuffer() *FrameBuffer {
 
 	// Sanity check
 	numberOfStrips := len(fb.Strips)
-	if numberOfStrips <= 0 || numberOfStrips % StripsPerTeensy != 0 {
-		panic("Number of framebuffer strips must be a multiple of " + strconv.Itoa(StripsPerTeensy))
+	if numberOfStrips <= 0 || numberOfStrips%StripsPerTeensy != 0 {
+		log.WithField("StripsPerTeensy", strconv.Itoa(StripsPerTeensy)).Panic("framebuffer strips must be multiple of")
 	}
 	return &fb
 }
 
 // Signal the frame buffer has changed to any listeners
 func (fb *FrameBuffer) Flush() {
+
 	fb.Mutex.Lock()
 	fb.Cond.Broadcast()
 	fb.Mutex.Unlock()

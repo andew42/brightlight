@@ -7,11 +7,13 @@ const MaxLedStripLen = 175
 const StripsPerTeensy = 8
 
 type LedStrip struct {
+
 	LeftToRight bool
 	Leds        []Rgb
 }
 
 func NewLedStrip(leftToRight bool, len int) *LedStrip {
+
 	var s LedStrip
 	s.LeftToRight = leftToRight
 	s.Leds = make([]Rgb, len, MaxLedStripLen)

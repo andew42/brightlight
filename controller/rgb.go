@@ -4,6 +4,7 @@ import "strconv"
 
 // Single LED colour
 type Rgb struct {
+
 	Red   byte
 	Green byte
 	Blue  byte
@@ -11,23 +12,18 @@ type Rgb struct {
 
 // Rgb constructors
 func NewRgb(r byte, g byte, b byte) Rgb {
-	var x Rgb
-	x.Red = r
-	x.Green = g
-	x.Blue = b
-	return x
+
+	return Rgb{r, g, b}
 }
 
 func NewRgbFromInt(colour int) Rgb {
-	var x Rgb
-	x.Red = byte(colour >> 16)
-	x.Green = byte(colour >> 8)
-	x.Blue = byte(colour)
-	return x
+
+	return Rgb{byte(colour >> 16), byte(colour >> 8), byte(colour)}
 }
 
 // Convert led RGB (3 bytes) to JSON colour (int)
 func (led Rgb) MarshalJSON() ([]byte, error) {
+
 	rc := make([]byte, 0, 16)
 	rc = strconv.AppendInt(rc, int64(led.Red)<<16+int64(led.Green)<<8+int64(led.Blue), 10)
 	return rc, nil
@@ -43,8 +39,9 @@ func (led Rgb) MarshalJSON() ([]byte, error) {
 //   lightness:  0 to 100 - how light the color is, 100=white, 50=color, 0=black
 //
 func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
+
 	if hue > 359 {
-		hue = hue % 360
+		hue = hue%360
 	}
 	if saturation > 100 {
 		saturation = 100
@@ -62,18 +59,18 @@ func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 	} else {
 		var v2 uint
 		if lightness < 50 {
-			v2 = lightness * (100 + saturation)
+			v2 = lightness*(100+saturation)
 		} else {
-			v2 = ((lightness + saturation) * 100) - (saturation * lightness)
+			v2 = ((lightness+saturation)*100)-(saturation*lightness)
 		}
-		v1 := lightness*200 - v2
+		v1 := lightness * 200 - v2
 
 		// Red
 		var h uint
 		if hue < 240 {
-			h = hue + 120
+			h = hue+120
 		} else {
-			h = hue - 240
+			h = hue-240
 		}
 		x.Red = byte(h2rgb(v1, v2, h) * 255 / 600000)
 
@@ -82,9 +79,9 @@ func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 
 		// Blue
 		if hue >= 120 {
-			h = hue - 120
+			h = hue-120
 		} else {
-			h = hue + 240
+			h = hue+240
 		}
 		x.Blue = byte(h2rgb(v1, v2, h) * 255 / 600000)
 	}
@@ -92,14 +89,15 @@ func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 }
 
 func h2rgb(v1 uint, v2 uint, hue uint) uint {
+
 	if hue < 60 {
-		return v1*60 + (v2-v1)*hue
+		return v1 * 60 + (v2 - v1) * hue
 	}
 	if hue < 180 {
 		return v2 * 60
 	}
 	if hue < 240 {
-		return v1*60 + (v2-v1)*(240-hue)
+		return v1 * 60 + (v2 - v1) * (240 - hue)
 	}
 	return v1 * 60
 }

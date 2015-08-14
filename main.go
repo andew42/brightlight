@@ -1,19 +1,19 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"golang.org/x/net/websocket"
 	"encoding/json"
-	"fmt"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/stats"
-	"log"
 	"net/http"
 	"os"
 	"path"
 	"runtime"
 	"strconv"
 	"strings"
+	"flag"
 )
 
 // The controller's frame buffer
@@ -22,6 +22,7 @@ var Statistics stats.Stats = stats.NewStats()
 
 // Render the frame buffer as JSON
 func sendFrameBufferToWebSocket(ws *websocket.Conn) error {
+
 	// Send back the frame buffer as JSON
 	rc, err := json.MarshalIndent(fb, "", " ")
 	if err != nil {
@@ -33,22 +34,25 @@ func sendFrameBufferToWebSocket(ws *websocket.Conn) error {
 
 // Handle HTTP requests to set all lights to a specific colour
 func allLightsHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("allLightsHandler Called")
 
 	// Colour value follows request path
 	extIndex := strings.LastIndex(r.URL.Path, `/`)
 	if extIndex == -1 {
 		http.Error(w, "No colour specified", 406)
+		log.Info("allLightsHandler no colour")
 		return
 	}
 
 	colourValue, err := strconv.ParseInt(r.URL.Path[extIndex+1:], 16, 32)
 	if err != nil {
 		http.Error(w, "Invalid colour specified", 406)
+		log.Info("allLightsHandler invalid colour")
 		return
 	}
 
-	animations.AnimateStaticColour(controller.NewRgbFromInt(int(colourValue)))
+	colourValueRgb := controller.NewRgbFromInt(int(colourValue))
+	log.WithField("colourValueRgb", colourValueRgb).Info("allLightsHandler")
+	animations.AnimateStaticColour(colourValueRgb)
 
 	d, _ := json.Marshal(controller.IsDriverConnected())
 	w.Write(d)
@@ -56,12 +60,12 @@ func allLightsHandler(w http.ResponseWriter, r *http.Request) {
 
 // Handle HTTP requests to run a named animation
 func animationHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("animationHandler Called")
 
 	// Animation name follows request path
 	extIndex := strings.LastIndex(r.URL.Path, `/`)
 	if extIndex == -1 {
 		http.Error(w, "No animation name specified", 406)
+		log.Info("animationHandler no name")
 		return
 	}
 
@@ -69,8 +73,11 @@ func animationHandler(w http.ResponseWriter, r *http.Request) {
 	err := animations.Animate(animationName)
 	if err != nil {
 		http.Error(w, err.Error()+" "+animationName, 406)
+		log.Info("animationHandler " + err.Error())
 		return
 	}
+
+	log.WithField("animationName", animationName).Info("animationHandler")
 
 	d, _ := json.Marshal(controller.IsDriverConnected())
 	w.Write(d)
@@ -78,40 +85,45 @@ func animationHandler(w http.ResponseWriter, r *http.Request) {
 
 // Handle HTTP requests to show strip lengths of room lights
 func stripLengthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("stripLengthHandler Called")
 
 	// Strip index, length follows request path
 	extIndex := strings.LastIndex(r.URL.Path, `/`)
 	if extIndex == -1 {
-		http.Error(w, "No configuration specified", 406)
+		http.Error(w, "No parameters specified", 406)
+		log.Info("stripLengthHandler called with no parameters")
 		return
 	}
 
-	// index and length
+	// index
 	config := strings.Split(r.URL.Path[extIndex+1:], ",")
-	index, err := strconv.ParseInt(config[0], 10, 32)
+	index, err := strconv.ParseInt(config[0], 10, 32);
 	if err != nil || index < 0 || index > int64(len(fb.Strips)) {
-		http.Error(w, "Invalid index specified", 406)
-		return
+		index = -1
 	}
+
+	// length
 	length, err := strconv.ParseInt(config[1], 10, 32)
 	if err != nil || length < 0 || length > controller.MaxLedStripLen {
-		http.Error(w, "Invalid length specified", 406)
-		return
+		length = -1
 	}
 
-	// TODO: Turn off animations idiomatic casting one of dual return
-	animations.AnimateStripLength(uint(index), uint(length))
+	if err = animations.AnimateStripLength(uint(index), uint(length)); err != nil {
+		http.Error(w, "Invalid index or length", 406)
+	}
+
+	log.WithFields(
+	log.Fields{"index":index, "length":length, "err":err, }).Info("stripLengthHandler called")
 }
 
 // Handle frame buffer web socket requests (web socket is closed when we return)
 func frameBufferSocketHandler(ws *websocket.Conn) {
+
 	for {
 		fb.Mutex.Lock()
 		// Fails if the client has disappeared
 		if err := sendFrameBufferToWebSocket(ws); err != nil {
 			fb.Mutex.Unlock()
-			log.Println(err)
+			log.Info("frameBufferSocketHandler " + err.Error())
 			return
 		}
 		// Wait for next frame buffer update
@@ -122,6 +134,7 @@ func frameBufferSocketHandler(ws *websocket.Conn) {
 
 // Handle stats web socket requests (web socket is closed when we return)
 func statsSocketHandler(ws *websocket.Conn) {
+
 	for {
 		fb.Mutex.Lock()
 
@@ -134,11 +147,10 @@ func statsSocketHandler(ws *websocket.Conn) {
 			}
 			if err != nil {
 				fb.Mutex.Unlock()
-				log.Println("Stats socket handler %v", err)
+				log.Info("statsSocketHandler" + err.Error())
 				return
 			}
 		}
-
 		// Wait for next frame buffer update
 		fb.Cond.Wait()
 		fb.Mutex.Unlock()
@@ -146,8 +158,17 @@ func statsSocketHandler(ws *websocket.Conn) {
 }
 
 func main() {
+
+	// Force logrus to use console colouring
+	var forceColours = flag.Bool("logrusforcecolours", false, "force logrus to use console colouring")
+	flag.Parse()
+	if *forceColours {
+		log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	}
+
 	// What are we running on?
-	fmt.Printf("environment: %v %v %v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
+	log.WithFields(
+	log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH, }).Info("brightlight started")
 
 	// Start serial and animation drivers
 	controller.StartDriver(fb, &Statistics)
@@ -178,7 +199,8 @@ func main() {
 
 	// Start web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Println("ListenAndServe: " + err.Error())
+		log.Error(err.Error())
 	}
-	fmt.Print("main exiting")
+
+	log.Info("brightlight exited")
 }

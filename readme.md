@@ -39,6 +39,8 @@ export GOPATH=/home/pi/go
 **go 1.4** https://golang.org/dl/
 **WebStorm 9.02** https://www.jetbrains.com/webstorm/
 **Go language plugin 0.9.15.3** Newer alpha version have trouble with import paths
+**Grep Console plugin** With ANSI terminal emulator enabled for logrus
+go get "github.com/Sirupsen/logrus"
 External Libraries breaks in project when new go version is installed:
 Create a new project
 Copy misc.xml from hidden .idea directory to same directory in brightlight project

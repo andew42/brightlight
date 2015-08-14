@@ -56,8 +56,7 @@ require([
                 var params = event.node.attributes["button-params"].value;
                 if (action === "action-navigate") {
                     window.location.href = params;
-                }
-                if (action === "allLights") {
+                } else if (action === "allLights") {
                     lights.allLights(params);
                 } else {
                     lights.animation(action);

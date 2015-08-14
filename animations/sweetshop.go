@@ -7,16 +7,15 @@ import (
 )
 
 type sweetshop struct {
-	seg controller.Segment
-	period time.Duration
+
+	seg        controller.Segment
+	period     time.Duration
 	changeTime time.Time
 }
 
 func newSweetshop(seg controller.Segment, period time.Duration) *sweetshop {
-	var s sweetshop
-	s.seg = seg
-	s.period = period
-	return &s
+
+	return &sweetshop{seg:seg, period:period}
 }
 
 func (s *sweetshop) animateNextFrame() {
