@@ -4,6 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"golang.org/x/net/websocket"
 	"encoding/json"
+	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/stats"
@@ -182,6 +183,11 @@ func main() {
 	fs := http.FileServer(http.Dir(contentPath))
 	http.Handle("/", fs)
 
+	// Config requires PUT (write) support
+	configServer := servers.Config {contentPath}
+	http.HandleFunc("/config/", configServer.Handler)
+
+	// TODO: MOVE ALL HANDLERS INTO SERVERS PACKAGE LIKE CONFIG
 	// Requests to turn on all lights
 	http.HandleFunc("/AllLights/", allLightsHandler)
 

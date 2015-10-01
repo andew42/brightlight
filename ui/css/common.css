@@ -33,11 +33,12 @@ body {
     display: table-cell;
 }
 
-/* iPhone status bar */
-.status-bar {
-    height: 22px;
-    width: 100%;
-    background-color: deeppink;
+/* Error box floats on top */
+.error {
+    z-index: 99;
+    position: absolute;
+    background-color: orange;
+    padding: 8px;
 }
 
 /* Default button background (forces body to cover
@@ -62,8 +63,6 @@ body {
 .left-column {
     position: absolute;
     float: left;
-    top: 22px;
-    bottom: 0;
     left: 1%;
     width: 32%;
     overflow-y: auto;
@@ -73,8 +72,6 @@ body {
 .mid-column {
     position: absolute;
     float: left;
-    top: 22px;
-    bottom: 0;
     left: 34%;
     width: 32%;
     overflow-y: auto;
@@ -84,8 +81,6 @@ body {
 .right-column {
     position: absolute;
     float: left;
-    top: 22px;
-    bottom: 0;
     left: 67.3333%;
     width:31.6666%;
     overflow-y: auto;

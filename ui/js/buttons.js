@@ -6,44 +6,26 @@ require([
         "../js/ractive/ractive-events-tap.js",
         "../js/lib/lights.js",
         "../js/lib/scroll",
-        "../js/lib/nav"],
-    function(doc,R,tap,lights,scroll,nav) {
+        "../js/lib/nav",
+        "../js/lib/util"],
+    function(doc,R,tap,lights,scroll,nav,util) {
         'use strict';
 
         // Ractive data binding object
         var dto = {
             buttons: undefined,
-            editMode: false
+            editMode: false,
+            error: undefined
         };
 
         // Page initialisation
         var init = function () {
-            // json description of button mappings
-            dto.buttons = {
-                leftColumn: [
-                    {id: "l1", name: "OFF", action: "allLights", params: "000000"},
-                    {id: "l2", name: "6f16d4", action: "allLights", params: "6f16d4"},
-                    {id: "l3", name: "c8721f", action: "allLights", params: "c8721f"},
-                    {id: "l4", name: "d71e1e", action: "allLights", params: "d71e1e"}
-                ],
-                midColumn: [
-                    {id: "m1", name: "Full", action: "allLights", params: "ffffff"},
-                    {id: "m2", name: "High", action: "allLights", params: "e0e0e0"},
-                    {id: "m3", name: "Mid", action: "allLights", params: "808080"},
-                    {id: "m4", name: "Low", action: "allLights", params: "3f3f3f"},
-                    {id: "m5", name: "Very Low", action: "allLights", params: "101010"},
-                    {id: "m6", name: "Nearly Off", action: "allLights", params: "020202"}
-                ],
-                rightColumn: [
-                    {id: "r1", name: "Sweet Shop", action: "sweetshop"},
-                    {id: "r2", name: "Runner", action: "runner"},
-                    {id: "r3", name: "Rainbow", action: "rainbow"},
-                    {id: "r4", name: "Cylon", action: "cylon"}
-                ]
-            };
 
             // Helper to find a button by id
             var findButtonById = function (id) {
+                if (dto.buttons === undefined) {
+                    return;
+                }
                 var columns = ["leftColumn", "midColumn", "rightColumn"];
                 for (var i = 0; i < columns.length; i++) {
                     var buttons = dto.buttons[columns[i]];
@@ -56,11 +38,40 @@ require([
                 return undefined;
             };
 
+            // Helper to save the updated button layout back to server
+            var saveButtonLayout = function() {
+
+                // Copy buttons WITHOUT ok and edit
+                var clone = function(obj) {
+                    var copy = {};
+                    var columns = ["leftColumn", "midColumn", "rightColumn"];
+                    for (var i = 0; i < columns.length; i++) {
+                        copy[columns[i]] = [];
+                        var buttons = dto.buttons[columns[i]];
+                        for (var b = 0; b < buttons.length; b++) {
+                            if (buttons[b].id !== 'edit' && buttons[b].id !== 'ok') {
+                                copy[columns[i]].push(buttons[b]);
+                            }
+                        }
+                    }
+                    return copy;
+                };
+
+                var test2 = util.putJson('../../config/user.json', clone(dto.buttons),
+                    function () {
+                        // TODO LITTLE SAVE POPUP
+                    },
+                    function (err) {
+                        dto.error = err.responseURL + ' : ' + err.responseText;
+                        ractive.set(dto); // ###
+                    });
+            };
+
             // Read write mode gets OK and Edit buttons
             var isReadWrite = location.search.split('rw=')[1];
-            if (isReadWrite) {
-                dto.buttons.leftColumn.push({id: "edit", name: "EDIT", action: "action-edit"});
-                dto.buttons.rightColumn.push({id: "ok", name: "OK", action: "action-back"});
+            if (isReadWrite && dto.buttons !== undefined) {
+                dto.buttons.leftColumn.push({id: 'edit', name: 'EDIT', action: 'action-edit'});
+                dto.buttons.rightColumn.push({id: 'ok', name: 'OK', action: 'action-back'});
             }
 
             var ractive = new R({
@@ -129,11 +140,32 @@ require([
                 var button = findButtonById(p.buttonId);
                 if (button !== undefined) {
                     button.params = p.colour;
+                    // Save changes to server
+                    saveButtonLayout();
                 }
                 // TODO update button id with name
             }
         };
-        // Initialise the page
-        init();
+
+        // Initialise the page after loading button layout
+        var test = util.getJson('../../config/user.json',
+            function (buttons) {
+                dto.buttons = buttons;
+                init();
+            },
+            function () {
+                // Couldn't find user.json, try default.json
+                var test = util.getJson('../../config/default.json',
+                    function (buttons) {
+                        dto.buttons = buttons;
+                        init();
+                    },
+                    function (err) {
+                        dto.error = err.responseURL + ' : ' + err.responseText;
+                        init();
+                    }
+                );
+            }
+        );
     }
 );
