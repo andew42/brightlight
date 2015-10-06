@@ -8,46 +8,62 @@ import (
 	"io/ioutil"
 )
 
-type Config struct {
-	ContentPath string
-}
-
 // Handle HTTP requests to read and write config
-func (config Config) Handler(w http.ResponseWriter, r *http.Request) {
+func GetConfigHandler(contentPath string) (func(http.ResponseWriter, *http.Request)) {
 
-	// Colour value follows request path
-	extIndex := strings.LastIndex(r.URL.Path, `/`)
-	if extIndex == -1 {
-		http.Error(w, "No config file specified", 400)
-		log.Info("configHandler no config file specified")
-		return
-	}
+	return func(w http.ResponseWriter, r *http.Request) {
 
-	fullPath := path.Join(config.ContentPath, r.URL.Path)
-
-	// TODO CHECK FILE NAME AND LENGTH
-
-	if r.Method == "GET" {
-
-		log.Info("configHandler with GET called " + fullPath)
-		content, err := ioutil.ReadFile(fullPath)
-		if err != nil {
-			log.Error("Failed to load config file : " + err.Error())
-			http.Error(w, "Failed to load config file", 404)
-		} else {
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(content)
+		extIndex := strings.LastIndex(r.URL.Path, `/`)
+		if extIndex == -1 {
+			log.Warn("configHandler no config file specified")
+			http.Error(w, "No config file specified", 400)
+			return
 		}
-	} else if r.Method == "PUT" {
 
-		log.Info("configHandler with PUT called " + fullPath)
-		content, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Error("Failed to read PUT content : " + err.Error())
-			http.Error(w, "Failed to read PUT content", 400)
+		// Construct file system path to config
+		fullPath := path.Join(string(contentPath), r.URL.Path)
+
+		if r.Method == "GET" {
+
+			log.WithField("FullPath", fullPath).Info("configHandler GET called")
+			content, err := ioutil.ReadFile(fullPath)
+			if err != nil {
+				log.WithField("Error", err.Error()).Warn("Failed to load config file")
+				http.Error(w, "Failed to load config file", 404)
+			} else {
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(content)
+			}
+		} else if r.Method == "PUT" {
+
+			log.WithField("FullPath", fullPath).Info("configHandler PUT called")
+
+			// Only support user.json
+			if (r.URL.Path != "/config/user.json") {
+				log.WithField("FileName", r.URL.Path).Warn("Unsupported config file name")
+				http.Error(w, "File name not allowed", 401)
+				return
+			}
+
+			// up to a size of 10K
+			if (r.ContentLength > 10000) {
+				log.WithField("ContentLength", r.ContentLength).Warn("Config file content too large")
+				http.Error(w, "Update content too large", 413)
+				return
+			}
+
+			if content, err := ioutil.ReadAll(r.Body); err != nil {
+				log.WithField("Error", err.Error()).Warn("Failed to read PUT body content")
+				http.Error(w, "Failed to read PUT content", 400)
+			} else {
+				if err = ioutil.WriteFile(fullPath, content, 0644); err != nil {
+					log.WithField("Error", err.Error()).Error("Failed to write file")
+					http.Error(w, "Failed to write file", 507)
+				}
+			}
 		} else {
-			err = ioutil.WriteFile(fullPath, content, 0644)
-			// TODO TEST ERROR
+			log.WithField("Method", r.Method).Warn("Unknown config server method")
+			http.Error(w, "Failed to write file", 405)
 		}
 	}
 }

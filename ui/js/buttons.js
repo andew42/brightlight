@@ -63,7 +63,7 @@ require([
                     },
                     function (err) {
                         dto.error = err.responseURL + ' : ' + err.responseText;
-                        ractive.set(dto); // ###
+                        ractive.set(dto);
                     });
             };
 
