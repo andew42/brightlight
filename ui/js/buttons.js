@@ -2,13 +2,13 @@
 // Paths are relative to buttons.html
 require([
         "./require/domReady!",
-        "../js/ractive/ractive.js",
-        "../js/ractive/ractive-events-tap.js",
-        "../js/lib/lights.js",
+        "../js/ractive/ractive",
+        "../js/ractive/ractive-touch",
+        "../js/lib/lights",
         "../js/lib/scroll",
         "../js/lib/nav",
         "../js/lib/util"],
-    function(doc,R,tap,lights,scroll,nav,util) {
+    function(doc,R,touch,lights,scroll,nav,util) {
         'use strict';
 
         // Ractive data binding object
@@ -75,9 +75,6 @@ require([
             }
 
             var ractive = new R({
-                // Attach tap handler extension
-                events: {tap: tap },
-
                 // The `el` option can be a node, an ID, or a CSS selector.
                 el: 'container',
 
@@ -133,6 +130,9 @@ require([
 
             // Disable scrolling on everything by default
             scroll.disable(document.body);
+
+            // TODO
+            document.body.classList.add("disable-user-select");
 
             // If we are returning from colour selection set new colour here
             var p = nav.getParam();

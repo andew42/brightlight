@@ -2,13 +2,13 @@
 // Paths are relative to colourpicker.html
 require([
         "./require/domReady!",
-        "../js/ractive/ractive.js",
-        "../js/ractive/ractive-events-tap.js",
-        "../js/tinycolor/tinycolor.js",
+        "../js/ractive/ractive",
+        "../js/ractive/ractive-touch",
+        "../js/tinycolor/tinycolor",
         "../js/lib/scroll",
         "../js/lib/controls",
         "../js/lib/nav"],
-    function(doc,R,tap,tinycolor,scroll,controls,nav) {
+    function(doc,R,touch,tinycolor,scroll,controls,nav) {
         'use strict';
         // Ractive data binding object
         var dto = {
@@ -26,9 +26,6 @@ require([
             scroll.disable(document.body);
 
             var ractive = new R({
-                // Attach tap handler extension
-                events: {tap: tap },
-
                 // The `el` option can be a node, an ID, or a CSS selector.
                 el: 'container',
 

@@ -2,11 +2,11 @@
 // Paths are relative to config.html
 require([
         "./require/domReady!",
-        "../js/ractive/ractive.js",
-        "../js/ractive/ractive-events-tap.js",
-        "../js/lib/controls.js",
+        "../js/ractive/ractive",
+        "../js/ractive/ractive-touch",
+        "../js/lib/controls",
         "../js/lib/scroll"],
-    function(doc,R,tap,controls,scroll) {
+    function(doc,R,touch,controls,scroll) {
         'use strict';
 
         // Ractive binding object
@@ -24,9 +24,6 @@ require([
             };
 
             var ractive = new R({
-                // Attach tap handler extension
-                events: {tap: tap },
-
                 // The `el` option can be a node, an ID, or a CSS selector.
                 el: 'container',
 
