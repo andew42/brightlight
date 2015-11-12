@@ -22,24 +22,52 @@
         <div class="buttons-background"></div>
         <div class="left-column">
             {{#buttons.leftColumn}}
-            <div class="button {{#editMode}}wiggle{{/}}">
-                <div class="button-content" id="{{id}}" on-tap="buttonHandler">{{name}}</div>
+            <div class="button">
+                <div class="button-content" id="{{id}}" on-tap="tapHandler" on-press="pressHandler">{{name}}</div>
             </div>
             {{/buttons.leftColumn}}
         </div>
         <div class="mid-column">
             {{#buttons.midColumn}}
-            <div class="button {{#editMode}}wiggle{{/}}">
-                <div class="button-content" id="{{id}}" on-tap="buttonHandler">{{name}}</div>
+            <div class="button">
+                <div class="button-content" id="{{id}}" on-tap="tapHandler" on-press="pressHandler">{{name}}</div>
             </div>
             {{/buttons.midColumn}}
         </div>
         <div class="right-column">
             {{#buttons.rightColumn}}
-            <div class="button {{#editMode}}wiggle{{/}}">
-                <div class="button-content" id="{{id}}" on-tap="buttonHandler">{{name}}</div>
+            <div class="button">
+                <div class="button-content" id="{{id}}" on-tap="tapHandler" on-press="pressHandler">{{name}}</div>
             </div>
             {{/buttons.rightColumn}}
+        </div>
+        <!-- Edit Menu -->
+        <div id="edit-menu" class="edit-menu" style="display:none">
+            <div class="edit-menu-row">
+                <div class="floating-button-full-width-container">
+                    <label>
+                        <input class="edit-menu-input" value="{{editButton.name}}">
+                    </label>
+                </div>
+            </div>
+            <div class="edit-menu-row">
+                <div class="floating-button-full-width-container">
+                    <div on-tap="tapHandler" id="menu-white" class="edit-menu-button">White</div>
+                </div>
+            </div>
+            <div class="edit-menu-row">
+                <div class="floating-button-full-width-container">
+                    <div on-tap="tapHandler" id="menu-colour" class="edit-menu-button">Colour</div>
+                </div>
+            </div>
+            <div class="edit-menu-row">
+                <div class="floating-button-half-width-container">
+                    <div on-tap="tapHandler" id="menu-ok" class="edit-menu-button">OK</div>
+                </div>
+                <div class="floating-button-half-width-container">
+                    <div on-tap="tapHandler" id="menu-cancel" class="edit-menu-button">Cancel</div>
+                </div>
+            </div>
         </div>
     </script>
 </div>

@@ -63,6 +63,16 @@ define (function() {
             xhr.open('PUT', path, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(typeof obj === "string" ? obj : JSON.stringify(obj));
+        },
+
+        // Ensure keyboard is hidden
+        // http://uihacker.blogspot.co.uk/2011/10/javascript-hide-ios-soft-keyboard.html
+        hideKeyboard : function() {
+            document.activeElement.blur();
+            var inputs = document.querySelectorAll('input');
+            for(var i=0; i < inputs.length; i++) {
+                inputs[i].blur();
+            }
         }
     };
 });

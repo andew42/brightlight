@@ -1,4 +1,4 @@
-/* global require */
+/* global require, console */
 // Paths are relative to buttons.html
 require([
         "./require/domReady!",
@@ -14,9 +14,12 @@ require([
         // Ractive data binding object
         var dto = {
             buttons: undefined,
-            editMode: false,
-            error: undefined
+            error: undefined,
+            editButton: undefined
         };
+
+        // The button that was last long pressed
+        var buttonBeingEdited;
 
         // Page initialisation
         var init = function () {
@@ -41,15 +44,15 @@ require([
             // Helper to save the updated button layout back to server
             var saveButtonLayout = function() {
 
-                // Copy buttons WITHOUT ok and edit
-                var clone = function(obj) {
+                // Copy buttons WITHOUT OK
+                var cloneEditableButtons = function() {
                     var copy = {};
                     var columns = ["leftColumn", "midColumn", "rightColumn"];
                     for (var i = 0; i < columns.length; i++) {
                         copy[columns[i]] = [];
                         var buttons = dto.buttons[columns[i]];
                         for (var b = 0; b < buttons.length; b++) {
-                            if (buttons[b].id !== 'edit' && buttons[b].id !== 'ok') {
+                            if (buttons[b].id !== 'ok') {
                                 copy[columns[i]].push(buttons[b]);
                             }
                         }
@@ -57,20 +60,40 @@ require([
                     return copy;
                 };
 
-                var test2 = util.putJson('../../config/user.json', clone(dto.buttons),
+                util.putJson('../../config/user.json', cloneEditableButtons(),
                     function () {
                         // TODO LITTLE SAVE POPUP
                     },
                     function (err) {
+                        /** @namespace err.responseURL */
                         dto.error = err.responseURL + ' : ' + err.responseText;
                         ractive.set(dto);
                     });
             };
 
-            // Read write mode gets OK and Edit buttons
+            // Helper to position menu div relative to mouse
+            var positionMenu = function (menu, x, y) {
+                // Ensure menu is visible so we can read width and height
+                menu.style.display='block';
+                var menuWidth = menu.clientWidth;
+                var menuHeight = menu.clientHeight;
+
+                // Set initial position slightly offset from x,y
+                var menuX = Math.max(0, x - 10);
+                var menuY = Math.max(0, y - 10);
+
+                // Now ensure menu fits entirely within the viewport
+                menuX = Math.min(menuX, window.innerWidth - menuWidth);
+                menuY = Math.min(menuY, window.innerHeight - menuHeight);
+
+                // Set menu position
+                menu.style.top = menuY + 'px';
+                menu.style.left = menuX + 'px';
+            };
+
+            // Read write mode gets OK button
             var isReadWrite = location.search.split('rw=')[1];
             if (isReadWrite && dto.buttons !== undefined) {
-                dto.buttons.leftColumn.push({id: 'edit', name: 'EDIT', action: 'action-edit'});
                 dto.buttons.rightColumn.push({id: 'ok', name: 'OK', action: 'action-back'});
             }
 
@@ -87,35 +110,82 @@ require([
             });
 
             // Set up an on tap handler for all the buttons
-            ractive.on('buttonHandler', function (event) {
+            ractive.on('tapHandler', function (event) {
+                // Close edit menu
+                var editMenu = document.getElementById("edit-menu");
+                editMenu.style.display='none';
+
+                // Check for edit context menu buttons
+                if (event.node.id === 'menu-name') {
+                    console.info('NAME:' + buttonBeingEdited.name);
+                }
+                else if (event.node.id === 'menu-white') {
+                    console.info('WHITE');
+                }
+                else if (event.node.id === 'menu-colour') {
+                    console.info('COLOUR');
+                    // Colour picker cares about colour, other parameters are just passed back
+                    nav.call("./colourpicker.html", "./buttons.html?rw=true", {
+                        colour: dto.editButton.params,
+                        editButton: dto.editButton,
+                        menuPos: {x: editMenu.style.left, y: editMenu.style.top}
+                    });
+                }
+                else if (event.node.id === 'menu-ok') {
+                    console.info('OK');
+                    util.hideKeyboard();
+                    // Update button info
+                    var buttonToUpdate = findButtonById(dto.editButton.id);
+                    buttonToUpdate.name = dto.editButton.name;
+                    buttonToUpdate.params = dto.editButton.params;
+                    ractive.set(dto);
+                    // Save changes to server
+                    saveButtonLayout();
+                }
+                else if (event.node.id === 'menu-cancel') {
+                    console.info('CANCEL');
+                    util.hideKeyboard();
+                }
+                
+                // Lookup dynamic lighting buttons
                 var id = event.node.id;
                 var button = findButtonById(id);
                 if (button === undefined) {
                     return;
                 }
-                if (button.action === "action-edit") {
-                    dto.editMode = !dto.editMode;
-                    ractive.set(dto);
-                }
-                else if (button.action === "action-back") {
+                // OK Button?
+                if (button.action === "action-back") {
                     window.location.href = "./index.html";
                 }
+                // Single colour light button?
                 else if (button.action === "allLights") {
-                    if (dto.editMode) {
-                        nav.call("./colourpicker.html", "./buttons.html?rw=true", {buttonId: id, colour: button.params});
-                    }
-                    else {
-                        lights.allLights(button.params);
-                    }
+                    lights.allLights(button.params);
                 }
+                // Animation button
                 else {
-                    if (dto.editMode) {
-                        // TODO edit mode for animations
-                    }
-                    else {
-                        lights.animation(button.action);
-                    }
+                    lights.animation(button.action);
                 }
+            });
+
+            // Set up an on long press handler for all the buttons
+            ractive.on('pressHandler', function (event) {
+                var id = event.node.id;
+                buttonBeingEdited = findButtonById(id);
+                if (buttonBeingEdited === undefined) {
+                    return true;
+                }
+                // Make a copy so user can cancel edit
+                dto.editButton = {
+                    "name": buttonBeingEdited.name,
+                    "id": buttonBeingEdited.id,
+                    "action": buttonBeingEdited.action,
+                    "params": buttonBeingEdited.params
+                };
+                ractive.set(dto);
+                console.info("Long Press " + buttonBeingEdited.name);
+                var editMenu = document.getElementById("edit-menu");
+                positionMenu(editMenu, event.original.srcEvent.pageX, event.original.srcEvent.pageY);
+                return false;
             });
 
             // TODO: Update UI when Teensy connection status changes
@@ -131,31 +201,31 @@ require([
             // Disable scrolling on everything by default
             scroll.disable(document.body);
 
-            // TODO
-            document.body.classList.add("disable-user-select");
-
             // If we are returning from colour selection set new colour here
             var p = nav.getParam();
+            // p will be undefined if user canceled dialog
             if (p !== undefined) {
-                var button = findButtonById(p.buttonId);
-                if (button !== undefined) {
-                    button.params = p.colour;
-                    // Save changes to server
-                    saveButtonLayout();
-                }
-                // TODO update button id with name
+                // Retrieve the edit button info and update menu bindings
+                dto.editButton = p.editButton;
+                dto.editButton.params = p.colour;
+                ractive.set(dto);
+                // Show context menu at correct position
+                var editMenu = document.getElementById("edit-menu");
+                editMenu.style.display='block';
+                editMenu.style.left = p.menuPos.x;
+                editMenu.style.top = p.menuPos.y;
             }
         };
 
         // Initialise the page after loading button layout
-        var test = util.getJson('../../config/user.json',
+        util.getJson('../../config/user.json',
             function (buttons) {
                 dto.buttons = buttons;
                 init();
             },
             function () {
                 // Couldn't find user.json, try default.json
-                var test = util.getJson('../../config/default.json',
+                util.getJson('../../config/default.json',
                     function (buttons) {
                         dto.buttons = buttons;
                         init();
