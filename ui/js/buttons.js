@@ -7,15 +7,17 @@ require([
         "../js/lib/lights",
         "../js/lib/scroll",
         "../js/lib/nav",
-        "../js/lib/util"],
-    function(doc,R,touch,lights,scroll,nav,util) {
+        "../js/lib/util",
+        "../config/static"],
+    function(doc,R,touch,lights,scroll,nav,util,sc) {
         'use strict';
 
         // Ractive data binding object
         var dto = {
             buttons: undefined,
             error: undefined,
-            editButton: undefined
+            editButton: undefined,
+            animations: sc.animations
         };
 
         // The button that was last long pressed
@@ -138,6 +140,7 @@ require([
                     var buttonToUpdate = findButtonById(dto.editButton.id);
                     buttonToUpdate.name = dto.editButton.name;
                     buttonToUpdate.params = dto.editButton.params;
+                    buttonToUpdate.action = dto.editButton.action;
                     ractive.set(dto);
                     // Save changes to server
                     saveButtonLayout();
@@ -208,6 +211,7 @@ require([
                 // Retrieve the edit button info and update menu bindings
                 dto.editButton = p.editButton;
                 dto.editButton.params = p.colour;
+                dto.editButton.action = "allLights";
                 ractive.set(dto);
                 // Show context menu at correct position
                 var editMenu = document.getElementById("edit-menu");

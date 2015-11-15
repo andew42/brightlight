@@ -63,20 +63,26 @@ func AnimateStripLength(stripIndex uint, stripLength uint) error {
 func Animate(animationName string) error {
 
 	animations := make([]animator, 0, 1)
-	switch {
-	case animationName == "runner":
+	switch animationName {
+	case "runner":
 		animations = append(animations, newRunner(allLeds, controller.NewRgb(0, 0, 255)))
 
-	case animationName == "cylon":
+	case "cylon":
 		animations = append(animations, newStaticColour(allLeds, controller.NewRgbFromInt(0)))
 		animations = append(animations, newCylon(NewLogSegment(allLeds, 8, 20)))
 		animations = append(animations, newCylon(NewLogSegment(allLeds, controller.MaxLedStripLen, 20)))
 
-	case animationName == "rainbow":
+	case "rainbow":
 		animations = append(animations, newRainbow(curtainLeds, time.Second*5))
 
-	case animationName == "sweetshop":
+	case "sweetshop":
 		animations = append(animations, newSweetshop(allLeds, time.Second*1))
+
+	case "candle":
+		animations = append(animations, newCandle(NewLogSegment(allLeds, 8, 3)))
+
+	case "christmas":
+		animations = append(animations, newChristmas(allLeds, time.Second*1))
 
 	default:
 		return ErrInvalidParameter

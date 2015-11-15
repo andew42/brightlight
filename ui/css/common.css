@@ -144,6 +144,13 @@ body {
     border: 4px solid darkorange;
 }
 
+.edit-menu-select {
+    font-size: x-large;
+    padding: 5px;
+    width: 100%;
+    border: 4px solid darkorange;
+}
+
 .edit-menu-button {
     text-align: center;
     vertical-align: middle;
