@@ -28,12 +28,12 @@ export GOPATH=/home/pi/go
 ### Scripts
 
 ###### OSX: Connecting to raspberry pi fom OSX terminal session
-```
+```bash
 ssh pi@192.168.0.46
 ```
 
 ###### Pi: clean
-```
+```bash
 sudo killall -q -9 brightlight
 rm -f -r /home/pi/go
 rm -f /home/pi/brightlight.log
@@ -41,21 +41,21 @@ mkdir -p /home/pi/go/src
 ```
 
 ###### OSX: copy latest source
-```
+```bash
 rsync -rav -e ssh --exclude='.git' \
 /Users/andrew/Dropbox/go/src/ \
 pi@192.168.0.46:/home/pi/go/src/
 ```
 
 ###### Pi: build
-```
+```bash
 export GOPATH=/home/pi/go
 cd /home/pi/go/src/github.com/andew42/brightlight
 go install
 ```
 
 ###### Pi: run
-```
+```bash
 # stty -F /dev/ttyACM0 raw
 export GOPATH=/home/pi/go
 /home/pi/go/bin/brightlight
