@@ -32,7 +32,9 @@ require([
             minSendTime: undefined,
             latchedMinSendTime: undefined,
             maxSendTime: undefined,
-            latchedMaxSendTime: undefined
+            latchedMaxSendTime: undefined,
+
+            gcCount: undefined
         };
 
         function init() {
@@ -101,6 +103,7 @@ require([
                 /** @namespace s.MinSendTime */
                 /** @namespace s.MaxSendTime */
                 /** @namespace s.SendCount */
+                /** @namespace s.GcCount */
                 var s = JSON.parse(evt.data);
 
                 // Convert stats to 2dp ms values
@@ -113,6 +116,7 @@ require([
                 dto.averageSendTime = (s.AverageSendTime / 1000000).toFixed(2);
                 dto.minSendTime = (s.MinSendTime / 1000000).toFixed(2);
                 dto.maxSendTime = (s.MaxSendTime / 1000000).toFixed(2);
+                dto.gcCount = s.GcCount;
 
                 // Any send time to display (real light controller connected)?
                 dto.showSendTimes = s.SendCount > 0;

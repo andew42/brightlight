@@ -45,30 +45,46 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 		f := openUsbPort(port)
 		usbConnected = true
 
+		// Allocate buffer once to avoid garbage collections in loop
+		var data = make([]byte, 4 + MaxLedStripLen * 8 * 4)
+
 		// Push frame buffer changes to Teensy
 		for {
 			fb.Mutex.Lock()
 
 			started := time.Now()
 
-			// Send the frame buffer
-			var data []byte = make([]byte, 0)
-			// Framing header
-			data = append(data, 0xff, 0xff, 0xff, 0xff)
+			// Build the frame buffer, start with header of 4 * 0xff
+			i := 0
+			for z := 0; z < 4; z++ {
+				data[i] = 0xff
+				i++
+			}
 			startStrip := driverIndex * 8
 			// Buffer is send 8*LED1, 8*LED2 ... 8*(LEDS_PER_STRIP - 1)
 			for l := 0; l < MaxLedStripLen; l++ {
 				for s := startStrip; s < startStrip+8 ; s++ {
 					if l >= len(fb.Strips[s].Leds) {
-						// Pad frame buffer as strip is < MaxLedStripLen
-						data = append(data, 0, 0, 0, 0)
+						// Pad frame buffer with zeros as strip is < MaxLedStripLen
+						for z := 0; z < 4; z++ {
+							data[i] = 0
+							i++
+						}
 					} else {
 						// Colours are sent as 4 bytes with leading 0x00
 						rgb := fb.Strips[s].Leds[l]
-						data = append(data, 0, rgb.Red, rgb.Green, rgb.Blue)
+						data[i] = 0
+						i++
+						data[i] = rgb.Red
+						i++
+						data[i] = rgb.Green
+						i++
+						data[i] = rgb.Blue
+						i++
 					}
 				}
 			}
+			// Send the frame buffer
 			n, err := f.Write(data)
 			if err == nil && n < len(data) {
 				err = io.ErrShortWrite

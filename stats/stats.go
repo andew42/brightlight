@@ -23,6 +23,8 @@ type Stats struct {
 	MinSendTime     time.Duration
 	MaxSendTime     time.Duration
 	AverageSendTime time.Duration
+	// GC count
+	GcCount			int64
 }
 
 // Constructor
