@@ -21,7 +21,7 @@ type christmas struct {
 func newChristmas(seg controller.Segment, period time.Duration) *christmas {
 
 	return &christmas{seg:seg, period:period, lightSize:3,
-		lightColours:[]controller.Rgb{controller.NewRgb(255,0,0), controller.NewRgb(0,255,0), controller.NewRgb(0,0,255)}}
+		lightColours:[]controller.Rgb{controller.NewRgb(255, 0, 0), controller.NewRgb(0, 255, 0), controller.NewRgb(0, 0, 255)}}
 }
 
 func (s *christmas) animateNextFrame() {
@@ -31,7 +31,7 @@ func (s *christmas) animateNextFrame() {
 		s.changeTime = time.Now().Add(s.period)
 
 		// Move on to next light colour
-		if s.nextColour == uint(len(s.lightColours)) - 1 {
+		if s.nextColour == uint(len(s.lightColours))-1 {
 			s.nextColour = 0;
 		} else {
 			s.nextColour++;

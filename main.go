@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"runtime"
-	"strings"
 	"flag"
 )
 
@@ -37,8 +36,8 @@ func main() {
 	animations.StartDriver(fb, &statistics)
 
 	// Figure out where the content directory is GOPATH may contain : separated paths
-	goPath := strings.Split(os.Getenv("GOPATH"), ":")
-	contentPath := path.Join(goPath[0], "src/github.com/andew42/brightlight/ui")
+	contentPath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight/ui")
+	log.WithField("contentPath", contentPath).Info("Serving content")
 
 	// Set up web routes (first static content)
 	fs := http.FileServer(http.Dir(contentPath))
@@ -47,11 +46,8 @@ func main() {
 	// Config requires PUT (write) support
 	http.HandleFunc("/config/", servers.GetConfigHandler(contentPath))
 
-	// Requests to turn on all lights
-	http.HandleFunc("/AllLights/", servers.AllLightsHandler)
-
-	// Requests to run an animation
-	http.HandleFunc("/Animation/", servers.AnimationHandler)
+	// Requests to run zero or more animation (json payload)
+	http.HandleFunc("/RunAnimations/", servers.RunAnimationsHandler)
 
 	// Requests to show a strip length on the room lights
 	http.HandleFunc("/StripLength/", servers.GetStripLenHandler(len(fb.Strips)))

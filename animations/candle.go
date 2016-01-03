@@ -7,7 +7,7 @@ import (
 
 type candle struct {
 
-	seg controller.Segment
+	seg             controller.Segment
 	framesPerUpdate uint
 }
 

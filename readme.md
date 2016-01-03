@@ -1,54 +1,82 @@
 ## Brightlight
 
-Brightlight is a lighting controller for pixel addressable LED strips,
-intended for domestic mood lighting.
+Brightlight is a lighting controller for pixel addressable LED strips, intended for domestic mood lighting.
 
 It has two parts. A low level controller responsible for generating the LED strip waveforms,
-written in Arduino C using the Teensy 3.x controller.
-
-https://www.pjrc.com/teensy/td_libs_OctoWS2811.html
+written in Arduino C using the [Teensy 3.x controller](https://www.pjrc.com/teensy/td_libs_OctoWS2811.html).
 
 A web site interface to control one or more Teensy boards via USB. This is written in GO and
-runs on a raspberry pi or similar.
+runs on a raspberry Pi or similar.
 
-## Scripts
+### Setting up Arduino environment
 
-// **OSX:** Connecting to raspberry pi fom OSX terminal session
-ssh pi@192.168.0.44
+* [Install Arduino 1.6.3](https://www.arduino.cc/en/Main/OldSoftwareReleases#previous)
+* [Install Teensyduino 1.26](https://www.pjrc.com/teensy/td_download.html)
 
-// **pi:** clean
+### Setting up new Pi
+* [Build latest raspbian card](https://www.raspberrypi.org/downloads/)
+* [Download go tar ball 1.5.2](http://dave.cheney.net/unofficial-arm-tarballs)
+* Update profile in /etc to include /usr/local/go/bin in path (sudo nano /etc/profile)
+* Create **clean**, **build** and **run** script and chmod 744 than to make them executable
+* sudo nano /etc/rc.local and add:
+```bash
+# Start bright light
+export GOPATH=/home/pi/go
+/home/pi/go/bin/brightlight > /dev/null 2>&1 &
+```
+
+### Scripts
+
+###### OSX: Connecting to raspberry pi fom OSX terminal session
+```
+ssh pi@192.168.0.46
+```
+
+###### Pi: clean
+```
 sudo killall -q -9 brightlight
 rm -f -r /home/pi/go
 rm -f /home/pi/brightlight.log
 mkdir -p /home/pi/go/src
+```
 
-// **OSX:** copy latest source
-scp -r /Users/andrew/Dropbox/go/src pi@192.168.0.44:/home/pi/go
+###### OSX: copy latest source
+```
+rsync -rav -e ssh --exclude='.git' \
+/Users/andrew/Dropbox/go/src/ \
+pi@192.168.0.46:/home/pi/go/src/
+```
 
-// **pi:** build
+###### Pi: build
+```
 export GOPATH=/home/pi/go
 cd /home/pi/go/src/github.com/andew42/brightlight
 go install
+```
 
-// **pi:** run
-stty -F /dev/ttyACM0 raw
+###### Pi: run
+```
+# stty -F /dev/ttyACM0 raw
 export GOPATH=/home/pi/go
 /home/pi/go/bin/brightlight
+```
 
-## Dev Environment
-**go 1.4** https://golang.org/dl/
-**WebStorm 9.02** https://www.jetbrains.com/webstorm/
-**Go language plugin 0.9.15.3** Newer alpha version have trouble with import paths
-**Grep Console plugin** With ANSI terminal emulator enabled for logrus
+### Dev Environment
+#### go 1.5.2
+https://golang.org/dl/
+
 go get "github.com/Sirupsen/logrus"
-External Libraries breaks in project when new go version is installed:
-Create a new project
-Copy misc.xml from hidden .idea directory to same directory in brightlight project
 
-##To Do
-Button edits should persist
-Support editing button names
-Support editing animations
-Doesn't support landscape well (as home screen app)
-Doesn't support on call bar well (as home screen app)
-Colour picker doesn't adjust the room lights
+#### WebStorm 10.04
+https://www.jetbrains.com/webstorm/
+
+#### Go language plugin 0.9.748
+https://github.com/go-lang-plugin-org
+
+#### Grep Console plugin
+With ANSI terminal emulator enabled for logrus
+
+#### To Do
+* Doesn't support landscape well (as home screen app)
+* Doesn't support on call bar well (as home screen app)
+* Colour picker doesn't adjust the room lights

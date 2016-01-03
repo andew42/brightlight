@@ -5,8 +5,8 @@
  */
 /*jslint */
 /*global require: false, define: false, requirejs: false,
-  window: false, clearInterval: false, document: false,
-  self: false, setInterval: false */
+ window: false, clearInterval: false, document: false,
+ self: false, setInterval: false */
 
 
 define(function () {
@@ -63,7 +63,8 @@ define(function () {
             testDiv = document.createElement('div');
             try {
                 isTop = window.frameElement === null;
-            } catch (e) {}
+            } catch (e) {
+            }
 
             //DOMContentLoaded approximation that uses a doScroll, as found by
             //Diego Perini: http://javascript.nwbox.com/IEContentLoaded/,
@@ -73,7 +74,8 @@ define(function () {
                     try {
                         testDiv.doScroll();
                         pageLoaded();
-                    } catch (e) {}
+                    } catch (e) {
+                    }
                 }, 30);
             }
         }

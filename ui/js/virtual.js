@@ -7,7 +7,7 @@ require([
         "../js/lib/controls",
         "../js/lib/lights",
         "../js/lib/scroll"],
-    function(doc,R,touch,controls,lights,scroll) {
+    function (doc, R, touch, controls, lights, scroll) {
         'use strict';
 
         // The ractive binding object
@@ -91,5 +91,6 @@ require([
             // Disable scrolling on everything by default
             scroll.disable(document.body);
         }
+
         init();
     });

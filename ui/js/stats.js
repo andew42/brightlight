@@ -6,7 +6,7 @@ require([
         "../js/ractive/ractive-touch",
         "../js/lib/controls",
         "../js/lib/scroll"],
-    function(doc,R,touch,controls,scroll) {
+    function (doc, R, touch, controls, scroll) {
         'use strict';
 
         // The ractive binding object
@@ -149,5 +149,6 @@ require([
             // Disable scrolling on everything
             scroll.disable(document.body);
         }
+
         init();
     });

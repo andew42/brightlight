@@ -53,10 +53,12 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 
 			// Send the frame buffer
 			var data []byte = make([]byte, 0)
+			// Framing header
 			data = append(data, 0xff, 0xff, 0xff, 0xff)
 			startStrip := driverIndex * 8
-			for s := startStrip; s < startStrip+8 ; s++ {
-				for l := 0; l < MaxLedStripLen; l++ {
+			// Buffer is send 8*LED1, 8*LED2 ... 8*(LEDS_PER_STRIP - 1)
+			for l := 0; l < MaxLedStripLen; l++ {
+				for s := startStrip; s < startStrip+8 ; s++ {
 					if l >= len(fb.Strips[s].Leds) {
 						// Pad frame buffer as strip is < MaxLedStripLen
 						data = append(data, 0, 0, 0, 0)
@@ -75,6 +77,9 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 				fb.Mutex.Unlock()
 				log.WithField("err", err).Warn("teensyDriver")
 				f.Close()
+
+				// Try again in a second
+				time.Sleep(1000 * time.Millisecond)
 
 				// Try and reconnect
 				break
@@ -118,6 +123,14 @@ func getPortName(index int) string {
 		case 0: return "/dev/cu.usbmodem288181"
 			// Teensy 3.0 "/dev/cu.usbmodem103721"
 			// Teensy 3.1 "/dev/cu.usbmodem103101"
+		}
+	} else if runtime.GOOS == "windows" {
+		// Windows
+		switch index {
+		case 0:
+			return "COM3"
+		case 1:
+			return "COM4"
 		}
 	} else {
 		// Raspberry pi

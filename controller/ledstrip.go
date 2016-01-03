@@ -3,7 +3,7 @@ package controller
 import "math/rand"
 
 // Maximum led strip length (must match teensy firmware)
-const MaxLedStripLen = 175
+const MaxLedStripLen = 300
 const StripsPerTeensy = 8
 
 type LedStrip struct {

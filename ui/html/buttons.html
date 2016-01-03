@@ -53,9 +53,19 @@
             <div class="edit-menu-row">
                 <div class="floating-button-full-width-container">
                     <label>
-                        <!--TODO: Maybe changing animation should update label-->
-                        <select class="edit-menu-select" value="{{editButton.action}}">
-                            <option value="allLights">No Animation</option>
+                        <select class="edit-menu-select" value="{{selectedSegment.id}}">
+                            {{#segments}}
+                            <option value="{{id}}">{{name}}</option>
+                            {{/segments}}
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div class="edit-menu-row">
+                <div class="floating-button-full-width-container">
+                    <label>
+                        <!--TODO: Maybe changing animation should update label?-->
+                        <select class="edit-menu-select" value="{{selectedSegment.animation.action}}">
                             {{#animations}}
                             <option value="{{action}}">{{name}}</option>
                             {{/animations}}

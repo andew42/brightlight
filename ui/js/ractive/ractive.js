@@ -12,7 +12,8 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
         typeof define === 'function' && define.amd ? define(factory) :
             global.Ractive = factory()
-}(this, function () { 'use strict';
+}(this, function () {
+    'use strict';
 
     var TEMPLATE_VERSION = 3;
 
@@ -23,7 +24,7 @@
         append: false,
 
         // template:
-        template: { v: TEMPLATE_VERSION, t: [] },
+        template: {v: TEMPLATE_VERSION, t: []},
 
         // parse:     // TODO static delimiters?
         preserveWhitespace: false,
@@ -106,7 +107,7 @@
     hasConsole = typeof console !== "undefined" && typeof console.warn === "function" && typeof console.warn.apply === "function";
 
     try {
-        Object.defineProperty({}, "test", { value: 0 });
+        Object.defineProperty({}, "test", {value: 0});
         environment__magic = true;
     } catch (e) {
         environment__magic = false;
@@ -270,10 +271,10 @@
     var create, defineProperty, defineProperties;
 
     try {
-        Object.defineProperty({}, "test", { value: 0 });
+        Object.defineProperty({}, "test", {value: 0});
 
         if (isClient) {
-            Object.defineProperty(document.createElement("div"), "test", { value: 0 });
+            Object.defineProperty(document.createElement("div"), "test", {value: 0});
         }
 
         defineProperty = Object.defineProperty;
@@ -287,14 +288,14 @@
 
     try {
         try {
-            Object.defineProperties({}, { test: { value: 0 } });
+            Object.defineProperties({}, {test: {value: 0}});
         } catch (err) {
             // TODO how do we account for this? noMagic = true;
             throw err;
         }
 
         if (isClient) {
-            Object.defineProperties(createElement("div"), { test: { value: 0 } });
+            Object.defineProperties(createElement("div"), {test: {value: 0}});
         }
 
         defineProperties = Object.defineProperties;
@@ -317,7 +318,8 @@
     } catch (err) {
         // sigh
         create = (function () {
-            var F = function () {};
+            var F = function () {
+            };
 
             return function (proto, props) {
                 var obj;
@@ -377,6 +379,7 @@
     // thanks, http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
     var is__toString = Object.prototype.toString,
         arrayLikePattern = /^\[object (?:Array|FileList)\]$/;
+
     function isArray(thing) {
         return is__toString.call(thing) === "[object Array]";
     }
@@ -405,7 +408,8 @@
         return thing && is__toString.call(thing) === "[object Object]";
     }
 
-    var noop = function () {};
+    var noop = function () {
+    };
 
     /* global console */
     var alreadyWarned = {},
@@ -687,6 +691,7 @@
     var utils_getPotentialWildcardMatches = getPotentialWildcardMatches;
 
     var starMaps = {};
+
     function getPotentialWildcardMatches(keypath) {
         var keys, starMap, mapper, i, result, wildcardKeypath;
 
@@ -912,6 +917,7 @@
             return keypath.join(key);
         };
     }
+
     function normalise(ref) {
         return ref ? ref.replace(refPattern, ".$1") : "";
     }
@@ -920,6 +926,7 @@
 
     var shared_add = add;
     var shared_add__errorMessage = "Cannot add to a non-numeric value";
+
     function add(root, keypath, d) {
         if (typeof keypath !== "string" || !is__isNumeric(d)) {
             throw new Error("Bad arguments");
@@ -954,6 +961,7 @@
     }
 
     var prototype_add = Ractive$add;
+
     function Ractive$add(keypath, d) {
         return shared_add(this, keypath, d === undefined ? 1 : +d);
     }
@@ -1928,7 +1936,8 @@
 
     var prototype_animate = Ractive$animate;
 
-    var noAnimation = { stop: noop };
+    var noAnimation = {stop: noop};
+
     function Ractive$animate(keypath, to, options) {
         var promise, fulfilPromise, k, animation, animations, easing, duration, step, complete, makeValueCollector, currentValues, collectValue, dummy, dummyOptions;
 
@@ -1967,7 +1976,7 @@
                 if (keypath.hasOwnProperty(k)) {
                     if (step || complete) {
                         collectValue = makeValueCollector(k);
-                        options = { easing: easing, duration: duration };
+                        options = {easing: easing, duration: duration};
 
                         if (step) {
                             options.step = collectValue;
@@ -1981,7 +1990,7 @@
 
             // Create a dummy animation, to facilitate step/complete
             // callbacks, and Promise fulfilment
-            dummyOptions = { easing: easing, duration: duration };
+            dummyOptions = {easing: easing, duration: duration};
 
             if (step) {
                 dummyOptions.step = function (t) {
@@ -2094,6 +2103,7 @@
 
     var prototype_detach = Ractive$detach;
     var prototype_detach__detachHook = new hooks_Hook("detach");
+
     function Ractive$detach() {
         if (this.detached) {
             return this.detached;
@@ -2118,6 +2128,7 @@
     }
 
     var test = Query$test;
+
     function Query$test(item, noDirty) {
         var itemMatches;
 
@@ -2270,15 +2281,16 @@
     };
 
     var _makeQuery = makeQuery;
+
     function makeQuery(ractive, selector, live, isComponentQuery) {
         var query = [];
 
         defineProperties(query, {
-            selector: { value: selector },
-            live: { value: live },
+            selector: {value: selector},
+            live: {value: live},
 
-            _isComponentQuery: { value: isComponentQuery },
-            _test: { value: test }
+            _isComponentQuery: {value: isComponentQuery},
+            _test: {value: test}
         });
 
         if (!live) {
@@ -2286,20 +2298,21 @@
         }
 
         defineProperties(query, {
-            cancel: { value: makeQuery_cancel },
+            cancel: {value: makeQuery_cancel},
 
-            _root: { value: ractive },
-            _sort: { value: sort },
-            _makeDirty: { value: makeQuery_dirty },
-            _remove: { value: remove },
+            _root: {value: ractive},
+            _sort: {value: sort},
+            _makeDirty: {value: makeQuery_dirty},
+            _remove: {value: remove},
 
-            _dirty: { value: false, writable: true }
+            _dirty: {value: false, writable: true}
         });
 
         return query;
     }
 
     var prototype_findAll = Ractive$findAll;
+
     function Ractive$findAll(selector, options) {
         var liveQueries, query;
 
@@ -2332,6 +2345,7 @@
     }
 
     var prototype_findAllComponents = Ractive$findAllComponents;
+
     function Ractive$findAllComponents(selector, options) {
         var liveQueries, query;
 
@@ -2497,6 +2511,7 @@
     }
 
     var prototype_fire = Ractive$fire;
+
     function Ractive$fire(eventName) {
 
         var options = {
@@ -2512,6 +2527,7 @@
         noUnwrap: true, // wrapped values should NOT be unwrapped
         fullRootGet: true // root get should return mappings
     };
+
     function Ractive$get(keypath) {
         var value;
 
@@ -2532,6 +2548,7 @@
     var insert = Ractive$insert;
 
     var insertHook = new hooks_Hook("insert");
+
     function Ractive$insert(target, anchor) {
         if (!this.fragment.rendered) {
             // TODO create, and link to, documentation explaining this
@@ -2563,6 +2580,7 @@
     }
 
     var prototype_merge = Ractive$merge;
+
     function Ractive$merge(keypath, array, options) {
         var currentArray, promise;
 
@@ -2638,6 +2656,7 @@
     var observe_Observer = Observer;
 
     var observe_getPattern = getPattern;
+
     function getPattern(ractive, pattern) {
         var matchingKeypaths, values;
 
@@ -2766,6 +2785,7 @@
 
     var observe_getObserverFacade = getObserverFacade;
     var emptyObject = {};
+
     function getObserverFacade(ractive, keypath, callback, options) {
         var observer, isPatternObserver, cancelled;
 
@@ -2812,6 +2832,7 @@
     }
 
     var observe = Ractive$observe;
+
     function Ractive$observe(keypath, callback, options) {
 
         var observers, map, keypaths, i;
@@ -2883,7 +2904,7 @@
         var observer = this.observe(property, function () {
             callback.apply(this, arguments);
             observer.cancel();
-        }, { init: false, defer: options && options.defer });
+        }, {init: false, defer: options && options.defer});
 
         return observer;
     }
@@ -2897,6 +2918,7 @@
     };
 
     var off = Ractive$off;
+
     function Ractive$off(eventName, callback) {
         var _this = this;
 
@@ -2940,6 +2962,7 @@
     }
 
     var on = Ractive$on;
+
     function Ractive$on(eventName, callback) {
         var _this = this;
 
@@ -3214,6 +3237,7 @@
 
     var renderHook = new hooks_Hook("render"),
         completeHook = new hooks_Hook("complete");
+
     function Ractive$render(target, anchor) {
         var _this = this;
 
@@ -3289,7 +3313,8 @@
             proto.adapt = custom_adapt__combine(proto.adapt, ensureArray(options.adapt));
         },
 
-        init: function () {}
+        init: function () {
+        }
     };
 
     var custom_adapt = adaptConfigurator;
@@ -3299,7 +3324,7 @@
             i = b.length;
 
         while (i--) {
-            if (! ~c.indexOf(b[i])) {
+            if (!~c.indexOf(b[i])) {
                 c.push(b[i]);
             }
         }
@@ -3314,6 +3339,7 @@
         selectorUnitPattern = /((?:(?:\[[^\]+]\])|(?:[^\s\+\>\~:]))+)((?::[^\s\+\>\~\(]+(?:\([^\)]+\))?)?\s*[\s\+\>\~]?)\s*/g,
         mediaQueryPattern = /^@media/,
         dataRvcGuidPattern = /\[data-ractive-css~="\{[a-z0-9-]+\}"]/g;
+
     function transformCss(css, id) {
         var transformed, dataAttr, addGuid;
 
@@ -3402,11 +3428,12 @@
                 var styles = options.noCssTransform ? options.css : transform(options.css, id);
 
                 proto.cssId = id;
-                global_css.add({ id: id, styles: styles });
+                global_css.add({id: id, styles: styles});
             }
         },
 
-        init: function () {}
+        init: function () {
+        }
     };
 
     var css_css = cssConfigurator;
@@ -3414,7 +3441,8 @@
     function validate(data) {
         // Warn if userOptions.data is a non-POJO
         if (data && data.constructor !== Object) {
-            if (typeof data === "function") {} else if (typeof data !== "object") {
+            if (typeof data === "function") {
+            } else if (typeof data !== "object") {
                 fatal("data option must be an object or a function, `" + data + "` is not valid");
             } else {
                 warnIfDebug("If supplied, options.data should be a plain JavaScript object - using a non-POJO as the root object may work, but is discouraged");
@@ -3729,6 +3757,7 @@
     var mustache_readDelimiterChange = readDelimiterChange;
     var delimiterChangePattern = /^[^\s=]+/,
         whitespacePattern = /^\s+/;
+
     function readDelimiterChange(parser) {
         var start, opening, closing;
 
@@ -3771,6 +3800,7 @@
 
     var readRegexpLiteral = readRegexpLiteral__readNumberLiteral;
     var regexpPattern = /^(\/(?:[^\n\r\u2028\u2029/\\[]|\\.|\[(?:[^\n\r\u2028\u2029\]\\]|\\.)*])+\/(?:([gimuy])(?![a-z]*\2))*(?![a-zA-Z_$0-9]))/;
+
     function readRegexpLiteral__readNumberLiteral(parser) {
         var result;
 
@@ -3786,7 +3816,8 @@
 
     var converters_readMustache = readMustache;
 
-    var delimiterChangeToken = { t: DELIMCHANGE, exclude: true };
+    var delimiterChangeToken = {t: DELIMCHANGE, exclude: true};
+
     function readMustache(parser) {
         var mustache, i;
 
@@ -3870,6 +3901,7 @@
 
     var literal_readNumberLiteral = literal_readNumberLiteral__readNumberLiteral;
     var literal_readNumberLiteral__numberPattern = /^(?:[+-]?)0*(?:(?:(?:[1-9]\d*)?\.\d+)|(?:(?:0|[1-9]\d*)\.)|(?:0|[1-9]\d*))(?:[eE][+-]?\d+)?/;
+
     function literal_readNumberLiteral__readNumberLiteral(parser) {
         var result;
 
@@ -3884,6 +3916,7 @@
     }
 
     var literal_readBooleanLiteral = readBooleanLiteral;
+
     function readBooleanLiteral(parser) {
         var remaining = parser.remaining();
 
@@ -4000,6 +4033,7 @@
     // can be any name, string literal, or number literal
     var shared_readKey = readKey;
     var identifier = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
+
     function readKey(parser) {
         var token;
 
@@ -4017,6 +4051,7 @@
     }
 
     var keyValuePair = readKeyValuePair;
+
     function readKeyValuePair(parser) {
         var start, key, value;
 
@@ -4058,6 +4093,7 @@
     }
 
     var objectLiteral_keyValuePairs = readKeyValuePairs;
+
     function readKeyValuePairs(parser) {
         var start, pairs, pair, keyValuePairs;
 
@@ -4114,6 +4150,7 @@
     };
 
     var shared_readExpressionList = readExpressionList;
+
     function readExpressionList(parser) {
         var start, expressions, expr, next;
 
@@ -4175,6 +4212,7 @@
     };
 
     var primary_readLiteral = readLiteral;
+
     function readLiteral(parser) {
         return literal_readNumberLiteral(parser) || literal_readBooleanLiteral(parser) || readStringLiteral(parser) || readObjectLiteral(parser) || readArrayLiteral(parser) || readRegexpLiteral(parser);
     }
@@ -4192,6 +4230,7 @@
 
     var legalReference = /^[a-zA-Z$_0-9]+(?:(?:\.[a-zA-Z$_0-9]+)|(?:\[[0-9]+\]))*/;
     var relaxedName = /^[a-zA-Z_$][-a-zA-Z_$0-9]*/;
+
     function readReference(parser) {
         var startPos, prefix, name, global, reference, lastDotIndex;
 
@@ -4252,6 +4291,7 @@
     }
 
     var primary_readBracketedExpression = readBracketedExpression;
+
     function readBracketedExpression(parser) {
         var start, expr;
 
@@ -4285,6 +4325,7 @@
     };
 
     var shared_readRefinement = readRefinement;
+
     function readRefinement(parser) {
         var start, name, expr;
 
@@ -4499,6 +4540,7 @@
 
     // The conditional operator is the lowest precedence operator, so we start here
     var readConditional = getConditional;
+
     function getConditional(parser) {
         var start, expression, ifTrue, ifFalse;
 
@@ -4543,6 +4585,7 @@
     }
 
     var converters_readExpression = readExpression;
+
     function readExpression(parser) {
         // The conditional operator is the lowest precedence operator (except yield,
         // assignment operators, and commas, none of which are supported), so we
@@ -4653,6 +4696,7 @@
     var utils_refineExpression = refineExpression;
 
     var arrayMemberPattern = /^[0-9][1-9]*$/;
+
     function refineExpression(expression, mustache) {
         var referenceExpression;
 
@@ -4711,6 +4755,7 @@
     }
 
     var mustache_readTriple = readTriple;
+
     function readTriple(parser, tag) {
         var expression = converters_readExpression(parser),
             triple;
@@ -4723,13 +4768,14 @@
             parser.error("Expected closing delimiter '" + tag.close + "'");
         }
 
-        triple = { t: TRIPLE };
+        triple = {t: TRIPLE};
         utils_refineExpression(expression, triple); // TODO handle this differently - it's mysterious
 
         return triple;
     }
 
     var mustache_readUnescaped = readUnescaped;
+
     function readUnescaped(parser, tag) {
         var expression, triple;
 
@@ -4749,13 +4795,14 @@
             parser.error("Expected closing delimiter '" + tag.close + "'");
         }
 
-        triple = { t: TRIPLE };
+        triple = {t: TRIPLE};
         utils_refineExpression(expression, triple); // TODO handle this differently - it's mysterious
 
         return triple;
     }
 
     var mustache_readPartial = readPartial;
+
     function readPartial(parser, tag) {
         var start, nameStart, expression, context, partial;
 
@@ -4784,7 +4831,7 @@
             return null;
         }
 
-        partial = { t: PARTIAL };
+        partial = {t: PARTIAL};
         utils_refineExpression(expression, partial); // TODO...
 
         parser.allowWhitespace();
@@ -4809,6 +4856,7 @@
     }
 
     var readMustacheComment = readComment;
+
     function readComment(parser, tag) {
         var index;
 
@@ -4820,11 +4868,12 @@
 
         if (index !== -1) {
             parser.pos += index + tag.close.length;
-            return { t: COMMENT };
+            return {t: COMMENT};
         }
     }
 
     var converters_readExpressionOrReference = readExpressionOrReference;
+
     function readExpressionOrReference(parser, expectedFollowers) {
         var start, expression, i;
 
@@ -4846,6 +4895,7 @@
     }
 
     var mustache_readInterpolator = readInterpolator;
+
     function readInterpolator(parser, tag) {
         var start, expression, interpolator, err;
 
@@ -4883,7 +4933,7 @@
             }
         }
 
-        interpolator = { t: INTERPOLATOR };
+        interpolator = {t: INTERPOLATOR};
         utils_refineExpression(expression, interpolator); // TODO handle this differently - it's mysterious
 
         return interpolator;
@@ -4891,6 +4941,7 @@
 
     var mustache_readYielder = readYielder;
     var yieldPattern = /^yield\s*/;
+
     function readYielder(parser, tag) {
         var start, name, yielder;
 
@@ -4907,7 +4958,7 @@
             parser.error("expected legal partial name");
         }
 
-        yielder = { t: YIELDER };
+        yielder = {t: YIELDER};
 
         if (name) {
             yielder.n = name;
@@ -4917,6 +4968,7 @@
     }
 
     var section_readClosing = readClosing;
+
     function readClosing(parser, tag) {
         var start, remaining, index, closing;
 
@@ -4959,6 +5011,7 @@
 
     var section_readElse = section_readElse__readElse;
     var section_readElse__elsePattern = /^\s*else\s*/;
+
     function section_readElse__readElse(parser, tag) {
         var start = parser.pos;
 
@@ -4982,6 +5035,7 @@
 
     var readElseIf = readElseIf__readElse;
     var readElseIf__elsePattern = /^\s*elseif\s+/;
+
     function readElseIf__readElse(parser, tag) {
         var start = parser.pos,
             expression;
@@ -5020,15 +5074,16 @@
     var indexRefPattern = /^\s*:\s*([a-zA-Z_$][a-zA-Z_$0-9]*)/,
         keyIndexRefPattern = /^\s*,\s*([a-zA-Z_$][a-zA-Z_$0-9]*)/,
         handlebarsBlockPattern = new RegExp("^(" + Object.keys(handlebarsBlockCodes).join("|") + ")\\b");
+
     function readSection(parser, tag) {
         var start, expression, section, child, children, hasElse, block, unlessBlock, conditions, closed, i, expectedClose;
 
         start = parser.pos;
 
         if (parser.matchString("^")) {
-            section = { t: SECTION, f: [], n: SECTION_UNLESS };
+            section = {t: SECTION, f: [], n: SECTION_UNLESS};
         } else if (parser.matchString("#")) {
-            section = { t: SECTION, f: [] };
+            section = {t: SECTION, f: []};
 
             if (parser.matchString("partial")) {
                 parser.pos = start - parser.standardDelimiters[0].length;
@@ -5224,6 +5279,7 @@
     var converters_readHtmlComment = readHtmlComment;
     var OPEN_COMMENT = "<!--",
         CLOSE_COMMENT = "-->";
+
     function readHtmlComment(parser) {
         var start, content, remaining, endIndex, comment;
 
@@ -5261,7 +5317,261 @@
     booleanAttributes = /^(allowFullscreen|async|autofocus|autoplay|checked|compact|controls|declare|default|defaultChecked|defaultMuted|defaultSelected|defer|disabled|enabled|formNoValidate|hidden|indeterminate|inert|isMap|itemScope|loop|multiple|muted|noHref|noResize|noShade|noValidate|noWrap|open|pauseOnExit|readOnly|required|reversed|scoped|seamless|selected|sortable|translate|trueSpeed|typeMustMatch|visible)$/i;
     voidElementNames = /^(?:area|base|br|col|command|doctype|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/i;
 
-    htmlEntities = { quot: 34, amp: 38, apos: 39, lt: 60, gt: 62, nbsp: 160, iexcl: 161, cent: 162, pound: 163, curren: 164, yen: 165, brvbar: 166, sect: 167, uml: 168, copy: 169, ordf: 170, laquo: 171, not: 172, shy: 173, reg: 174, macr: 175, deg: 176, plusmn: 177, sup2: 178, sup3: 179, acute: 180, micro: 181, para: 182, middot: 183, cedil: 184, sup1: 185, ordm: 186, raquo: 187, frac14: 188, frac12: 189, frac34: 190, iquest: 191, Agrave: 192, Aacute: 193, Acirc: 194, Atilde: 195, Auml: 196, Aring: 197, AElig: 198, Ccedil: 199, Egrave: 200, Eacute: 201, Ecirc: 202, Euml: 203, Igrave: 204, Iacute: 205, Icirc: 206, Iuml: 207, ETH: 208, Ntilde: 209, Ograve: 210, Oacute: 211, Ocirc: 212, Otilde: 213, Ouml: 214, times: 215, Oslash: 216, Ugrave: 217, Uacute: 218, Ucirc: 219, Uuml: 220, Yacute: 221, THORN: 222, szlig: 223, agrave: 224, aacute: 225, acirc: 226, atilde: 227, auml: 228, aring: 229, aelig: 230, ccedil: 231, egrave: 232, eacute: 233, ecirc: 234, euml: 235, igrave: 236, iacute: 237, icirc: 238, iuml: 239, eth: 240, ntilde: 241, ograve: 242, oacute: 243, ocirc: 244, otilde: 245, ouml: 246, divide: 247, oslash: 248, ugrave: 249, uacute: 250, ucirc: 251, uuml: 252, yacute: 253, thorn: 254, yuml: 255, OElig: 338, oelig: 339, Scaron: 352, scaron: 353, Yuml: 376, fnof: 402, circ: 710, tilde: 732, Alpha: 913, Beta: 914, Gamma: 915, Delta: 916, Epsilon: 917, Zeta: 918, Eta: 919, Theta: 920, Iota: 921, Kappa: 922, Lambda: 923, Mu: 924, Nu: 925, Xi: 926, Omicron: 927, Pi: 928, Rho: 929, Sigma: 931, Tau: 932, Upsilon: 933, Phi: 934, Chi: 935, Psi: 936, Omega: 937, alpha: 945, beta: 946, gamma: 947, delta: 948, epsilon: 949, zeta: 950, eta: 951, theta: 952, iota: 953, kappa: 954, lambda: 955, mu: 956, nu: 957, xi: 958, omicron: 959, pi: 960, rho: 961, sigmaf: 962, sigma: 963, tau: 964, upsilon: 965, phi: 966, chi: 967, psi: 968, omega: 969, thetasym: 977, upsih: 978, piv: 982, ensp: 8194, emsp: 8195, thinsp: 8201, zwnj: 8204, zwj: 8205, lrm: 8206, rlm: 8207, ndash: 8211, mdash: 8212, lsquo: 8216, rsquo: 8217, sbquo: 8218, ldquo: 8220, rdquo: 8221, bdquo: 8222, dagger: 8224, Dagger: 8225, bull: 8226, hellip: 8230, permil: 8240, prime: 8242, Prime: 8243, lsaquo: 8249, rsaquo: 8250, oline: 8254, frasl: 8260, euro: 8364, image: 8465, weierp: 8472, real: 8476, trade: 8482, alefsym: 8501, larr: 8592, uarr: 8593, rarr: 8594, darr: 8595, harr: 8596, crarr: 8629, lArr: 8656, uArr: 8657, rArr: 8658, dArr: 8659, hArr: 8660, forall: 8704, part: 8706, exist: 8707, empty: 8709, nabla: 8711, isin: 8712, notin: 8713, ni: 8715, prod: 8719, sum: 8721, minus: 8722, lowast: 8727, radic: 8730, prop: 8733, infin: 8734, ang: 8736, and: 8743, or: 8744, cap: 8745, cup: 8746, int: 8747, there4: 8756, sim: 8764, cong: 8773, asymp: 8776, ne: 8800, equiv: 8801, le: 8804, ge: 8805, sub: 8834, sup: 8835, nsub: 8836, sube: 8838, supe: 8839, oplus: 8853, otimes: 8855, perp: 8869, sdot: 8901, lceil: 8968, rceil: 8969, lfloor: 8970, rfloor: 8971, lang: 9001, rang: 9002, loz: 9674, spades: 9824, clubs: 9827, hearts: 9829, diams: 9830 };
+    htmlEntities = {
+        quot: 34,
+        amp: 38,
+        apos: 39,
+        lt: 60,
+        gt: 62,
+        nbsp: 160,
+        iexcl: 161,
+        cent: 162,
+        pound: 163,
+        curren: 164,
+        yen: 165,
+        brvbar: 166,
+        sect: 167,
+        uml: 168,
+        copy: 169,
+        ordf: 170,
+        laquo: 171,
+        not: 172,
+        shy: 173,
+        reg: 174,
+        macr: 175,
+        deg: 176,
+        plusmn: 177,
+        sup2: 178,
+        sup3: 179,
+        acute: 180,
+        micro: 181,
+        para: 182,
+        middot: 183,
+        cedil: 184,
+        sup1: 185,
+        ordm: 186,
+        raquo: 187,
+        frac14: 188,
+        frac12: 189,
+        frac34: 190,
+        iquest: 191,
+        Agrave: 192,
+        Aacute: 193,
+        Acirc: 194,
+        Atilde: 195,
+        Auml: 196,
+        Aring: 197,
+        AElig: 198,
+        Ccedil: 199,
+        Egrave: 200,
+        Eacute: 201,
+        Ecirc: 202,
+        Euml: 203,
+        Igrave: 204,
+        Iacute: 205,
+        Icirc: 206,
+        Iuml: 207,
+        ETH: 208,
+        Ntilde: 209,
+        Ograve: 210,
+        Oacute: 211,
+        Ocirc: 212,
+        Otilde: 213,
+        Ouml: 214,
+        times: 215,
+        Oslash: 216,
+        Ugrave: 217,
+        Uacute: 218,
+        Ucirc: 219,
+        Uuml: 220,
+        Yacute: 221,
+        THORN: 222,
+        szlig: 223,
+        agrave: 224,
+        aacute: 225,
+        acirc: 226,
+        atilde: 227,
+        auml: 228,
+        aring: 229,
+        aelig: 230,
+        ccedil: 231,
+        egrave: 232,
+        eacute: 233,
+        ecirc: 234,
+        euml: 235,
+        igrave: 236,
+        iacute: 237,
+        icirc: 238,
+        iuml: 239,
+        eth: 240,
+        ntilde: 241,
+        ograve: 242,
+        oacute: 243,
+        ocirc: 244,
+        otilde: 245,
+        ouml: 246,
+        divide: 247,
+        oslash: 248,
+        ugrave: 249,
+        uacute: 250,
+        ucirc: 251,
+        uuml: 252,
+        yacute: 253,
+        thorn: 254,
+        yuml: 255,
+        OElig: 338,
+        oelig: 339,
+        Scaron: 352,
+        scaron: 353,
+        Yuml: 376,
+        fnof: 402,
+        circ: 710,
+        tilde: 732,
+        Alpha: 913,
+        Beta: 914,
+        Gamma: 915,
+        Delta: 916,
+        Epsilon: 917,
+        Zeta: 918,
+        Eta: 919,
+        Theta: 920,
+        Iota: 921,
+        Kappa: 922,
+        Lambda: 923,
+        Mu: 924,
+        Nu: 925,
+        Xi: 926,
+        Omicron: 927,
+        Pi: 928,
+        Rho: 929,
+        Sigma: 931,
+        Tau: 932,
+        Upsilon: 933,
+        Phi: 934,
+        Chi: 935,
+        Psi: 936,
+        Omega: 937,
+        alpha: 945,
+        beta: 946,
+        gamma: 947,
+        delta: 948,
+        epsilon: 949,
+        zeta: 950,
+        eta: 951,
+        theta: 952,
+        iota: 953,
+        kappa: 954,
+        lambda: 955,
+        mu: 956,
+        nu: 957,
+        xi: 958,
+        omicron: 959,
+        pi: 960,
+        rho: 961,
+        sigmaf: 962,
+        sigma: 963,
+        tau: 964,
+        upsilon: 965,
+        phi: 966,
+        chi: 967,
+        psi: 968,
+        omega: 969,
+        thetasym: 977,
+        upsih: 978,
+        piv: 982,
+        ensp: 8194,
+        emsp: 8195,
+        thinsp: 8201,
+        zwnj: 8204,
+        zwj: 8205,
+        lrm: 8206,
+        rlm: 8207,
+        ndash: 8211,
+        mdash: 8212,
+        lsquo: 8216,
+        rsquo: 8217,
+        sbquo: 8218,
+        ldquo: 8220,
+        rdquo: 8221,
+        bdquo: 8222,
+        dagger: 8224,
+        Dagger: 8225,
+        bull: 8226,
+        hellip: 8230,
+        permil: 8240,
+        prime: 8242,
+        Prime: 8243,
+        lsaquo: 8249,
+        rsaquo: 8250,
+        oline: 8254,
+        frasl: 8260,
+        euro: 8364,
+        image: 8465,
+        weierp: 8472,
+        real: 8476,
+        trade: 8482,
+        alefsym: 8501,
+        larr: 8592,
+        uarr: 8593,
+        rarr: 8594,
+        darr: 8595,
+        harr: 8596,
+        crarr: 8629,
+        lArr: 8656,
+        uArr: 8657,
+        rArr: 8658,
+        dArr: 8659,
+        hArr: 8660,
+        forall: 8704,
+        part: 8706,
+        exist: 8707,
+        empty: 8709,
+        nabla: 8711,
+        isin: 8712,
+        notin: 8713,
+        ni: 8715,
+        prod: 8719,
+        sum: 8721,
+        minus: 8722,
+        lowast: 8727,
+        radic: 8730,
+        prop: 8733,
+        infin: 8734,
+        ang: 8736,
+        and: 8743,
+        or: 8744,
+        cap: 8745,
+        cup: 8746,
+        int: 8747,
+        there4: 8756,
+        sim: 8764,
+        cong: 8773,
+        asymp: 8776,
+        ne: 8800,
+        equiv: 8801,
+        le: 8804,
+        ge: 8805,
+        sub: 8834,
+        sup: 8835,
+        nsub: 8836,
+        sube: 8838,
+        supe: 8839,
+        oplus: 8853,
+        otimes: 8855,
+        perp: 8869,
+        sdot: 8901,
+        lceil: 8968,
+        rceil: 8969,
+        lfloor: 8970,
+        rfloor: 8971,
+        lang: 9001,
+        rang: 9002,
+        loz: 9674,
+        spades: 9824,
+        clubs: 9827,
+        hearts: 9829,
+        diams: 9830
+    };
     controlCharacters = [8364, 129, 8218, 402, 8222, 8230, 8224, 8225, 710, 8240, 352, 8249, 338, 141, 381, 143, 144, 8216, 8217, 8220, 8221, 8226, 8211, 8212, 732, 8482, 353, 8250, 339, 157, 382, 376];
     entityPattern = new RegExp("&(#?(?:x[\\w\\d]+|\\d+|" + Object.keys(htmlEntities).join("|") + "));?", "g");
 
@@ -5436,6 +5746,7 @@
     var trailingWhitespace = /[ \t\f\r\n]+$/;
     var leadingNewLine = /^(?:\r\n|\r|\n)/;
     var trailingNewLine = /(?:\r\n|\r|\n)$/;
+
     function cleanup(items, stripComments, preserveWhitespace, removeLeadingWhitespace, removeTrailingWhitespace) {
         var i, item, previousItem, nextItem, preserveWhitespaceInsideFragment, removeLeadingWhitespaceInsideFragment, removeTrailingWhitespaceInsideFragment, key;
 
@@ -5554,6 +5865,7 @@
 
     var element_readClosingTag = readClosingTag;
     var closingTagPattern = /^([a-zA-Z]{1,}:?[a-zA-Z0-9\-]*)\s*\>/;
+
     function readClosingTag(parser) {
         var start, tag;
 
@@ -5609,6 +5921,7 @@
 
     var attributeNamePattern = /^[^\s"'>\/=]+/,
         unquotedAttributeValueTextPattern = /^[^\s"'=<>`]+/;
+
     function readAttribute(parser) {
         var attr, name, value;
 
@@ -5619,7 +5932,7 @@
             return null;
         }
 
-        attr = { name: name };
+        attr = {name: name};
 
         value = readAttributeValue(parser);
         if (value != null) {
@@ -5799,7 +6112,7 @@
                 return null;
             }
 
-            return { value: result[0].v };
+            return {value: result[0].v};
         },
 
         converters: [function getPlaceholder(parser) {
@@ -5812,19 +6125,19 @@
             placeholder = parser.matchPattern(placeholderAtStartPattern);
 
             if (placeholder && parser.values.hasOwnProperty(placeholder)) {
-                return { v: parser.values[placeholder] };
+                return {v: parser.values[placeholder]};
             }
         }, function getSpecial(parser) {
             var special;
 
             if (special = parser.matchPattern(specialsPattern)) {
-                return { v: specials[special] };
+                return {v: specials[special]};
             }
         }, function getNumber(parser) {
             var number;
 
             if (number = parser.matchPattern(parseJSON__numberPattern)) {
-                return { v: +number };
+                return {v: +number};
             }
         }, function getString(parser) {
             var stringLiteral = readStringLiteral(parser),
@@ -5851,7 +6164,7 @@
             parser.allowWhitespace();
 
             if (parser.matchString("}")) {
-                return { v: result };
+                return {v: result};
             }
 
             while (pair = getKeyValuePair(parser)) {
@@ -5860,7 +6173,7 @@
                 parser.allowWhitespace();
 
                 if (parser.matchString("}")) {
-                    return { v: result };
+                    return {v: result};
                 }
 
                 if (!parser.matchString(",")) {
@@ -5881,7 +6194,7 @@
             parser.allowWhitespace();
 
             if (parser.matchString("]")) {
-                return { v: result };
+                return {v: result};
             }
 
             while (valueToken = parser.read()) {
@@ -5890,7 +6203,7 @@
                 parser.allowWhitespace();
 
                 if (parser.matchString("]")) {
-                    return { v: result };
+                    return {v: result};
                 }
 
                 if (!parser.matchString(",")) {
@@ -5915,7 +6228,7 @@
             return null;
         }
 
-        pair = { key: key };
+        pair = {key: key};
 
         parser.allowWhitespace();
         if (!parser.matchString(":")) {
@@ -5962,7 +6275,7 @@
                     parentParser.error("Invalid input after method call expression '" + tokens.slice(end + 1) + "'");
                 }
 
-                result = { m: match[1] };
+                result = {m: match[1]};
                 args = "[" + tokens.slice(result.m.length + 1, end) + "]";
 
                 parser = new ExpressionParser(args);
@@ -6042,8 +6355,8 @@
         onPattern = /^on/,
         proxyEventPattern = /^on-([a-zA-Z\\*\\.$_][a-zA-Z\\*\\.$_0-9\-]+)$/,
         reservedEventNames = /^(?:change|reset|teardown|update|construct|config|init|render|unrender|detach|insert)$/,
-        directives = { "intro-outro": "t0", intro: "t1", outro: "t2", decorator: "o" },
-        exclude = { exclude: true },
+        directives = {"intro-outro": "t0", intro: "t1", outro: "t2", decorator: "o"},
+        exclude = {exclude: true},
         disallowedContents;
 
     // based on http://developers.whatwg.org/syntax.html#syntax-tag-omission
@@ -6206,7 +6519,7 @@
                         parser.pos = pos;
 
                         // if it doesn't close a parent tag, error
-                        if (! ~parser.elementStack.indexOf(closingTagName)) {
+                        if (!~parser.elementStack.indexOf(closingTagName)) {
                             var errorMessage = "Unexpected closing tag";
 
                             // add additional help for void elements, since component names
@@ -6221,7 +6534,10 @@
                 }
 
                 // implicit close by closing section tag. TODO clean this up
-                else if (child = section_readClosing(parser, { open: parser.standardDelimiters[0], close: parser.standardDelimiters[1] })) {
+                else if (child = section_readClosing(parser, {
+                        open: parser.standardDelimiters[0],
+                        close: parser.standardDelimiters[1]
+                    })) {
                     closed = true;
                     parser.pos = pos;
                 } else {
@@ -6275,10 +6591,11 @@
             return true;
         }
 
-        return ! ~disallowed.indexOf(match[1].toLowerCase());
+        return !~disallowed.indexOf(match[1].toLowerCase());
     }
 
     var converters_readText = readText;
+
     function readText(parser) {
         var index, remaining, disallowed, barrier;
 
@@ -6325,6 +6642,7 @@
 
     var utils_escapeRegExp = escapeRegExp;
     var utils_escapeRegExp__pattern = /[-/\\^$*+?.()|[\]{}]/g;
+
     function escapeRegExp(str) {
         return str.replace(utils_escapeRegExp__pattern, "\\$&");
     }
@@ -6384,6 +6702,7 @@
 
     var converters_readPartialDefinitionSection = readPartialDefinitionSection;
     var partialDefinitionSectionPattern = /^#\s*partial\s+/;
+
     function readPartialDefinitionSection(parser) {
         var start, name, content, child, closed;
 
@@ -6414,7 +6733,10 @@
 
         do {
             // TODO clean this up
-            if (child = section_readClosing(parser, { open: parser.standardDelimiters[0], close: parser.standardDelimiters[1] })) {
+            if (child = section_readClosing(parser, {
+                    open: parser.standardDelimiters[0],
+                    close: parser.standardDelimiters[1]
+                })) {
                 if (!child.r === "partial") {
                     parser.error("Expected " + delimiters[0] + "/partial" + delimiters[1]);
                 }
@@ -6439,6 +6761,7 @@
     }
 
     var converters_readTemplate = readTemplate;
+
     function readTemplate(parser) {
         var fragment = [];
         var partials = create(null);
@@ -6487,6 +6810,7 @@
     var STATIC_READERS = [mustache_readUnescaped, mustache_readSection, mustache_readInterpolator]; // TODO does it make sense to have a static section?
 
     var StandardParser = undefined;
+
     function parse(template, options) {
         return new StandardParser(template, options || {}).result;
     }
@@ -6502,7 +6826,31 @@
 
             this.standardDelimiters = options.delimiters || ["{{", "}}"];
 
-            this.tags = [{ isStatic: false, isTriple: false, open: this.standardDelimiters[0], close: this.standardDelimiters[1], readers: STANDARD_READERS }, { isStatic: false, isTriple: true, open: tripleDelimiters[0], close: tripleDelimiters[1], readers: TRIPLE_READERS }, { isStatic: true, isTriple: false, open: staticDelimiters[0], close: staticDelimiters[1], readers: STATIC_READERS }, { isStatic: true, isTriple: true, open: staticTripleDelimiters[0], close: staticTripleDelimiters[1], readers: TRIPLE_READERS }];
+            this.tags = [{
+                isStatic: false,
+                isTriple: false,
+                open: this.standardDelimiters[0],
+                close: this.standardDelimiters[1],
+                readers: STANDARD_READERS
+            }, {
+                isStatic: false,
+                isTriple: true,
+                open: tripleDelimiters[0],
+                close: tripleDelimiters[1],
+                readers: TRIPLE_READERS
+            }, {
+                isStatic: true,
+                isTriple: false,
+                open: staticDelimiters[0],
+                close: staticDelimiters[1],
+                readers: STATIC_READERS
+            }, {
+                isStatic: true,
+                isTriple: true,
+                open: staticTripleDelimiters[0],
+                close: staticTripleDelimiters[1],
+                readers: TRIPLE_READERS
+            }];
 
             this.sortMustacheTags();
 
@@ -6532,7 +6880,7 @@
         postProcess: function (result) {
             // special case - empty string
             if (!result.length) {
-                return { t: [], v: TEMPLATE_VERSION };
+                return {t: [], v: TEMPLATE_VERSION};
             }
 
             if (this.sectionDepth > 0) {
@@ -6558,7 +6906,11 @@
     var parseOptions = ["preserveWhitespace", "sanitize", "stripComments", "delimiters", "tripleDelimiters", "interpolate"];
 
     var parser = {
-        fromId: fromId, isHashedId: isHashedId, isParsed: isParsed, getParseOptions: getParseOptions, createHelper: template_parser__createHelper,
+        fromId: fromId,
+        isHashedId: isHashedId,
+        isParsed: isParsed,
+        getParseOptions: getParseOptions,
+        createHelper: template_parser__createHelper,
         parse: doParse
     };
 
@@ -6787,7 +7139,8 @@
             this.configure(this.useDefaults ? Parent.defaults : Parent, this.useDefaults ? proto : proto.constructor, options);
         },
 
-        init: function () {},
+        init: function () {
+        },
 
         configure: function (Parent, target, options) {
             var name = this.name,
@@ -6885,6 +7238,7 @@
     }
 
     var config_deprecate = deprecate;
+
     function getMessage(deprecated, correct, isError) {
         return "options." + deprecated + " has been deprecated in favour of options." + correct + "." + (isError ? " You cannot specify both options, please use options." + correct + "." : "");
     }
@@ -6899,6 +7253,7 @@
             }
         }
     }
+
     function deprecate(options) {
         deprecateOption(options, "beforeInit", "onconstruct");
         deprecateOption(options, "init", "onrender");
@@ -6956,7 +7311,8 @@
 
         // this defines the order. TODO this isn't used anywhere in the codebase,
         // only in the test suite - should get rid of it
-        order: order };
+        order: order
+    };
 
     function configure(method, Parent, target, options) {
         config_deprecate(options);
@@ -7200,6 +7556,7 @@
     }
 
     var getArgsList = Fragment$getArgsList;
+
     function Fragment$getArgsList() {
         var values, source, parsed, result;
 
@@ -7235,6 +7592,7 @@
     }
 
     var prototype_getValue = Fragment$getValue;
+
     function Fragment$getValue() {
         var values, source, parsed, result;
 
@@ -7378,9 +7736,9 @@
     };
 
     var props = {
-        "@keypath": { prefix: "c", prop: ["context"] },
-        "@index": { prefix: "i", prop: ["index"] },
-        "@key": { prefix: "k", prop: ["key", "index"] }
+        "@keypath": {prefix: "c", prop: ["context"]},
+        "@index": {prefix: "i", prop: ["index"]},
+        "@key": {prefix: "k", prop: ["key", "index"]}
     };
 
     function getProp(target, prop) {
@@ -7553,6 +7911,7 @@
     };
 
     var Resolvers_createReferenceResolver = createReferenceResolver;
+
     function createReferenceResolver(owner, ref, callback) {
         var indexRef;
 
@@ -7569,6 +7928,7 @@
 
     var shared_getFunctionFromString = getFunctionFromString;
     var cache = {};
+
     function getFunctionFromString(str, i) {
         var fn, args;
 
@@ -7672,7 +8032,7 @@
                     }
 
                     return function () {
-                        var value = _this.root.viewmodel.get(keypath, { noUnwrap: true, fullRootGet: true });
+                        var value = _this.root.viewmodel.get(keypath, {noUnwrap: true, fullRootGet: true});
                         if (typeof value === "function") {
                             value = wrapFunction(value, _this.root);
                         }
@@ -7966,6 +8326,7 @@
     var ReferenceExpressionResolver_ReferenceExpressionResolver = ReferenceExpressionResolver;
 
     var Mustache_initialise = Mustache$init;
+
     function Mustache$init(mustache, options) {
 
         var ref, parentFragment, template;
@@ -8725,6 +9086,7 @@
     }
 
     var prototype_unbind = Section$unbind;
+
     function Section$unbind() {
         var _this = this;
 
@@ -8827,7 +9189,7 @@
 
         if (options.template.i) {
             this.indexRefs = options.template.i.split(",").map(function (k, i) {
-                return { n: k, t: i === 0 ? "k" : "i" };
+                return {n: k, t: i === 0 ? "k" : "i"};
             });
         }
 
@@ -8888,6 +9250,7 @@
     }
 
     var Triple_prototype_find = Triple$find;
+
     function Triple$find(selector) {
         var i, len, node, queryResult;
 
@@ -8912,6 +9275,7 @@
     }
 
     var Triple_prototype_findAll = Triple$findAll;
+
     function Triple$findAll(selector, queryResult) {
         var i, len, node, queryAllResult, numNodes, j;
 
@@ -9055,6 +9419,7 @@
     }
 
     var Triple_prototype_render = Triple$render;
+
     function Triple$render() {
         if (this.rendered) {
             throw new Error("Attempted to render an item that was already rendered");
@@ -9071,6 +9436,7 @@
     }
 
     var prototype_setValue = Triple$setValue;
+
     function Triple$setValue(value) {
         var wrapper;
 
@@ -9090,11 +9456,13 @@
     }
 
     var Triple_prototype_toString = Triple$toString;
+
     function Triple$toString() {
         return this.value != undefined ? decodeCharacterReferences("" + this.value) : "";
     }
 
     var Triple_prototype_unrender = Triple$unrender;
+
     function Triple$unrender(shouldDestroy) {
         if (this.rendered && shouldDestroy) {
             this.nodes.forEach(detachNode);
@@ -9105,6 +9473,7 @@
     }
 
     var Triple_prototype_update = Triple$update;
+
     function Triple$update() {
         var node, parentNode;
 
@@ -9265,6 +9634,7 @@
     };
 
     var Attribute_prototype_bubble = Attribute$bubble;
+
     function Attribute$bubble() {
         var value = this.useProperty || !this.rendered ? this.fragment.getValue() : this.fragment.toString();
 
@@ -9343,6 +9713,7 @@
     };
 
     var helpers_getInterpolator = getInterpolator;
+
     function getInterpolator(attribute) {
         var items = attribute.fragment.items;
 
@@ -9356,6 +9727,7 @@
     }
 
     var prototype_init = Attribute$init;
+
     function Attribute$init(options) {
         this.type = ATTRIBUTE;
         this.element = options.element;
@@ -9425,6 +9797,7 @@
         tabindex: "tabIndex",
         usemap: "useMap"
     };
+
     function Attribute$render(node) {
         var propertyName;
 
@@ -9549,6 +9922,7 @@
     }
 
     var updateMultipleSelectValue = Attribute$updateMultipleSelect;
+
     function Attribute$updateMultipleSelect() {
         var value = this.value,
             options,
@@ -9582,6 +9956,7 @@
     }
 
     var updateRadioValue = Attribute$updateRadioValue;
+
     function Attribute$updateRadioValue() {
         var wasChecked,
             node = this.node,
@@ -9623,12 +9998,16 @@
     }
 
     var updateCheckboxName = Attribute$updateCheckboxName;
+
     function Attribute$updateCheckboxName() {
         var _ref = this;
 
         var element = _ref.element;
         var node = _ref.node;
-        var value = _ref.value;var binding = element.binding;var valueAttribute;var i;
+        var value = _ref.value;
+        var binding = element.binding;
+        var valueAttribute;
+        var i;
 
         valueAttribute = element.getAttribute("value");
 
@@ -9647,6 +10026,7 @@
     }
 
     var updateClassName = Attribute$updateClassName;
+
     function Attribute$updateClassName() {
         this.node.className = safeToStringValue(this.value);
     }
@@ -9756,12 +10136,15 @@
     // attribute has finished initialising, then replaces the prototype method with a more
     // suitable one. That way, we save ourselves doing a bunch of tests on each call
     var Attribute_prototype_update = Attribute$update;
+
     function Attribute$update() {
         var _ref = this;
 
         var name = _ref.name;
         var element = _ref.element;
-        var node = _ref.node;var type;var updateMethod;
+        var node = _ref.node;
+        var type;
+        var updateMethod;
 
         if (name === "id") {
             updateMethod = updateIdAttribute;
@@ -9994,12 +10377,12 @@
 
         if (keypath = interpolator.keypath) {
             if (keypath.str.slice(-1) === "}") {
-                warnOnceIfDebug("Two-way binding does not work with expressions (`%s` on <%s>)", interpolator.resolver.uniqueString, element.name, { ractive: this.root });
+                warnOnceIfDebug("Two-way binding does not work with expressions (`%s` on <%s>)", interpolator.resolver.uniqueString, element.name, {ractive: this.root});
                 return false;
             }
 
             if (keypath.isSpecial) {
-                warnOnceIfDebug("Two-way binding does not work with %s", interpolator.resolver.ref, { ractive: this.root });
+                warnOnceIfDebug("Two-way binding does not work with %s", interpolator.resolver.ref, {ractive: this.root});
                 return false;
             }
         } else {
@@ -10018,7 +10401,7 @@
             // be explicit when using two-way data-binding about what keypath you're
             // updating. Using it in lists is probably a recipe for confusion...
             var ref = interpolator.template.r ? "'" + interpolator.template.r + "' reference" : "expression";
-            warnIfDebug("The %s being used for two-way binding is ambiguous, and may cause unexpected results. Consider initialising your data to eliminate the ambiguity", ref, { ractive: this.root });
+            warnIfDebug("The %s being used for two-way binding is ambiguous, and may cause unexpected results. Consider initialising your data to eliminate the ambiguity", ref, {ractive: this.root});
             interpolator.resolver.forceResolution();
             keypath = interpolator.keypath;
         }
@@ -10075,7 +10458,8 @@
             bindings.push(this);
         },
 
-        unbind: function () {}
+        unbind: function () {
+        }
     };
 
     Binding.extend = function (properties) {
@@ -10217,6 +10601,7 @@
 
     var shared_getSiblings = getSiblings;
     var sets = {};
+
     function getSiblings(id, group, keypath) {
         var hash = id + group + keypath;
         return sets[hash] || (sets[hash] = []);
@@ -10703,7 +11088,7 @@
 
                 // we can either bind the name attribute, or the checked attribute - not both
                 if (bindName && bindChecked) {
-                    warnIfDebug("A radio input can have two-way binding on its name attribute, or its checked attribute - not both", { ractive: element.root });
+                    warnIfDebug("A radio input can have two-way binding on its name attribute, or its checked attribute - not both", {ractive: element.root});
                 }
 
                 if (bindName) {
@@ -10754,8 +11139,9 @@
     // This function may be overwritten, if the event directive
     // includes parameters
     var EventHandler_prototype_fire = EventHandler$fire;
+
     function EventHandler$fire(event) {
-        shared_fireEvent(this.root, this.getAction(), { event: event });
+        shared_fireEvent(this.root, this.getAction(), {event: event});
     }
 
     var getAction = EventHandler$getAction;
@@ -10767,6 +11153,7 @@
     var EventHandler_prototype_init = EventHandler$init;
 
     var eventPattern = /^event(?:\.(.+))?/;
+
     function EventHandler$init(element, name, template) {
         var _this = this;
 
@@ -10883,7 +11270,7 @@
     }
 
     function fireEventWithParams(event) {
-        shared_fireEvent(this.root, this.getAction(), { event: event, args: this.params });
+        shared_fireEvent(this.root, this.getAction(), {event: event, args: this.params});
     }
 
     function fireEventWithDynamicParams(event) {
@@ -10894,10 +11281,11 @@
             args = args.substr(1, args.length - 2);
         }
 
-        shared_fireEvent(this.root, this.getAction(), { event: event, args: args });
+        shared_fireEvent(this.root, this.getAction(), {event: event, args: args});
     }
 
     var shared_genericHandler = genericHandler;
+
     function genericHandler(event) {
         var storage,
             handler,
@@ -10931,6 +11319,7 @@
             //not w3c, but supported in some browsers
             touchleave: true
         };
+
     function EventHandler$listen() {
         var definition,
             name = this.name;
@@ -10947,7 +11336,7 @@
 
                 // okay to use touch events if this browser doesn't support them
                 if (!touchEvents[name]) {
-                    warnOnceIfDebug(missingPlugin(name, "event"), { node: this.node });
+                    warnOnceIfDebug(missingPlugin(name, "event"), {node: this.node});
                 }
 
                 return;
@@ -11019,6 +11408,7 @@
     }
 
     var EventHandler_prototype_unbind = EventHandler$unbind;
+
     function EventHandler$unbind() {
         if (this.method) {
             this.refResolvers.forEach(methodCallers__unbind);
@@ -11037,6 +11427,7 @@
     }
 
     var EventHandler_prototype_unrender = EventHandler$unrender;
+
     function EventHandler$unrender() {
 
         if (this.custom) {
@@ -11313,6 +11704,7 @@
     }
 
     var Element_prototype_init = Element$init;
+
     function Element$init(options) {
         var parentFragment, template, ractive, binding, bindings, twoway, bindingAttrs;
 
@@ -11366,7 +11758,7 @@
 
         // the element setting should override the ractive setting
         twoway = ractive.twoway;
-        if (bindingAttrs.twoway === false) twoway = false;else if (bindingAttrs.twoway === true) twoway = true;
+        if (bindingAttrs.twoway === false) twoway = false; else if (bindingAttrs.twoway === true) twoway = true;
 
         this.twoway = twoway;
         this.lazy = bindingAttrs.lazy;
@@ -11396,6 +11788,7 @@
     }
 
     var Element_prototype_rebind = Element$rebind;
+
     function Element$rebind(oldKeypath, newKeypath) {
         var i, storage, liveQueries, ractive;
 
@@ -11485,6 +11878,7 @@
     }
 
     var Transition_prototype_init = Transition$init;
+
     function Transition$init(element, template, isIntro) {
         var ractive, name, fragment;
 
@@ -11530,7 +11924,7 @@
         this._fn = findInViewHierarchy("transitions", ractive, name);
 
         if (!this._fn) {
-            warnOnceIfDebug(missingPlugin(name, "transition"), { ractive: this.root });
+            warnOnceIfDebug(missingPlugin(name, "transition"), {ractive: this.root});
         }
     }
 
@@ -11705,6 +12099,7 @@
     };
 
     var shared_Ticker = Ticker;
+
     function linear(t) {
         return t;
     }
@@ -11860,7 +12255,7 @@
                             // will get confused
                             index = changedProperties.indexOf(prop);
                             if (index === -1) {
-                                warnIfDebug("Something very strange happened with transitions. Please raise an issue at https://github.com/ractivejs/ractive/issues - thanks!", { node: t.node });
+                                warnIfDebug("Something very strange happened with transitions. Please raise an issue at https://github.com/ractivejs/ractive/issues - thanks!", {node: t.node});
                             } else {
                                 changedProperties.splice(index, 1);
                             }
@@ -12072,14 +12467,14 @@
 
     var processParams = function (params, defaults) {
         if (typeof params === "number") {
-            params = { duration: params };
+            params = {duration: params};
         } else if (typeof params === "string") {
             if (params === "slow") {
-                params = { duration: 600 };
+                params = {duration: 600};
             } else if (params === "fast") {
-                params = { duration: 200 };
+                params = {duration: 200};
             } else {
-                params = { duration: 400 };
+                params = {duration: 400};
             }
         } else if (!params) {
             params = {};
@@ -12179,7 +12574,7 @@
 
     updateScript = function () {
         if (!this.node.type || this.node.type === "text/javascript") {
-            warnIfDebug("Script tag was updated. This does not cause the code to be re-evaluated!", { ractive: this.root });
+            warnIfDebug("Script tag was updated. This does not cause the code to be re-evaluated!", {ractive: this.root});
             // As it happens, we ARE in a position to re-evaluate the code if we wanted
             // to - we could eval() it, or insert it into a fresh (temporary) script tag.
             // But this would be a terrible idea with unpredictable results, so let's not.
@@ -12490,6 +12885,7 @@
     }
 
     var Element_prototype_unbind = Element$unbind;
+
     function Element$unbind() {
         if (this.fragment) {
             this.fragment.unbind();
@@ -12660,7 +13056,7 @@
         }
 
         // Does it exist on the page as a script tag?
-        partial = template_parser.fromId(name, { noThrow: true });
+        partial = template_parser.fromId(name, {noThrow: true});
 
         if (partial) {
             // is this necessary?
@@ -12698,7 +13094,7 @@
         }
 
         if (!partial && partial !== "") {
-            warnIfDebug(noRegistryFunctionReturn, name, "partial", "partial", { ractive: ractive });
+            warnIfDebug(noRegistryFunctionReturn, name, "partial", "partial", {ractive: ractive});
             return;
         }
 
@@ -12712,7 +13108,7 @@
             // Partials cannot contain nested partials!
             // TODO add a test for this
             if (parsed.p) {
-                warnIfDebug("Partials ({{>%s}}) cannot contain nested inline partials", name, { ractive: ractive });
+                warnIfDebug("Partials ({{>%s}}) cannot contain nested inline partials", name, {ractive: ractive});
             }
 
             // if fn, use instance to store result, otherwise needs to go
@@ -12831,7 +13227,7 @@
         },
 
         getPartialName: function () {
-            if (this.isNamed && this.name) return this.name;else if (this.value === undefined) return this.name;else return this.value;
+            if (this.isNamed && this.name) return this.name; else if (this.value === undefined) return this.name; else return this.value;
         },
 
         getValue: function () {
@@ -12880,7 +13276,7 @@
             }
 
             if (!template) {
-                warnOnceIfDebug(missingPartialMessage, this.name, { ractive: this.root });
+                warnOnceIfDebug(missingPartialMessage, this.name, {ractive: this.root});
             }
 
             this.value = value;
@@ -12978,6 +13374,7 @@
     // finds the component constructor in the registry or view hierarchy registries
 
     var Component_getComponent = getComponent;
+
     function getComponent(ractive, name) {
 
         var Component,
@@ -12994,7 +13391,7 @@
                 Component = fn();
 
                 if (!Component) {
-                    warnIfDebug(noRegistryFunctionReturn, name, "component", "component", { ractive: ractive });
+                    warnIfDebug(noRegistryFunctionReturn, name, "component", "component", {ractive: ractive});
 
                     return;
                 }
@@ -13014,6 +13411,7 @@
 
     var Component_prototype_detach = Component$detach;
     var Component_prototype_detach__detachHook = new hooks_Hook("detach");
+
     function Component$detach() {
         var detached = this.instance.fragment.detach();
         Component_prototype_detach__detachHook.fire(this.instance);
@@ -13274,7 +13672,7 @@
     var magicAdaptor, MagicWrapper;
 
     try {
-        Object.defineProperty({}, "test", { value: 0 });
+        Object.defineProperty({}, "test", {value: 0});
 
         magicAdaptor = {
             filter: function (object, keypath, ractive) {
@@ -13352,7 +13750,7 @@
                 this.updating = true;
                 this.obj[this.prop] = value; // trigger set() accessor
                 global_runloop.addRactive(this.ractive);
-                this.ractive.viewmodel.mark(this.keypath, { keepExistingWrapper: true });
+                this.ractive.viewmodel.mark(this.keypath, {keepExistingWrapper: true});
                 this.updating = false;
                 return true;
             },
@@ -13474,7 +13872,7 @@
         // Create an array of wrappers, in case other keypaths/ractives depend on this property.
         // Handily, we can store them as a property of the set function. Yay JavaScript.
         set._ractiveWrappers = [originalWrapper];
-        Object.defineProperty(object, property, { get: get, set: set, enumerable: true, configurable: true });
+        Object.defineProperty(object, property, {get: get, set: set, enumerable: true, configurable: true});
     }
 
     var magicArrayAdaptor, MagicArrayWrapper;
@@ -13518,6 +13916,7 @@
     var prototype_adapt = Viewmodel$adapt;
 
     var prefixers = {};
+
     function Viewmodel$adapt(keypath, value) {
         var len, i, adaptor, wrapped;
 
@@ -13583,6 +13982,7 @@
     // TEMP
 
     var helpers_getUpstreamChanges = getUpstreamChanges;
+
     function getUpstreamChanges(changes) {
         var upstreamChanges = [rootKeypath],
             i,
@@ -14088,6 +14488,7 @@
     var Computation_Computation = Computation;
 
     var compute = Viewmodel$compute;
+
     function Viewmodel$compute(key, signature) {
         var computation = new Computation_Computation(key, signature);
 
@@ -14098,11 +14499,12 @@
         return this.computations[key.str] = computation;
     }
 
-    var FAILED_LOOKUP = { FAILED_LOOKUP: true };
+    var FAILED_LOOKUP = {FAILED_LOOKUP: true};
 
     var viewmodel_prototype_get = Viewmodel$get;
 
     var viewmodel_prototype_get__empty = {};
+
     function Viewmodel$get(keypath, options) {
         var cache = this.cache,
             value,
@@ -14116,7 +14518,7 @@
 
         // capture the keypath, if we're inside a computation
         if (options.capture && (captureGroup = lastItem(this.captureGroups))) {
-            if (! ~captureGroup.indexOf(keypath)) {
+            if (!~captureGroup.indexOf(keypath)) {
                 captureGroup.push(keypath);
             }
         }
@@ -14273,7 +14675,7 @@
         },
 
         register: function (keypath, dependant, group) {
-            this.deps.push({ keypath: keypath, dep: dependant, group: group });
+            this.deps.push({keypath: keypath, dep: dependant, group: group});
 
             if (this.resolved) {
                 this.origin.register(this.map(keypath), dependant, group);
@@ -14452,6 +14854,7 @@
     var merge = Viewmodel$merge;
 
     var comparators = {};
+
     function Viewmodel$merge(keypath, currentArray, array, options) {
         var oldArray, newArray, comparator, newIndices;
 
@@ -14647,7 +15050,7 @@
         valueSet = function () {
             if (!parentValue) {
                 parentValue = createBranch(keypath.lastKey);
-                viewmodel.set(keypath.parent, parentValue, { silent: true });
+                viewmodel.set(keypath.parent, parentValue, {silent: true});
             }
             parentValue[keypath.lastKey] = value;
         };
@@ -14671,8 +15074,9 @@
 
     var smartUpdate = Viewmodel$smartUpdate;
 
-    var implicitOption = { implicit: true },
-        noCascadeOption = { noCascade: true };
+    var implicitOption = {implicit: true},
+        noCascadeOption = {noCascade: true};
+
     function Viewmodel$smartUpdate(keypath, array, newIndices) {
         var _this = this;
 
@@ -14689,7 +15093,7 @@
 
         // Update the model
         // TODO allow existing array to be updated in place, rather than replaced?
-        this.set(keypath, array, { silent: true });
+        this.set(keypath, array, {silent: true});
 
         if (dependants = this.deps["default"][keypath.str]) {
             dependants.filter(canShuffle).forEach(function (d) {
@@ -14934,6 +15338,7 @@
     var helpers_getComputationSignatures = getComputationSignatures;
 
     var helpers_getComputationSignatures__pattern = /\$\{([^\}]+)\}/g;
+
     function getComputationSignatures(ractive, computed) {
         var signatures = {},
             key;
@@ -14970,7 +15375,7 @@
             }
         }
 
-        return { getter: getter, setter: setter };
+        return {getter: getter, setter: setter};
     }
 
     function createFunctionFromString(ractive, str) {
@@ -15015,7 +15420,7 @@
         initialiseProperties(ractive, options);
 
         // TODO remove this, eventually
-        defineProperty(ractive, "data", { get: deprecateRactiveData });
+        defineProperty(ractive, "data", {get: deprecateRactiveData});
 
         // TODO don't allow `onconstruct` with `new Ractive()`, there's no need for it
         constructHook.fire(ractive, userOptions);
@@ -15083,7 +15488,7 @@
             if (_Ractive.DEBUG_PROMISES) {
                 promise["catch"](function (err) {
                     warnOnceIfDebug("Promise debugging is enabled, to help solve errors that happen asynchronously. Some browsers will log unhandled promise rejections, in which case you can safely disable promise debugging:\n  Ractive.DEBUG_PROMISES = false;");
-                    warnIfDebug("An error happened during rendering", { ractive: ractive });
+                    warnIfDebug("An error happened during rendering", {ractive: ractive});
                     err.stack && logIfDebug(err.stack);
 
                     throw err;
@@ -15139,7 +15544,7 @@
             i = b.length;
 
         while (i--) {
-            if (! ~c.indexOf(b[i])) {
+            if (!~c.indexOf(b[i])) {
                 c.push(b[i]);
             }
         }
@@ -15412,7 +15817,7 @@
 
             args = Array.prototype.slice.call(arguments);
 
-            shared_fireEvent(parentInstance, proxyEventName, { event: event, args: args });
+            shared_fireEvent(parentInstance, proxyEventName, {event: event, args: args});
 
             // cancel bubbling
             return false;
@@ -15434,6 +15839,7 @@
     };
 
     var Component_prototype_init = Component$init;
+
     function Component$init(options, Component) {
         var parentFragment, root;
 
@@ -15457,7 +15863,7 @@
 
         // intro, outro and decorator directives have no effect
         if (options.template.t0 || options.template.t1 || options.template.t2 || options.template.o) {
-            warnIfDebug("The \"intro\", \"outro\" and \"decorator\" directives have no effect on components", { ractive: this.instance });
+            warnIfDebug("The \"intro\", \"outro\" and \"decorator\" directives have no effect on components", {ractive: this.instance});
         }
 
         initialise_updateLiveQueries(this);
@@ -15505,6 +15911,7 @@
     var Component_prototype_unbind = Component$unbind;
 
     var Component_prototype_unbind__teardownHook = new hooks_Hook("teardown");
+
     function Component$unbind() {
         var instance = this.instance;
 
@@ -15616,7 +16023,7 @@
         var template = container._inlinePartials[name];
 
         if (!template) {
-            warnIfDebug("Could not find template for partial \"" + name + "\"", { ractive: options.root });
+            warnIfDebug("Could not find template for partial \"" + name + "\"", {ractive: options.root});
             template = [];
         }
 
@@ -15783,6 +16190,7 @@
     }
 
     var Fragment_prototype_rebind = Fragment$rebind;
+
     function Fragment$rebind(oldKeypath, newKeypath) {
 
         // assign new context keypath if needed
@@ -15903,6 +16311,7 @@
     var prototype_reset = Ractive$reset;
     var shouldRerender = ["template", "partials", "components", "decorators", "events"],
         resetHook = new hooks_Hook("reset");
+
     function Ractive$reset(data) {
         var promise, wrapper, changes, i, rerender;
 
@@ -16044,10 +16453,11 @@
     // conceptually be similar to resetPartial, which couldn't be async
 
     var resetTemplate = Ractive$resetTemplate;
+
     function Ractive$resetTemplate(template) {
         var transitionsEnabled, component;
 
-        template_template.init(null, this, { template: template });
+        template_template.init(null, this, {template: template});
 
         transitionsEnabled = this.transitionsEnabled;
         this.transitionsEnabled = false;
@@ -16129,6 +16539,7 @@
     var splice = makeArrayMethod("splice");
 
     var subtract = Ractive$subtract;
+
     function Ractive$subtract(keypath, d) {
         return shared_add(this, keypath, d === undefined ? -1 : -d);
     }
@@ -16139,6 +16550,7 @@
     var Ractive_prototype_teardown = Ractive$teardown;
 
     var Ractive_prototype_teardown__teardownHook = new hooks_Hook("teardown");
+
     function Ractive$teardown() {
         var promise;
 
@@ -16166,6 +16578,7 @@
     }
 
     var toggle = Ractive$toggle;
+
     function Ractive$toggle(keypath) {
         var _this = this;
 
@@ -16196,6 +16609,7 @@
 
     var Ractive_prototype_unrender = Ractive$unrender;
     var unrenderHook = new hooks_Hook("unrender");
+
     function Ractive$unrender() {
         var promise, shouldDestroy;
 
@@ -16229,6 +16643,7 @@
 
     var Ractive_prototype_update = Ractive$update;
     var updateHook = new hooks_Hook("update");
+
     function Ractive$update(keypath) {
         var promise;
 
@@ -16506,13 +16921,13 @@
         // Static properties
         defineProperties(Child, {
             // alias prototype as defaults
-            defaults: { value: proto },
+            defaults: {value: proto},
 
             // extendable
-            extend: { value: _extend__extend, writable: true, configurable: true },
+            extend: {value: _extend__extend, writable: true, configurable: true},
 
             // Parent - for IE8, can't use Object.getPrototypeOf
-            _Parent: { value: Parent }
+            _Parent: {value: Parent}
         });
 
         // extend configuration
@@ -16562,33 +16977,33 @@
     properties = {
 
         // debug flag
-        DEBUG: { writable: true, value: true },
-        DEBUG_PROMISES: { writable: true, value: true },
+        DEBUG: {writable: true, value: true},
+        DEBUG_PROMISES: {writable: true, value: true},
 
         // static methods:
-        extend: { value: _extend },
-        getNodeInfo: { value: getNodeInfo },
-        parse: { value: _parse },
+        extend: {value: _extend},
+        getNodeInfo: {value: getNodeInfo},
+        parse: {value: _parse},
 
         // Namespaced constructors
-        Promise: { value: utils_Promise },
+        Promise: {value: utils_Promise},
 
         // support
-        svg: { value: svg },
-        magic: { value: environment__magic },
+        svg: {value: svg},
+        magic: {value: environment__magic},
 
         // version
-        VERSION: { value: "0.7.3" },
+        VERSION: {value: "0.7.3"},
 
         // Plugins
-        adaptors: { writable: true, value: {} },
-        components: { writable: true, value: {} },
-        decorators: { writable: true, value: {} },
-        easing: { writable: true, value: static_easing },
-        events: { writable: true, value: {} },
-        interpolators: { writable: true, value: static_interpolators },
-        partials: { writable: true, value: {} },
-        transitions: { writable: true, value: {} }
+        adaptors: {writable: true, value: {}},
+        components: {writable: true, value: {}},
+        decorators: {writable: true, value: {}},
+        easing: {writable: true, value: static_easing},
+        events: {writable: true, value: {}},
+        interpolators: {writable: true, value: static_interpolators},
+        partials: {writable: true, value: {}},
+        transitions: {writable: true, value: {}}
     };
 
     // Ractive properties

@@ -101,9 +101,9 @@
 }
 
 @media only screen
-and (min-device-width : 375px)
-and (max-device-width : 667px)
-and (orientation : portrait) {
+and (min-device-width: 375px)
+and (max-device-width: 667px)
+and (orientation: portrait) {
     /* Make fat sliders a bit fatter on iPhone6 */
     .cp-slider {
         float: left;

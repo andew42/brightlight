@@ -1,22 +1,163 @@
 {
   "leftColumn": [
-    {"id": "l1", "name": "OFF", "action": "allLights", "params": "000000"},
-    {"id": "l2", "name": "6f16d4", "action": "allLights", "params": "6f16d4"},
-    {"id": "l3", "name": "c8721f", "action": "allLights", "params": "c8721f"},
-    {"id": "l4", "name": "d71e1e", "action": "allLights", "params": "d71e1e"}
+    {
+      "id": "l1",
+      "name": "OFF",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "000000"
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "name": "6f16d4",
+      "segments": [
+        {
+          "segmentId": "s4",
+          "action": "static",
+          "params": "6f16d4"
+        },
+        {
+          "segmentId": "s5",
+          "action": "static",
+          "params": "0016d4"
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "name": "c8721f",
+      "segments": [
+        {
+          "segmentId": "s1",
+          "action": "static",
+          "params": "c8721f"
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "name": "d71e1e",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "d71e1e"
+        }
+      ]
+    }
   ],
   "midColumn": [
-    {"id": "m1", "name": "Full", "action": "allLights", "params": "ffffff"},
-    {"id": "m2", "name": "High", "action": "allLights", "params": "e0e0e0"},
-    {"id": "m3", "name": "Mid", "action": "allLights", "params": "808080"},
-    {"id": "m4", "name": "Low", "action": "allLights", "params": "3f3f3f"},
-    {"id": "m5", "name": "Very Low", "action": "allLights", "params": "101010"},
-    {"id": "m6", "name": "Nearly Off", "action": "allLights", "params": "020202"}
+    {
+      "id": "m1",
+      "name": "Full",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "ffffff"
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "name": "High",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "e0e0e0"
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "name": "Mid",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "808080"
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "name": "Low",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "3f3f3f"
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "name": "Very Low",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "101010"
+        }
+      ]
+    },
+    {
+      "id": "m6",
+      "name": "Nearly Off",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "static",
+          "params": "020202"
+        }
+      ]
+    }
   ],
   "rightColumn": [
-    {"id": "r1", "name": "Sweet Shop", "action": "sweetshop"},
-    {"id": "r2", "name": "Runner", "action": "runner"},
-    {"id": "r3", "name": "Rainbow", "action": "rainbow"},
-    {"id": "r4", "name": "Cylon", "action": "cylon"}
+    {
+      "id": "r1",
+      "name": "Sweet Shop",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "sweetshop"
+        }
+      ]
+    },
+    {
+      "id": "r2",
+      "name": "Runner",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "runner"
+        }
+      ]
+    },
+    {
+      "id": "r3",
+      "name": "Rainbow",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "rainbow"
+        }
+      ]
+    },
+    {
+      "id": "r4",
+      "name": "Cylon",
+      "segments": [
+        {
+          "segmentId": "s0",
+          "action": "cylon"
+        }
+      ]
+    }
   ]
 }

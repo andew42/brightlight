@@ -8,7 +8,7 @@ require([
         "../js/lib/scroll",
         "../js/lib/controls",
         "../js/lib/nav"],
-    function(doc,R,touch,tinycolor,scroll,controls,nav) {
+    function (doc, R, touch, tinycolor, scroll, controls, nav) {
         'use strict';
         // Ractive data binding object
         var dto = {
@@ -85,6 +85,7 @@ require([
 
             updateUi();
         }
+
         // Initialise the page
         init();
     });

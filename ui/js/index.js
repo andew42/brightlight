@@ -6,32 +6,32 @@ require([
         "../js/ractive/ractive-touch",
         "../js/lib/lights",
         "../js/lib/scroll"],
-    function(doc,R,touch,lights,scroll) {
+    function (doc, R, touch, lights, scroll) {
         'use strict';
 
         // Ractive data binding object
         var dto = {
-            buttons : undefined
+            buttons: undefined
         };
 
         // Page initialisation
-        var init = function() {
+        var init = function () {
             // json description of button mappings
             dto.buttons = {
-                leftColumn : [
-                    {name:"OFF", action:"allLights", params:"000000"},
-                    {name:"Buttons RO", action:"action-navigate", params:"./buttons.html"},
-                    {name:"Virtual", action:"action-navigate", params:"./virtual.html"}
+                leftColumn: [
+                    {name: "OFF", action: "allLights", params: "000000"},
+                    {name: "Buttons RO", action: "action-navigate", params: "./buttons.html"},
+                    {name: "Virtual", action: "action-navigate", params: "./virtual.html"}
                 ],
-                midColumn : [
-                    {name:"High", action:"allLights", params:"e0e0e0"},
-                    {name:"Buttons RW", action:"action-navigate", params:"./buttons.html?rw=true"},
-                    {name:"Strip Length", action:"action-navigate", params:"./striplength.html"}
+                midColumn: [
+                    {name: "High", action: "allLights", params: "e0e0e0"},
+                    {name: "Buttons RW", action: "action-navigate", params: "./buttons.html?rw=true"},
+                    {name: "Strip Length", action: "action-navigate", params: "./striplength.html"}
                 ],
-                rightColumn : [
-                    {name:"Purple", action:"allLights", params:"6f16d4"},
-                    {name:"Rainbow", action:"rainbow", params:""},
-                    {name:"Stats", action:"action-navigate", params:"./stats.html"}
+                rightColumn: [
+                    {name: "Purple", action: "allLights", params: "6f16d4"},
+                    {name: "Rainbow", action: "rainbow", params: ""},
+                    {name: "Stats", action: "action-navigate", params: "./stats.html"}
                 ]
             };
 
@@ -48,7 +48,7 @@ require([
             });
 
             // Set up an on tap handler for all the buttons
-            ractive.on( 'buttonHandler', function ( event ) {
+            ractive.on('buttonHandler', function (event) {
                 var action = event.node.attributes["button-action"].value;
                 var params = event.node.attributes["button-params"].value;
                 if (action === "action-navigate") {

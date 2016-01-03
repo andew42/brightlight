@@ -6,20 +6,29 @@ import (
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/stats"
 	log "github.com/Sirupsen/logrus"
+	"strconv"
 )
 
-// Frame rate as duration 20ms -> 50Hz
-const frameRate time.Duration = 20 * time.Millisecond
+// Animation action to perform on a segment
+type SegmentAction struct {
+	SegmentId  string
+	Action     string
+	Params     string
+}
+
+// Frame rate as duration
+// 20ms -> 50Hz
+// * 25ms -> 40Hz
+// 40ms -> 25Hz
+// 50ms -> 20Hz
+const frameRate time.Duration = 25 * time.Millisecond
 
 var (
-	// All physical strips in a single segment
-	allLeds controller.Segment
+	// Definitions of named segments by segment id
+	namedSegments map[string]segmentInfo
 
 	// One segment for each physical strip (i.e. 8 per Teensy)
 	physicalStrips []controller.Segment
-
-	// A segment representing the strips above the curtain
-	curtainLeds controller.Segment
 
 	// Communicate next animation to driver
 	animationDriverChan chan []animator
@@ -28,10 +37,67 @@ var (
 	ErrInvalidParameter = errors.New("invalid parameters")
 )
 
-// High level request to play a static colour animation
-func AnimateStaticColour(colour controller.Rgb) {
+// Animate a bunch of segments supplied by a UI button press
+func RunAnimations(segments []SegmentAction) {
 
-	animationDriverChan <- []animator{newStaticColour(allLeds, colour)}
+	// Build a slice of animators
+	animators := make([]animator, 1, 4)
+
+	// Initial animation turns all lights off
+	animators[0] = newStaticColour(namedSegments["s0"].Seg, controller.NewRgbFromInt(0))
+
+	// Foreach supplied segment action
+	for _, seg := range segments {
+
+		// Lookup action's segment id
+		segInfo, ok := namedSegments[seg.SegmentId]
+		if !ok {
+			log.WithField(seg.SegmentId, "SegmentId").Warn("Unknown segment id")
+			continue
+		}
+
+		// Append animators for this segment action
+		appendAnimatorsForAction(&animators, segInfo.Seg, seg.Action, seg.Params)
+	}
+
+	log.WithField("len(animators)", len(animators)).Info("RunAnimations")
+
+	// Send the (possibly) new animation to driver
+	animationDriverChan <- animators
+}
+
+// Append an animation specified as a string
+func appendAnimatorsForAction(animators *[]animator, seg controller.Segment, action string, params string) {
+
+	switch action {
+	case "static":
+		colour, err := strconv.ParseInt(params, 16, 32)
+		if err != nil {
+			log.WithFields(log.Fields{"params": params, "Error": err.Error()}).Warn("Bad animataion parameter")
+		}
+		*animators = append(*animators, newStaticColour(seg, controller.NewRgbFromInt(int(colour))))
+
+	case "runner":
+		*animators = append(*animators, newRunner(seg, controller.NewRgb(0, 0, 255)))
+
+	case "cylon":
+		*animators = append(*animators, newCylon(seg))
+
+	case "rainbow": // TODO MAKE TIME A PARAMETER
+		*animators = append(*animators, newRainbow(seg, time.Second*5))
+
+	case "sweetshop": // TODO MAKE TIME A PARAMETER
+		*animators = append(*animators, newSweetshop(seg, time.Second*1))
+
+	case "candle": // TODO MAKE POSITION AND REPEAT PARAMETERS
+		*animators = append(*animators, newCandle(NewLogSegment(seg, 8, 3)))
+
+	case "christmas": // TODO MAKE TIME A PARAMETER
+		*animators = append(*animators, newChristmas(seg, time.Second*1))
+
+	default:
+		log.WithField("action", action).Warn("Unknown animataion action")
+	}
 }
 
 // High level request to light the first stripLength LEDs of a physical strip
@@ -41,7 +107,7 @@ func AnimateStripLength(stripIndex uint, stripLength uint) error {
 	if stripIndex < uint(len(physicalStrips)) && stripLength <= physicalStrips[stripIndex].Len() {
 		// Turn off all leds
 		animations := make([]animator, 2)
-		animations[0] = newStaticColour(allLeds, controller.NewRgb(0, 0, 0))
+		animations[0] = newStaticColour(namedSegments["s0"].Seg, controller.NewRgb(0, 0, 0))
 
 		// Turn on test strip, if a strip is reverse direction then this may not
 		// show up on the virtual display which shows only the FIRST 20 LEDs
@@ -53,44 +119,10 @@ func AnimateStripLength(stripIndex uint, stripLength uint) error {
 	} else {
 		// Turn all leds red (for error)
 		animations := make([]animator, 1)
-		animations[0] = newStaticColour(allLeds, controller.NewRgb(128, 0, 0))
+		animations[0] = newStaticColour(namedSegments["s0"].Seg, controller.NewRgb(128, 0, 0))
 		animationDriverChan <- animations
 		return ErrInvalidParameter
 	}
-}
-
-// High level request to play an animation from web UI
-func Animate(animationName string) error {
-
-	animations := make([]animator, 0, 1)
-	switch animationName {
-	case "runner":
-		animations = append(animations, newRunner(allLeds, controller.NewRgb(0, 0, 255)))
-
-	case "cylon":
-		animations = append(animations, newStaticColour(allLeds, controller.NewRgbFromInt(0)))
-		animations = append(animations, newCylon(NewLogSegment(allLeds, 8, 20)))
-		animations = append(animations, newCylon(NewLogSegment(allLeds, controller.MaxLedStripLen, 20)))
-
-	case "rainbow":
-		animations = append(animations, newRainbow(curtainLeds, time.Second*5))
-
-	case "sweetshop":
-		animations = append(animations, newSweetshop(allLeds, time.Second*1))
-
-	case "candle":
-		animations = append(animations, newCandle(NewLogSegment(allLeds, 8, 3)))
-
-	case "christmas":
-		animations = append(animations, newChristmas(allLeds, time.Second*1))
-
-	default:
-		return ErrInvalidParameter
-	}
-
-	// Send the (possibly) new animation to driver
-	animationDriverChan <- animations
-	return nil
 }
 
 // Start animate driver
@@ -100,21 +132,14 @@ func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
 		log.Panic("StartAnimateDriver called twice")
 	}
 
-	// TODO: Make this a config file
-	// All frame buffer strips as a single long segment
-	allLeds = controller.NewPhySegment(fb.Strips)
-
 	// Each frame buffer strip as its own segment
 	physicalStrips = make([]controller.Segment, len(fb.Strips))
 	for i, _ := range fb.Strips {
 		physicalStrips[i] = controller.NewPhySegment(fb.Strips[i:i+1])
 	}
 
-	// Two physical strips above curtains
-	x := make([]controller.LedStrip, 2)
-	x[0] = fb.Strips[3]
-	x[1] = fb.Strips[7]
-	curtainLeds = controller.NewPhySegment(x)
+	// Construct list of named segments
+	namedSegments = NewNamedSegments(fb)
 
 	// Start the animator go routine
 	animationDriverChan = make(chan []animator)
