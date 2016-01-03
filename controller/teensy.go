@@ -46,7 +46,7 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 		usbConnected = true
 
 		// Allocate buffer once to avoid garbage collections in loop
-		var data = make([]byte, 4 + MaxLedStripLen * 8 * 4)
+		var data = make([]byte, 4 + MaxLedStripLen * 8 * 4 + 4)
 
 		// Push frame buffer changes to Teensy
 		for {
@@ -61,6 +61,7 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 				i++
 			}
 			startStrip := driverIndex * 8
+			var checksum int32 = 0;
 			// Buffer is send 8*LED1, 8*LED2 ... 8*(LEDS_PER_STRIP - 1)
 			for l := 0; l < MaxLedStripLen; l++ {
 				for s := startStrip; s < startStrip+8 ; s++ {
@@ -81,9 +82,18 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 						i++
 						data[i] = rgb.Blue
 						i++
+						// Update the checksum
+						checksum += ((int32(rgb.Red) << 16) + (int32(rgb.Green) << 8) + int32(rgb.Blue))
 					}
 				}
 			}
+
+			// Append checksum MSB first
+			for z := 3; z >= 0; z-- {
+				data[i] = byte((checksum >> (8 * uint(z))) & 0xff)
+				i++
+			}
+
 			// Send the frame buffer
 			n, err := f.Write(data)
 			if err == nil && n < len(data) {

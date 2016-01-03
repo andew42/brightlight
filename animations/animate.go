@@ -18,7 +18,7 @@ type SegmentAction struct {
 
 // Frame rate as duration
 // 20ms -> 50Hz
-// * 25ms -> 40Hz
+// 25ms -> 40Hz *
 // 40ms -> 25Hz
 // 50ms -> 20Hz
 const frameRate time.Duration = 25 * time.Millisecond
