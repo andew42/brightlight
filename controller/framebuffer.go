@@ -1,15 +1,14 @@
 package controller
 
 import (
-	"sync"
-	"strconv"
 	log "github.com/Sirupsen/logrus"
+	"strconv"
+	"sync"
 )
 
 // Frame buffer is a slice of strips A Mutex
 // and Cond are used to broadcast changes
 type FrameBuffer struct {
-
 	sync.Mutex
 	*sync.Cond
 	Strips []LedStrip
@@ -27,33 +26,47 @@ func NewFrameBuffer() *FrameBuffer {
 	fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
 	fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
 
-	// 2 Bed Wall
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 168))
+	// 2 Bed wall
+	fb.Strips = append(fb.Strips, *NewLedStrip(false, 168))
 
-	// 3 Bed Curtains
+	// 3 Bed curtains
 	fb.Strips = append(fb.Strips, *NewLedStrip(true, 164))
 
-	// 4 Bed Ceiling
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 165))
+	// 4 Bed ceiling
+	fb.Strips = append(fb.Strips, *NewLedStrip(false, 165))
 
-	// 5 Dressing Table Wall
+	// 5 Dressing table wall
 	fb.Strips = append(fb.Strips, *NewLedStrip(true, 85))
 
-	// 6 Dressing Table Ceiling
+	// 6 Dressing table ceiling
 	fb.Strips = append(fb.Strips, *NewLedStrip(true, 80))
 
-	// 7 Dressing Table Curtain
+	// 7 Dressing table curtain
 	fb.Strips = append(fb.Strips, *NewLedStrip(false, 162))
 
-	// 8, 15 Unused strips
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, MaxLedStripLen))
+	// 8 Bathroom mirror wall
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, 172))
+
+	// 9 Bath ceiling
+	fb.Strips = append(fb.Strips, *NewLedStrip(false, 226))
+
+	// 10 Bath+ wall
+	fb.Strips = append(fb.Strips, *NewLedStrip(false, 291))
+
+	// 11 Bathroom mirror ceiling
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, 162))
+
+	// 12 Unused
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+
+	// 13 Left of door ceiling
+	fb.Strips = append(fb.Strips, *NewLedStrip(true, 88))
+
+	// 14 Right of door ceiling
+	fb.Strips = append(fb.Strips, *NewLedStrip(false, 142))
+
+	// 15 Right of door wall
+	fb.Strips = append(fb.Strips, *NewLedStrip(false, 122))
 
 	// Sanity check
 	numberOfStrips := len(fb.Strips)

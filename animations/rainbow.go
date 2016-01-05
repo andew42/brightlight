@@ -1,12 +1,12 @@
 package animations
 
 import (
-	"time"
+	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
+	"time"
 )
 
 type rainbow struct {
-
 	seg             controller.Segment
 	degreesPerFrame float32
 	startDegree     float32
@@ -17,8 +17,8 @@ func newRainbow(seg controller.Segment, period time.Duration) *rainbow {
 
 	var r rainbow
 	r.seg = seg
-	framesPerPeriod := float32(period) / float32(frameRate)
-	r.degreesPerFrame = 360.0/framesPerPeriod
+	framesPerPeriod := float32(period) / float32(config.FramePeriodMs)
+	r.degreesPerFrame = 360.0 / framesPerPeriod
 	return &r
 }
 

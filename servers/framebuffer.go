@@ -1,14 +1,14 @@
 package servers
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"golang.org/x/net/websocket"
-	"github.com/andew42/brightlight/controller"
 	"encoding/json"
+	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/controller"
+	"golang.org/x/net/websocket"
 )
 
 // Handle frame buffer web socket requests (web socket is closed when we return)
-func GetFrameBufferHandler(fb *controller.FrameBuffer) (func(ws *websocket.Conn)) {
+func GetFrameBufferHandler(fb *controller.FrameBuffer) func(ws *websocket.Conn) {
 
 	return func(ws *websocket.Conn) {
 

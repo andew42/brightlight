@@ -2,26 +2,20 @@ package animations
 
 import (
 	"errors"
-	"time"
+	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/stats"
-	log "github.com/Sirupsen/logrus"
 	"strconv"
+	"time"
 )
 
 // Animation action to perform on a segment
 type SegmentAction struct {
-	SegmentId  string
-	Action     string
-	Params     string
+	SegmentId string
+	Action    string
+	Params    string
 }
-
-// Frame rate as duration
-// 20ms -> 50Hz
-// 25ms -> 40Hz *
-// 40ms -> 25Hz
-// 50ms -> 20Hz
-const frameRate time.Duration = 25 * time.Millisecond
 
 var (
 	// Definitions of named segments by segment id
@@ -135,7 +129,7 @@ func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
 	// Each frame buffer strip as its own segment
 	physicalStrips = make([]controller.Segment, len(fb.Strips))
 	for i, _ := range fb.Strips {
-		physicalStrips[i] = controller.NewPhySegment(fb.Strips[i:i+1])
+		physicalStrips[i] = controller.NewPhySegment(fb.Strips[i : i+1])
 	}
 
 	// Construct list of named segments
@@ -149,19 +143,19 @@ func StartDriver(fb *controller.FrameBuffer, statistics *stats.Stats) {
 // The animation go routine
 func animateDriver(newAnimations chan []animator, fb *controller.FrameBuffer, statistics *stats.Stats) {
 
-	frameSync := time.Tick(frameRate)
+	frameSync := time.Tick(config.FramePeriodMs)
 	currentAnimations := make([]animator, 0)
-	nextFrameTime := time.Now().Add(frameRate)
+	nextFrameTime := time.Now().Add(config.FramePeriodMs)
 	for {
 		select {
 		case <-frameSync:
 			// Wait for a frame tick
 			started := time.Now()
 			jitter := started.Sub(nextFrameTime)
-			nextFrameTime = started.Add(frameRate)
-		for _, value := range currentAnimations {
-			value.animateNextFrame()
-		}
+			nextFrameTime = started.Add(config.FramePeriodMs)
+			for _, value := range currentAnimations {
+				value.animateNextFrame()
+			}
 			fb.Flush()
 			statistics.AddAnimation(time.Since(started), jitter)
 

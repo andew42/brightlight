@@ -3,7 +3,6 @@ package animations
 import "github.com/andew42/brightlight/controller"
 
 type cylon struct {
-
 	seg controller.Segment
 	pos uint
 	dir bool

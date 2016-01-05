@@ -13,15 +13,15 @@
     },
     {
       "id": "l2",
-      "name": "6f16d4",
+      "name": "Two Tone",
       "segments": [
         {
-          "segmentId": "s4",
+          "segmentId": "s1",
           "action": "static",
           "params": "6f16d4"
         },
         {
-          "segmentId": "s5",
+          "segmentId": "s2",
           "action": "static",
           "params": "0016d4"
         }
@@ -32,7 +32,7 @@
       "name": "c8721f",
       "segments": [
         {
-          "segmentId": "s1",
+          "segmentId": "s0",
           "action": "static",
           "params": "c8721f"
         }
@@ -144,18 +144,18 @@
       "name": "Rainbow",
       "segments": [
         {
-          "segmentId": "s0",
+          "segmentId": "s3",
           "action": "rainbow"
         }
       ]
     },
     {
       "id": "r4",
-      "name": "Cylon",
+      "name": "Candle",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "cylon"
+          "segmentId": "s3",
+          "action": "candle"
         }
       ]
     }

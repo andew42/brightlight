@@ -4,7 +4,6 @@ import "strconv"
 
 // Single LED colour
 type Rgb struct {
-
 	Red   byte
 	Green byte
 	Blue  byte
@@ -41,7 +40,7 @@ func (led Rgb) MarshalJSON() ([]byte, error) {
 func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 
 	if hue > 359 {
-		hue = hue%360
+		hue = hue % 360
 	}
 	if saturation > 100 {
 		saturation = 100
@@ -59,18 +58,18 @@ func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 	} else {
 		var v2 uint
 		if lightness < 50 {
-			v2 = lightness*(100+saturation)
+			v2 = lightness * (100 + saturation)
 		} else {
-			v2 = ((lightness+saturation)*100)-(saturation*lightness)
+			v2 = ((lightness + saturation) * 100) - (saturation * lightness)
 		}
-		v1 := lightness * 200 - v2
+		v1 := lightness*200 - v2
 
 		// Red
 		var h uint
 		if hue < 240 {
-			h = hue+120
+			h = hue + 120
 		} else {
-			h = hue-240
+			h = hue - 240
 		}
 		x.Red = byte(h2rgb(v1, v2, h) * 255 / 600000)
 
@@ -79,9 +78,9 @@ func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 
 		// Blue
 		if hue >= 120 {
-			h = hue-120
+			h = hue - 120
 		} else {
-			h = hue+240
+			h = hue + 240
 		}
 		x.Blue = byte(h2rgb(v1, v2, h) * 255 / 600000)
 	}
@@ -91,13 +90,13 @@ func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 func h2rgb(v1 uint, v2 uint, hue uint) uint {
 
 	if hue < 60 {
-		return v1 * 60 + (v2 - v1) * hue
+		return v1*60 + (v2-v1)*hue
 	}
 	if hue < 180 {
 		return v2 * 60
 	}
 	if hue < 240 {
-		return v1 * 60 + (v2 - v1) * (240 - hue)
+		return v1*60 + (v2-v1)*(240-hue)
 	}
 	return v1 * 60
 }

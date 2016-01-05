@@ -3,7 +3,6 @@ package animations
 import "github.com/andew42/brightlight/controller"
 
 type staticColour struct {
-
 	seg    controller.Segment
 	colour controller.Rgb
 	done   bool

@@ -1,17 +1,17 @@
 package main
 
 import (
+	"flag"
 	log "github.com/Sirupsen/logrus"
-	"golang.org/x/net/websocket"
-	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
+	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/stats"
+	"golang.org/x/net/websocket"
 	"net/http"
 	"os"
 	"path"
 	"runtime"
-	"flag"
 )
 
 // The controller's frame buffer
@@ -29,7 +29,7 @@ func main() {
 
 	// What are we running on?
 	log.WithFields(
-	log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH, }).Info("brightlight started")
+		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).Info("brightlight started")
 
 	// Start serial and animation drivers
 	controller.StartDriver(fb, &statistics)

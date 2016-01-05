@@ -1,13 +1,12 @@
 package animations
 
 import (
-	"github.com/andew42/brightlight/controller"
 	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/controller"
 )
 
 // A logical segment is a slice of another segment
 type LogSegment struct {
-
 	baseSeg controller.Segment
 	start   uint
 	len     uint

@@ -3,7 +3,6 @@ package animations
 import "github.com/andew42/brightlight/controller"
 
 type runner struct {
-
 	seg    controller.Segment
 	colour controller.Rgb
 	pos    uint

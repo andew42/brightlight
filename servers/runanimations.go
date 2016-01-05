@@ -1,12 +1,12 @@
 package servers
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
+	"io/ioutil"
+	"net/http"
 )
 
 // Handle HTTP requests to run zero or more animation specified in json payload
@@ -19,7 +19,7 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.WithField("err", err.Error()).Error("RunAnimationsHandler bad body")
 		http.Error(w, err.Error(), 400)
-		return;
+		return
 	}
 
 	// Unmarshal JSON into typed slice
@@ -28,7 +28,7 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 	if err = json.Unmarshal(body, &segments); err != nil {
 		log.WithField("err", err.Error()).Error("RunAnimationsHandler bad body JSON")
 		http.Error(w, err.Error(), 400)
-		return;
+		return
 	}
 
 	log.WithField("Decoded JSON", segments).Info("RunAnimationsHandler called")

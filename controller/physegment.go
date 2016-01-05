@@ -6,14 +6,20 @@ import (
 
 // A physical segment aggregates a number of LedStrips
 type PhySegment struct {
-
 	Strips []LedStrip
 }
 
 // Constructor
 func NewPhySegment(strips []LedStrip) PhySegment {
 
-	return PhySegment{Strips: strips}
+	// Strip out zero length segments
+	ps := PhySegment{}
+	for _, s := range strips {
+		if len(s.Leds) > 0 {
+			ps.Strips = append(ps.Strips, s)
+		}
+	}
+	return ps
 }
 
 // Number of LEDs in the segment

@@ -1,15 +1,14 @@
 package animations
 
 import (
-	"time"
 	"github.com/andew42/brightlight/controller"
+	"time"
 )
 
 // Simulates traditional christmas lights where each light position is
 // a fixed colour and light positions alternate around specified colours
 // Each light can be represented by more than one adjacent LED
 type christmas struct {
-
 	seg          controller.Segment
 	period       time.Duration
 	changeTime   time.Time
@@ -20,8 +19,8 @@ type christmas struct {
 
 func newChristmas(seg controller.Segment, period time.Duration) *christmas {
 
-	return &christmas{seg:seg, period:period, lightSize:3,
-		lightColours:[]controller.Rgb{controller.NewRgb(255, 0, 0), controller.NewRgb(0, 255, 0), controller.NewRgb(0, 0, 255)}}
+	return &christmas{seg: seg, period: period, lightSize: 3,
+		lightColours: []controller.Rgb{controller.NewRgb(255, 0, 0), controller.NewRgb(0, 255, 0), controller.NewRgb(0, 0, 255)}}
 }
 
 func (s *christmas) animateNextFrame() {
@@ -32,19 +31,19 @@ func (s *christmas) animateNextFrame() {
 
 		// Move on to next light colour
 		if s.nextColour == uint(len(s.lightColours))-1 {
-			s.nextColour = 0;
+			s.nextColour = 0
 		} else {
-			s.nextColour++;
+			s.nextColour++
 		}
 
 		// Set each LED appropriately
-		off := controller.NewRgbFromInt(0);
+		off := controller.NewRgbFromInt(0)
 		for i := uint(0); i < s.seg.Len(); i++ {
 			// Which colour index should this be
-			c := (i / s.lightSize) % uint(len(s.lightColours));
+			c := (i / s.lightSize) % uint(len(s.lightColours))
 
 			// Either turn colour on or turn LED off
-			if (c == s.nextColour) {
+			if c == s.nextColour {
 				s.seg.Set(i, s.lightColours[s.nextColour])
 			} else {
 				s.seg.Set(i, off)

@@ -6,7 +6,6 @@ import (
 
 // Part of another segment
 type SubSegment struct {
-
 	baseSeg Segment
 	start   uint
 	len     uint

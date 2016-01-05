@@ -1,26 +1,27 @@
 package servers
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"golang.org/x/net/websocket"
-	"github.com/andew42/brightlight/controller"
 	"encoding/json"
+	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/config"
+	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/stats"
+	"golang.org/x/net/websocket"
 	"runtime/debug"
 )
 
 var gcStats debug.GCStats
 
 // Handle stats web socket requests (web socket is closed when we return)
-func GetStatsHandler(statistics *stats.Stats, fb *controller.FrameBuffer) (func(ws *websocket.Conn)) {
+func GetStatsHandler(statistics *stats.Stats, fb *controller.FrameBuffer) func(ws *websocket.Conn) {
 
 	return func(ws *websocket.Conn) {
 
 		for {
 			fb.Mutex.Lock()
 
-			// Report stats for last second every second (50 frames)
-			if statistics.FrameCount == stats.ResetFrame {
+			// Report stats for last second every second every second
+			if statistics.FrameCount == config.FrameFrequencyHz {
 				// Update garbage collection count
 				debug.ReadGCStats(&gcStats)
 				statistics.GcCount = gcStats.NumGC

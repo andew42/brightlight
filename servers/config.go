@@ -2,14 +2,14 @@ package servers
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"net/http"
-	"strings"
-	"path"
 	"io/ioutil"
+	"net/http"
+	"path"
+	"strings"
 )
 
 // Handle HTTP requests to read and write config
-func GetConfigHandler(contentPath string) (func(http.ResponseWriter, *http.Request)) {
+func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -39,14 +39,14 @@ func GetConfigHandler(contentPath string) (func(http.ResponseWriter, *http.Reque
 			log.WithField("FullPath", fullPath).Info("configHandler PUT called")
 
 			// Only support user.json
-			if (r.URL.Path != "/config/user.json") {
+			if r.URL.Path != "/config/user.json" {
 				log.WithField("FileName", r.URL.Path).Warn("Unsupported config file name")
 				http.Error(w, "File name not allowed", 401)
 				return
 			}
 
 			// up to a size of 10K
-			if (r.ContentLength > 10000) {
+			if r.ContentLength > 10000 {
 				log.WithField("ContentLength", r.ContentLength).Warn("Config file content too large")
 				http.Error(w, "Update content too large", 413)
 				return

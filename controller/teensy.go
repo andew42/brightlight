@@ -1,12 +1,12 @@
 package controller
 
 import (
+	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/stats"
 	"io"
 	"os"
 	"runtime"
 	"time"
-	"github.com/andew42/brightlight/stats"
-	log "github.com/Sirupsen/logrus"
 )
 
 var driverStarted bool
@@ -46,7 +46,7 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 		usbConnected = true
 
 		// Allocate buffer once to avoid garbage collections in loop
-		var data = make([]byte, 4 + MaxLedStripLen * 8 * 4 + 4)
+		var data = make([]byte, 4+MaxLedStripLen*8*4+4)
 
 		// Push frame buffer changes to Teensy
 		for {
@@ -61,10 +61,10 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 				i++
 			}
 			startStrip := driverIndex * 8
-			var checksum int32 = 0;
+			var checksum int32 = 0
 			// Buffer is send 8*LED1, 8*LED2 ... 8*(LEDS_PER_STRIP - 1)
 			for l := 0; l < MaxLedStripLen; l++ {
-				for s := startStrip; s < startStrip+8 ; s++ {
+				for s := startStrip; s < startStrip+8; s++ {
 					if l >= len(fb.Strips[s].Leds) {
 						// Pad frame buffer with zeros as strip is < MaxLedStripLen
 						for z := 0; z < 4; z++ {
@@ -146,7 +146,8 @@ func getPortName(index int) string {
 	if runtime.GOOS == "darwin" {
 		// OSX
 		switch index {
-		case 0: return "/dev/cu.usbmodem288181"
+		case 0:
+			return "/dev/cu.usbmodem288181"
 			// Teensy 3.0 "/dev/cu.usbmodem103721"
 			// Teensy 3.1 "/dev/cu.usbmodem103101"
 		}

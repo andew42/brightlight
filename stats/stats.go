@@ -1,9 +1,9 @@
 package stats
 
-import "time"
-
-// Statistics reset after every 50 frames
-const ResetFrame = 50
+import (
+	"github.com/andew42/brightlight/config"
+	"time"
+)
 
 // Statistics on animation frame times and serial send times
 type Stats struct {
@@ -24,7 +24,7 @@ type Stats struct {
 	MaxSendTime     time.Duration
 	AverageSendTime time.Duration
 	// GC count
-	GcCount			int64
+	GcCount int64
 }
 
 // Constructor
@@ -38,16 +38,16 @@ func NewStats() Stats {
 func (stats *Stats) Reset() {
 	stats.FrameCount = 0
 	stats.TotalFrameTime = 0
-	stats.MinFrameTime = 1<<63-1
+	stats.MinFrameTime = 1<<63 - 1
 	stats.MaxFrameTime = 0
 	stats.AverageFrameTime = 0
 	stats.TotalJitter = 0
-	stats.MinJitter = 1<<63-1
+	stats.MinJitter = 1<<63 - 1
 	stats.MaxJitter = 0
 	stats.AverageJitter = 0
 	stats.SendCount = 0
 	stats.TotalSendTime = 0
-	stats.MinSendTime = 1<<63-1
+	stats.MinSendTime = 1<<63 - 1
 	stats.MaxSendTime = 0
 	stats.AverageSendTime = 0
 }
@@ -55,8 +55,8 @@ func (stats *Stats) Reset() {
 // Adds a sample point for animation frame
 func (stats *Stats) AddAnimation(frameTime time.Duration, jitter time.Duration) {
 
-	// Reset statistics every 50 frames, socket listeners should have update after last frame
-	if stats.FrameCount == ResetFrame {
+	// Reset statistics every second, socket listeners should have update after last reset by now
+	if stats.FrameCount == config.FrameFrequencyHz {
 		stats.Reset()
 	}
 	stats.FrameCount++
@@ -69,7 +69,7 @@ func (stats *Stats) AddAnimation(frameTime time.Duration, jitter time.Duration) 
 	if frameTime > stats.MaxFrameTime {
 		stats.MaxFrameTime = frameTime
 	}
-	stats.AverageFrameTime = time.Duration(stats.TotalFrameTime.Nanoseconds()/stats.FrameCount)
+	stats.AverageFrameTime = time.Duration(stats.TotalFrameTime.Nanoseconds() / stats.FrameCount)
 
 	// Jitter statistics
 	stats.TotalJitter += jitter
@@ -79,7 +79,7 @@ func (stats *Stats) AddAnimation(frameTime time.Duration, jitter time.Duration) 
 	if jitter > stats.MaxJitter {
 		stats.MaxJitter = jitter
 	}
-	stats.AverageJitter = time.Duration(stats.TotalJitter.Nanoseconds()/stats.FrameCount)
+	stats.AverageJitter = time.Duration(stats.TotalJitter.Nanoseconds() / stats.FrameCount)
 }
 
 // Adds sample point for serial send
@@ -95,5 +95,5 @@ func (stats *Stats) AddSerial(sendTime time.Duration) {
 	if sendTime > stats.MaxSendTime {
 		stats.MaxSendTime = sendTime
 	}
-	stats.AverageSendTime = time.Duration(stats.TotalSendTime.Nanoseconds()/stats.SendCount)
+	stats.AverageSendTime = time.Duration(stats.TotalSendTime.Nanoseconds() / stats.SendCount)
 }
