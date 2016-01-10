@@ -1,4 +1,4 @@
-package controller
+package framebuffer
 
 // A segment describes a logical LED strip
 type Segment interface {

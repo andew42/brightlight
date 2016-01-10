@@ -1,24 +1,19 @@
 package animations
 
-import "github.com/andew42/brightlight/controller"
+import "github.com/andew42/brightlight/framebuffer"
 
 type staticColour struct {
-	seg    controller.Segment
-	colour controller.Rgb
-	done   bool
+	colour framebuffer.Rgb
 }
 
-func newStaticColour(seg controller.Segment, colour controller.Rgb) *staticColour {
+func newStaticColour(colour framebuffer.Rgb) *staticColour {
 
-	return &staticColour{seg, colour, false}
+	return &staticColour{colour}
 }
 
-func (sc *staticColour) animateNextFrame() {
+func (sc *staticColour) animateNextFrame(seg framebuffer.Segment) {
 
-	if !sc.done {
-		for s := uint(0); s < sc.seg.Len(); s++ {
-			sc.seg.Set(s, sc.colour)
-		}
-		sc.done = true
+	for s := uint(0); s < seg.Len(); s++ {
+		seg.Set(s, sc.colour)
 	}
 }

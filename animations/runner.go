@@ -1,21 +1,20 @@
 package animations
 
-import "github.com/andew42/brightlight/controller"
+import "github.com/andew42/brightlight/framebuffer"
 
 type runner struct {
-	seg    controller.Segment
-	colour controller.Rgb
+	colour framebuffer.Rgb
 	pos    uint
 }
 
-func newRunner(seg controller.Segment, colour controller.Rgb) *runner {
+func newRunner(colour framebuffer.Rgb) *runner {
 
-	return &runner{seg, colour, 0}
+	return &runner{colour, 0}
 }
 
-func (r *runner) animateNextFrame() {
+func (r *runner) animateNextFrame(seg framebuffer.Segment) {
 
-	r.seg.Set(r.pos, controller.NewRgb(0, 0, 0))
-	r.pos = nextPos(r.pos, r.seg.Len())
-	r.seg.Set(r.pos, r.colour)
+	seg.Set(r.pos, framebuffer.NewRgb(0, 0, 0))
+	r.pos = nextPos(r.pos, seg.Len())
+	seg.Set(r.pos, r.colour)
 }

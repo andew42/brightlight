@@ -2,26 +2,28 @@ package controller
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/andew42/brightlight/stats"
+	"github.com/andew42/brightlight/config"
+	"github.com/andew42/brightlight/framebuffer"
 	"io"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 )
 
 var driverStarted bool
 
-// Run driver as a go routine
-func StartDriver(fb *FrameBuffer, statistics *stats.Stats) {
+// Run driver or two as a go routine
+func StartDriver() {
 
 	if driverStarted {
 		log.Panic("Teensy driver started twice")
 	}
 	driverStarted = true
 
-	// Start 2 drivers (16 channels)
-	go teensyDriver(0, fb, statistics)
-	go teensyDriver(1, fb, statistics)
+	// Start 2 sub drivers (16 channels)
+	go teensyDriver(0)
+	go teensyDriver(1)
 }
 
 func IsDriverConnected() bool {
@@ -32,7 +34,7 @@ func IsDriverConnected() bool {
 var usbConnected bool
 
 // Monitors changes to frame buffer and update Teensy via USB
-func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
+func teensyDriver(driverIndex int) {
 
 	port := getPortName(driverIndex)
 	if port == "" {
@@ -40,81 +42,83 @@ func teensyDriver(driverIndex int, fb *FrameBuffer, statistics *stats.Stats) {
 		return
 	}
 
+	name := "Teensy " + strconv.Itoa(driverIndex)
+
 	for {
 		usbConnected = false
 		f := openUsbPort(port)
 		usbConnected = true
 
 		// Allocate buffer once to avoid garbage collections in loop
-		var data = make([]byte, 4+MaxLedStripLen*8*4+4)
+		var data = make([]byte, 4+config.MaxLedStripLen*8*4+4)
+
+		// Request frame buffer updates
+		src, done := framebuffer.AddListener(name)
 
 		// Push frame buffer changes to Teensy
 		for {
-			fb.Mutex.Lock()
+			select {
+			case fb := <-src:
 
-			started := time.Now()
+				// TODO	started := time.Now()
 
-			// Build the frame buffer, start with header of 4 * 0xff
-			i := 0
-			for z := 0; z < 4; z++ {
-				data[i] = 0xff
-				i++
-			}
-			startStrip := driverIndex * 8
-			var checksum int32 = 0
-			// Buffer is send 8*LED1, 8*LED2 ... 8*(LEDS_PER_STRIP - 1)
-			for l := 0; l < MaxLedStripLen; l++ {
-				for s := startStrip; s < startStrip+8; s++ {
-					if l >= len(fb.Strips[s].Leds) {
-						// Pad frame buffer with zeros as strip is < MaxLedStripLen
-						for z := 0; z < 4; z++ {
+				// Build the frame buffer, start with header of 4 * 0xff
+				i := 0
+				for z := 0; z < 4; z++ {
+					data[i] = 0xff
+					i++
+				}
+				startStrip := driverIndex * 8
+				var checksum int32 = 0
+				// Buffer is send 8*LED1, 8*LED2 ... 8*(LEDS_PER_STRIP - 1)
+				for l := 0; l < config.MaxLedStripLen; l++ {
+					for s := startStrip; s < startStrip+8; s++ {
+						if l >= len(fb.Strips[s].Leds) {
+							// Pad frame buffer with zeros as strip is < MaxLedStripLen
+							for z := 0; z < 4; z++ {
+								data[i] = 0
+								i++
+							}
+						} else {
+							// Colours are sent as 4 bytes with leading 0x00
+							rgb := fb.Strips[s].Leds[l]
 							data[i] = 0
 							i++
+							data[i] = rgb.Red
+							i++
+							data[i] = rgb.Green
+							i++
+							data[i] = rgb.Blue
+							i++
+							// Update the checksum
+							checksum += ((int32(rgb.Red) << 16) + (int32(rgb.Green) << 8) + int32(rgb.Blue))
 						}
-					} else {
-						// Colours are sent as 4 bytes with leading 0x00
-						rgb := fb.Strips[s].Leds[l]
-						data[i] = 0
-						i++
-						data[i] = rgb.Red
-						i++
-						data[i] = rgb.Green
-						i++
-						data[i] = rgb.Blue
-						i++
-						// Update the checksum
-						checksum += ((int32(rgb.Red) << 16) + (int32(rgb.Green) << 8) + int32(rgb.Blue))
 					}
 				}
+
+				// Append checksum MSB first
+				for z := 3; z >= 0; z-- {
+					data[i] = byte((checksum >> (8 * uint(z))) & 0xff)
+					i++
+				}
+
+				// Send the frame buffer
+				n, err := f.Write(data)
+				if err == nil && n < len(data) {
+					err = io.ErrShortWrite
+				}
+				if err != nil {
+					log.WithField("err", err).Warn("teensyDriver")
+					f.Close()
+
+					// Close down listener
+					done <- src
+
+					// Try and reconnect
+					break
+				}
+				//	TODO statistics.AddSerial(time.Since(started))
 			}
-
-			// Append checksum MSB first
-			for z := 3; z >= 0; z-- {
-				data[i] = byte((checksum >> (8 * uint(z))) & 0xff)
-				i++
-			}
-
-			// Send the frame buffer
-			n, err := f.Write(data)
-			if err == nil && n < len(data) {
-				err = io.ErrShortWrite
-			}
-			if err != nil {
-				fb.Mutex.Unlock()
-				log.WithField("err", err).Warn("teensyDriver")
-				f.Close()
-
-				// Try again in a second
-				time.Sleep(1000 * time.Millisecond)
-
-				// Try and reconnect
-				break
-			}
-
-			statistics.AddSerial(time.Since(started))
-			// Wait for next frame buffer update
-			fb.Cond.Wait()
-			fb.Mutex.Unlock()
 		}
 	}
 }

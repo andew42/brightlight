@@ -3,13 +3,12 @@ package servers
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
-	"github.com/andew42/brightlight/controller"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-func GetStripLenHandler(numberOfStrips int) func(http.ResponseWriter, *http.Request) {
+func GetStripLenHandler() func(http.ResponseWriter, *http.Request) {
 
 	// Handle HTTP requests to show strip lengths of room lights
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -23,22 +22,19 @@ func GetStripLenHandler(numberOfStrips int) func(http.ResponseWriter, *http.Requ
 		}
 
 		// index
-		config := strings.Split(r.URL.Path[extIndex+1:], ",")
-		index, err := strconv.ParseInt(config[0], 10, 32)
-		if err != nil || index < 0 || index > int64(numberOfStrips) {
+		configStrings := strings.Split(r.URL.Path[extIndex+1:], ",")
+		index, err := strconv.ParseInt(configStrings[0], 10, 32)
+		if err != nil {
 			index = -1
 		}
 
 		// length
-		length, err := strconv.ParseInt(config[1], 10, 32)
-		if err != nil || length < 0 || length > controller.MaxLedStripLen {
+		length, err := strconv.ParseInt(configStrings[1], 10, 32)
+		if err != nil {
 			length = -1
 		}
 
-		if err = animations.AnimateStripLength(uint(index), uint(length)); err != nil {
-			http.Error(w, "Invalid index or length", 406)
-		}
-
+		animations.AnimateStripLength(uint(index), uint(length))
 		log.WithFields(log.Fields{"index": index, "length": length, "err": err}).Info("stripLengthHandler called")
 	}
 }

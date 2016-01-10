@@ -1,5 +1,7 @@
 package animations
 
+import "github.com/andew42/brightlight/framebuffer"
+
 type animator interface {
-	animateNextFrame()
+	animateNextFrame(seg framebuffer.Segment)
 }

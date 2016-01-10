@@ -1,24 +1,23 @@
 package animations
 
-import "github.com/andew42/brightlight/controller"
+import "github.com/andew42/brightlight/framebuffer"
 
 type cylon struct {
-	seg controller.Segment
 	pos uint
 	dir bool
 }
 
-func newCylon(seg controller.Segment) *cylon {
+func newCylon() *cylon {
 
-	return &cylon{seg, 0, false}
+	return &cylon{0, false}
 }
 
-func (c *cylon) animateNextFrame() {
+func (c *cylon) animateNextFrame(seg framebuffer.Segment) {
 
-	c.seg.Set(c.pos, controller.NewRgb(0, 0, 0))
+	seg.Set(c.pos, framebuffer.NewRgb(0, 0, 0))
 
 	if c.dir {
-		if c.pos == c.seg.Len()-1 {
+		if c.pos == seg.Len()-1 {
 			c.dir = false
 		} else {
 			c.pos++
@@ -31,5 +30,5 @@ func (c *cylon) animateNextFrame() {
 		}
 	}
 
-	c.seg.Set(c.pos, controller.NewRgb(255, 0, 0))
+	seg.Set(c.pos, framebuffer.NewRgb(255, 0, 0))
 }

@@ -1,19 +1,18 @@
-package animations
+package framebuffer
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/andew42/brightlight/controller"
 )
 
 // A logical segment is a slice of another segment
 type LogSegment struct {
-	baseSeg controller.Segment
+	baseSeg Segment
 	start   uint
 	len     uint
 }
 
 // Constructor
-func NewLogSegment(baseSeg controller.Segment, start uint, len uint) LogSegment {
+func NewLogSegment(baseSeg Segment, start uint, len uint) LogSegment {
 
 	baseLen := baseSeg.Len()
 	if start >= baseLen {
@@ -32,7 +31,7 @@ func (seg LogSegment) Len() uint {
 }
 
 // Set a particular LED colour from the left of the segment
-func (seg LogSegment) Set(pos uint, colour controller.Rgb) {
+func (seg LogSegment) Set(pos uint, colour Rgb) {
 
 	// Is position out of range?
 	if pos >= seg.len {

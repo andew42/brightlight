@@ -1,4 +1,4 @@
-package controller
+package framebuffer
 
 import (
 	log "github.com/Sirupsen/logrus"
@@ -52,7 +52,7 @@ func (seg PhySegment) Set(pos uint, colour Rgb) {
 	}
 
 	// Set at position within strip
-	if seg.Strips[i].LeftToRight {
+	if seg.Strips[i].Clockwise {
 		seg.Strips[i].Leds[pos] = colour
 	} else {
 		seg.Strips[i].Leds[uint(len(seg.Strips[i].Leds))-pos-1] = colour

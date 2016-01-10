@@ -1,4 +1,4 @@
-package controller
+package framebuffer
 
 import "strconv"
 

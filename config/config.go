@@ -2,6 +2,10 @@ package config
 
 import "time"
 
+// Maximum led strip length (must match teensy firmware)
+const MaxLedStripLen = 300
+const StripsPerTeensy = 8
+
 // Frame buffer update frequency used by animation and stats
 // 20ms -> 50Hz, 25ms -> 40Hz *, 40ms -> 25Hz, 50ms -> 20Hz
 const framePeriodMs = 25

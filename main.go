@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
+	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/stats"
 	"golang.org/x/net/websocket"
@@ -13,10 +14,6 @@ import (
 	"path"
 	"runtime"
 )
-
-// The controller's frame buffer
-var fb = controller.NewFrameBuffer()
-var statistics = stats.NewStats()
 
 func main() {
 
@@ -29,11 +26,13 @@ func main() {
 
 	// What are we running on?
 	log.WithFields(
-		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).Info("brightlight started")
+		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).Info("Brightlight")
 
-	// Start serial and animation drivers
-	controller.StartDriver(fb, &statistics)
-	animations.StartDriver(fb, &statistics)
+	// Start drivers
+	controller.StartDriver()
+	renderer := make(chan *framebuffer.FrameBuffer)
+	framebuffer.StartDriver(renderer)
+	animations.StartDriver(renderer)
 
 	// Figure out where the content directory is GOPATH may contain : separated paths
 	contentPath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight/ui")
@@ -50,13 +49,14 @@ func main() {
 	http.HandleFunc("/RunAnimations/", servers.RunAnimationsHandler)
 
 	// Requests to show a strip length on the room lights
-	http.HandleFunc("/StripLength/", servers.GetStripLenHandler(len(fb.Strips)))
+	http.HandleFunc("/StripLength/", servers.GetStripLenHandler())
 
 	// Push frame buffer changes over a web socket
-	http.Handle("/FrameBuffer", websocket.Handler(servers.GetFrameBufferHandler(fb)))
+	http.Handle("/FrameBuffer", websocket.Handler(servers.GetFrameBufferHandler()))
 
 	// Push stats info over a web socket
-	http.Handle("/Stats", websocket.Handler(servers.GetStatsHandler(&statistics, fb)))
+	var statistics = stats.NewStats()
+	http.Handle("/Stats", websocket.Handler(servers.GetStatsHandler(&statistics)))
 
 	// Start web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {

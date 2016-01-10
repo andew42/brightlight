@@ -22,7 +22,7 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Unmarshal JSON into typed slice
+	// Un-marshal JSON into typed slice
 	var segments []animations.SegmentAction
 
 	if err = json.Unmarshal(body, &segments); err != nil {
