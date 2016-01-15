@@ -3,6 +3,7 @@ package animations
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
+	"github.com/andew42/brightlight/stats"
 	"strconv"
 	"time"
 )
@@ -114,6 +115,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 			select {
 			// Request to render a frame buffer
 			case fb := <-renderer:
+				renderStartTime := time.Now()
 				// Animate and return update frame buffer
 				for _, v := range animators {
 					// Resolve the segment to animate, based on string name, and animate it
@@ -121,6 +123,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 						v.animator.animateNextFrame(seg.Seg)
 					}
 				}
+				stats.AddFrameRenderTimeSample(time.Since(renderStartTime))
 				renderer <- fb
 
 			// Request animation update
@@ -130,3 +133,4 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 		}
 	}()
 }
+

@@ -33,6 +33,7 @@ func main() {
 	renderer := make(chan *framebuffer.FrameBuffer)
 	framebuffer.StartDriver(renderer)
 	animations.StartDriver(renderer)
+	stats.StartDriver()
 
 	// Figure out where the content directory is GOPATH may contain : separated paths
 	contentPath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight/ui")
@@ -55,8 +56,7 @@ func main() {
 	http.Handle("/FrameBuffer", websocket.Handler(servers.GetFrameBufferHandler()))
 
 	// Push stats info over a web socket
-	var statistics = stats.NewStats()
-	http.Handle("/Stats", websocket.Handler(servers.GetStatsHandler(&statistics)))
+	http.Handle("/Stats", websocket.Handler(servers.GetStatsHandler()))
 
 	// Start web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {

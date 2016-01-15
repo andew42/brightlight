@@ -3,6 +3,7 @@ package framebuffer
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/config"
+	"github.com/andew42/brightlight/stats"
 	"strconv"
 	"time"
 )
@@ -76,8 +77,9 @@ func NewFrameBuffer() *FrameBuffer {
 
 // Parameter sent to internal add listener channel
 type addListenerParams struct {
-	name string
-	src  chan *FrameBuffer
+	name     string
+	isSerial bool
+	src      chan *FrameBuffer
 }
 
 // Used internally to communicate an add listener request
@@ -90,10 +92,10 @@ var listenerDone = make(chan chan *FrameBuffer)
 // frame buffer changes. src is a channel down which new frame buffers are
 // sent. The src channel is sent to the done channel when updates are no
 // longer required
-func AddListener(name string) (src chan *FrameBuffer, done chan<- chan *FrameBuffer) {
+func AddListener(name string, isSerial bool) (src chan *FrameBuffer, done chan<- chan *FrameBuffer) {
 
 	newSrc := make(chan *FrameBuffer)
-	addListener <- addListenerParams{name, newSrc}
+	addListener <- addListenerParams{name, isSerial, newSrc}
 	return newSrc, listenerDone
 }
 
@@ -103,29 +105,40 @@ func StartDriver(renderer chan *FrameBuffer) {
 	go func() {
 		// All the frame buffer listeners, can be added and removed dynamically to
 		// support web page(s) with virtual frame buffer displays that come and go
-		var listeners map[chan *FrameBuffer]string = make(map[chan *FrameBuffer]string)
+		type listenerInfo struct {
+			name     string
+			isSerial bool
+		}
+		var listeners = make(map[chan *FrameBuffer]listenerInfo)
 		lastRenderedFrameBuffer := NewFrameBuffer()
 		renderInProgress := false
 		frameSync := time.Tick(config.FramePeriodMs)
+		nextFrameTime := time.Now().Add(config.FramePeriodMs)
 		for {
 			select {
 			case <-frameSync:
 				// Frame tick, first collect timer jitter
-				//			started := time.Now()
-				//			jitter := started.Sub(nextFrameTime)
-				//			nextFrameTime = started.Add(config.FramePeriodMs)
+				now := time.Now()
+				jitter := now.Sub(nextFrameTime)
+				nextFrameTime = now.Add(config.FramePeriodMs)
+				stats.AddFrameSyncJitterSample(jitter)
 
 				// Send to all listeners, that are idle, the most recent frame buffer
-				for k, _ := range listeners {
+				for k, v := range listeners {
 					// Send the latest frame buffer if listener has processed the last one
 					select {
 					case k <- lastRenderedFrameBuffer:
 					default:
+						if v.isSerial {
+							stats.AddSerialDroppedFrame(v.name)
+						}
 					}
 				}
 
 				// Render next frame, if current one is done
-				if !renderInProgress {
+				if renderInProgress {
+					stats.AddFrameRenderDroppedFrame()
+				} else {
 					renderInProgress = true
 					renderer <- NewFrameBuffer()
 				}
@@ -137,7 +150,7 @@ func StartDriver(renderer chan *FrameBuffer) {
 			// Process new listener requests
 			case newListener := <-addListener:
 				log.WithField("name", newListener.name).Info("Framebuffer listener added")
-				listeners[newListener.src] = newListener.name
+				listeners[newListener.src] = listenerInfo{newListener.name, newListener.isSerial}
 
 			// Process remove listener request
 			case listenerToRemove := <-listenerDone:

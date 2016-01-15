@@ -11,3 +11,6 @@ const StripsPerTeensy = 8
 const framePeriodMs = 25
 const FramePeriodMs = framePeriodMs * time.Millisecond
 const FrameFrequencyHz = 1 / (framePeriodMs / 1000.0)
+
+// Statistics update period
+const StatsUpdatePeriodMs = 1000 * time.Millisecond

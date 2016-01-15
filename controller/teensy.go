@@ -4,10 +4,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
+	"github.com/andew42/brightlight/stats"
 	"io"
 	"os"
 	"runtime"
-	"strconv"
 	"time"
 )
 
@@ -42,8 +42,6 @@ func teensyDriver(driverIndex int) {
 		return
 	}
 
-	name := "Teensy " + strconv.Itoa(driverIndex)
-
 	for {
 		usbConnected = false
 		f := openUsbPort(port)
@@ -53,15 +51,13 @@ func teensyDriver(driverIndex int) {
 		var data = make([]byte, 4+config.MaxLedStripLen*8*4+4)
 
 		// Request frame buffer updates
-		src, done := framebuffer.AddListener(name)
+		src, done := framebuffer.AddListener(port, true)
 
 		// Push frame buffer changes to Teensy
 		for {
 			select {
 			case fb := <-src:
-
-				// TODO	started := time.Now()
-
+				started := time.Now()
 				// Build the frame buffer, start with header of 4 * 0xff
 				i := 0
 				for z := 0; z < 4; z++ {
@@ -117,7 +113,7 @@ func teensyDriver(driverIndex int) {
 					// Try and reconnect
 					break
 				}
-				//	TODO statistics.AddSerial(time.Since(started))
+				stats.AddSerialSendTimeSample(port, time.Since(started))
 			}
 		}
 	}

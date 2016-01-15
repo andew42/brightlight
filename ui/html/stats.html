@@ -16,74 +16,54 @@
     <div class="white-background"></div>
     {{#socketConnected}}
     <table class="stats-table">
+        <!-- Total Render Time -->
         <tr class="stats-table-row-frame">
-            <td class="stats-table-annotation-text">Avg Frame</td>
-            <td class="stats-table-value-text">{{averageFrameTime}}ms</td>
+            <td colspan="2">{{stats.FrameRenderTime.Name}}</td>
+            <td class="stats-table-value-text">{{stats.FrameRenderTime.DroppedFrames}}</td>
         </tr>
-
         <tr class="stats-table-row-frame">
-            <td class="stats-table-annotation-text">Min Frame</td>
-            <td class="stats-table-value-text">{{minFrameTime}}ms</td>
-            <td class="stats-table-value-text">{{latchedMinFrameTime}}ms</td>
+            <td class="stats-table-value-text">{{stats.FrameRenderTime.MinTime}}ms</td>
+            <td class="stats-table-value-text">{{stats.FrameRenderTime.AverageTime}}ms</td>
+            <td class="stats-table-value-text">{{stats.FrameRenderTime.MaxTime}}ms</td>
         </tr>
 
+        <!-- Frame Sync Jitter -->
         <tr class="stats-table-row-frame">
-            <td class="stats-table-annotation-text">Max Frame</td>
-            <td class="stats-table-value-text">{{maxFrameTime}}ms</td>
-            <td class="stats-table-value-text">{{latchedMaxFrameTime}}ms</td>
+            <td colspan="3">{{stats.FrameSyncJitter.Name}}</td>
+        </tr>
+        <tr class="stats-table-row-frame">
+            <td class="stats-table-value-text">{{stats.FrameSyncJitter.MinTime}}ms</td>
+            <td class="stats-table-value-text">{{stats.FrameSyncJitter.AverageTime}}ms</td>
+            <td class="stats-table-value-text">{{stats.FrameSyncJitter.MaxTime}}ms</td>
         </tr>
 
-        <tr class="stats-table-row-jitter">
-            <td class="stats-table-annotation-text">Avg Jitter</td>
-            <td class="stats-table-value-text">{{averageJitter}}ms</td>
+        {{#stats.SerialSendTime}}
+        <tr class="stats-table-row-frame">
+            <td colspan="2">{{Name}}</td>
+            <td class="stats-table-value-text">{{DroppedFrames}}</td>
         </tr>
-
-        <tr class="stats-table-row-jitter">
-            <td class="stats-table-annotation-text">Min Jitter</td>
-            <td class="stats-table-value-text">{{minJitter}}ms</td>
-            <td class="stats-table-value-text">{{latchedMinJitter}}ms</td>
+        <tr class="stats-table-row-frame">
+            <td class="stats-table-value-text">{{MinTime}}ms</td>
+            <td class="stats-table-value-text">{{AverageTime}}ms</td>
+            <td class="stats-table-value-text">{{MaxTime}}ms</td>
         </tr>
-
-        <tr class="stats-table-row-jitter">
-            <td class="stats-table-annotation-text">Max Jitter</td>
-            <td class="stats-table-value-text">{{maxJitter}}ms</td>
-            <td class="stats-table-value-text">{{latchedMaxJitter}}ms</td>
-        </tr>
-        {{#showSendTimes}}
-        <!-- Optional serial send statistics-->
-        <tr class="stats-table-row-serial">
-            <td class="stats-table-annotation-text">Avg Send</td>
-            <td class="stats-table-value-text">{{averageSendTime}}ms</td>
-        </tr>
-        <tr class="stats-table-row-serial">
-            <td class="stats-table-annotation-text">Min Send</td>
-            <td class="stats-table-value-text">{{minSendTime}}ms</td>
-            <td class="stats-table-value-text">{{latchedMinSendTime}}ms</td>
-        </tr>
-        <tr class="stats-table-row-serial">
-            <td class="stats-table-annotation-text">Max Send</td>
-            <td class="stats-table-value-text">{{maxSendTime}}ms</td>
-            <td class="stats-table-value-text">{{latchedMaxSendTime}}ms</td>
-        </tr>
-        {{/showSendTimes}}
-        {{^showSendTimes}}
+        {{/stats.SerialSendTime}}
+        {{^stats.SerialSendTime}}
         <tr>
             <td></td>
             <td class="stats-light-controller-error">No Light Controller Connected</td>
             <td></td>
         </tr>
-        {{/showSendTimes}}
+        {{/stats.SerialSendTime}}
         <tr>
-            <td class="stats-table-annotation-text">GC Count</td>
-            <td class="stats-table-value-text">{{gcCount}}</td>
-            <td></td>
+            <td class="stats-table-annotation-text">Frame Period</td>
+            <td class="stats-table-value-text">{{stats.FramePeriodMs}}ms</td>
+            <td class="stats-table-value-text">{{stats.FrameRateHz}}Hz</td>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
-            <td class="button">
-                <div class="button-content" id="btnReset" on-tap="btnReset"></div>
-            </td>
+            <td class="stats-table-annotation-text">GC Count</td>
+            <td class="stats-table-value-text">{{stats.GcCount}}</td>
+            <td class="stats-table-value-text">{{stats.GcPauseTime}}ms</td>
         </tr>
     </table>
     {{/socketConnected}}

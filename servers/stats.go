@@ -1,43 +1,37 @@
 package servers
 
 import (
-	//"encoding/json"
-	//log "github.com/Sirupsen/logrus"
-	//"github.com/andew42/brightlight/config"
+	"encoding/json"
+	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/stats"
 	"golang.org/x/net/websocket"
-	"runtime/debug"
+	"strconv"
 )
 
-var gcStats debug.GCStats
+// Give each stats listener its own unique ID
+var statsListenerId = 0
 
 // Handle stats web socket requests (web socket is closed when we return)
-func GetStatsHandler(statistics *stats.Stats) func(ws *websocket.Conn) {
+func GetStatsHandler() func(ws *websocket.Conn) {
 
 	return func(ws *websocket.Conn) {
-		// TODO REWRITE STATISTICS
-		//		for {
-		//			fb.Mutex.Lock()
-		//
-		//			// Report stats for last second every second every second
-		//			if statistics.FrameCount == config.FrameFrequencyHz {
-		//				// Update garbage collection count
-		//				debug.ReadGCStats(&gcStats)
-		//				statistics.GcCount = gcStats.NumGC
-		//				// Render the stats as JSON (fails if the client has disappeared)
-		//				rc, err := json.MarshalIndent(statistics, "", " ")
-		//				if err == nil {
-		//					_, err = ws.Write(rc)
-		//				}
-		//				if err != nil {
-		//					fb.Mutex.Unlock()
-		//					log.Info("statsSocketHandler" + err.Error())
-		//					return
-		//				}
-		//			}
-		//			// Wait for next frame buffer update
-		//			fb.Cond.Wait()
-		//			fb.Mutex.Unlock()
-		//		}
+		// Not thread safe but good enough for debug output
+		statsListenerId++
+		src, done := stats.AddListener("Stats Listener " + strconv.Itoa(statsListenerId))
+		for {
+			select {
+			// src sends us stats updates
+			case stats := <-src:
+				// Render the stats as JSON (fails if the client has disappeared)
+				if rc, err := json.MarshalIndent(stats, "", " "); err == nil {
+					_, err = ws.Write(rc)
+				} else {
+					log.Info("statsSocketHandler" + err.Error())
+					// Un-subscribe before returning and closing connection
+					done <- src
+					return
+				}
+			}
+		}
 	}
 }

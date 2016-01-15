@@ -9,15 +9,15 @@ import (
 )
 
 // Give each virtual frame buffer its own unique ID
-var listenerId = 0
+var frameBufferListenerId = 0
 
 // Handle frame buffer web socket requests (web socket is closed when we return)
 func GetFrameBufferHandler() func(ws *websocket.Conn) {
 
 	return func(ws *websocket.Conn) {
 		// Not thread safe but good enough for debug output
-		listenerId++
-		src, done := framebuffer.AddListener("Virtual Frame Buffer " + strconv.Itoa(listenerId))
+		frameBufferListenerId++
+		src, done := framebuffer.AddListener("Virtual Frame Buffer "+strconv.Itoa(frameBufferListenerId), false)
 		for {
 			select {
 			// src sends us frame buffer updates
