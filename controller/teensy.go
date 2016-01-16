@@ -54,6 +54,7 @@ func teensyDriver(driverIndex int) {
 		src, done := framebuffer.AddListener(port, true)
 
 		// Push frame buffer changes to Teensy
+	pushLoop:
 		for {
 			select {
 			case fb := <-src:
@@ -111,7 +112,7 @@ func teensyDriver(driverIndex int) {
 					done <- src
 
 					// Try and reconnect
-					break
+					break pushLoop
 				}
 				stats.AddSerialSendTimeSample(port, time.Since(started))
 			}

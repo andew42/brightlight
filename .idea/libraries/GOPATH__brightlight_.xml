@@ -13,6 +13,8 @@
       <root url="file://$PROJECT_DIR$/../../../golang.org/x/text/.git" />
       <root url="file://$PROJECT_DIR$/../../../golang.org/x/text/encoding/testdata" />
       <root url="file://$PROJECT_DIR$" />
+      <root url="file://$PROJECT_DIR$/firmware/firmware/.vs" />
+      <root url="file://$PROJECT_DIR$/firmware/firmware/__vm" />
       <root url="file://$PROJECT_DIR$/../../../golang.org/x/net/.git" />
       <root url="file://$PROJECT_DIR$/../../Sirupsen/logrus/.git" />
       <root url="file://$PROJECT_DIR$/.git" />
