@@ -7,6 +7,7 @@ import (
 	"github.com/andew42/brightlight/stats"
 	"io"
 	"os"
+	"os/exec"
 	"runtime"
 	"time"
 )
@@ -128,6 +129,16 @@ func openUsbPort(port string) *os.File {
 		f, err := os.Create(port)
 		if err == nil {
 			log.WithField("port", port).Info("openUsbPort connected")
+
+			// Set raw mode on raspberry pi, if we don't set raw mode
+			// xon/xoff character in the frame buffer cause problems
+			if runtime.GOOS == "linux" {
+				cmd := exec.Command("stty", "-F", port, "raw")
+				if err := cmd.Run(); err != nil {
+					log.WithField("error", err.Error()).Error("Failed to set stty raw mode")
+				}
+			}
+
 			return f
 		}
 

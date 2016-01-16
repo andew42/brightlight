@@ -56,7 +56,6 @@ go install
 
 ###### Pi: run
 ```bash
-# stty -F /dev/ttyACM0 raw
 export GOPATH=/home/pi/go
 /home/pi/go/bin/brightlight
 ```
