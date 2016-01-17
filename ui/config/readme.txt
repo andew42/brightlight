@@ -11,10 +11,3 @@ static.js
 ---------
 Animation names used when programming buttons
 Segment layout and names used when creating a lighting scene
-
-TODO
-----
-Flicker when switching buttons
-Runner and rainbow aren't smooth (40hz)
-Candle is rubbish and too bright
-Sweetshop doesn't work

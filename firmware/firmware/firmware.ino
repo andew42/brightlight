@@ -82,7 +82,8 @@ int serial_read() {
   // age to return, slowing everything down. Went with count
   // of reties instead. The count should be larger than the
   // frame rate otherwise LEDs will be switched off mid frame
-  for (int i = 0; i < 100000; i++) {
+  // 1,000,000 is around 300ms at 96Mhz
+  for (int i = 0; i < 1000000; i++) {
     if (Serial.available()) {
       return Serial.read();
     }

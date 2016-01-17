@@ -126,7 +126,7 @@ func openUsbPort(port string) *os.File {
 
 	errorLogged := false
 	for {
-		f, err := os.Create(port)
+		f, err := os.OpenFile(port, os.O_RDWR, 0)
 		if err == nil {
 			log.WithField("port", port).Info("openUsbPort connected")
 
