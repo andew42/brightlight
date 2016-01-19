@@ -27,7 +27,6 @@ require([
 
         // Page initialisation
         var init = function () {
-
             // Helper to find a button by id
             var findButtonById = function (id) {
                 if (dto.buttons === undefined) {
@@ -47,7 +46,6 @@ require([
 
             // Helper to save the updated button layout back to server
             var saveButtonLayout = function () {
-
                 // Copy buttons WITHOUT OK
                 var cloneEditableButtons = function () {
                     var copy = {};
@@ -63,7 +61,6 @@ require([
                     }
                     return copy;
                 };
-
                 util.putJson('../../config/user.json', cloneEditableButtons(),
                     function () {
                         // TODO LITTLE SAVE POPUP
@@ -102,12 +99,8 @@ require([
             var getSegmentWithAnimationName = function (segmentId, activeSegments) {
                 // Look up the segment display name, given it's id
                 var segmentName = util.findFirst(sc.segments,
-                    function (seg) {
-                        return seg.id === segmentId;
-                    },
-                    function (seg) {
-                        return seg.name;
-                    });
+                    function (seg) {return seg.id === segmentId;},
+                    function (seg) {return seg.name;});
 
                 // Give up if the segment id is unknown
                 if (segmentName === undefined) {
@@ -116,9 +109,7 @@ require([
 
                 // Determine if the segment has an animation running
                 var activeSegmentIndex = util.findFirstIndex(activeSegments,
-                    function (seg) {
-                        return seg.segmentId === segmentId;
-                    });
+                    function (seg) {return seg.segmentId === segmentId;});
 
                 // Not active so just return segment name
                 if (activeSegmentIndex === undefined) {
@@ -128,9 +119,7 @@ require([
                 // Otherwise look up the actions display name
                 var action = activeSegments[activeSegmentIndex].action;
                 var animationIndex = util.findFirstIndex(sc.animations,
-                    function (animation) {
-                        return animation.action === action;
-                    });
+                    function (animation) {return animation.action === action;});
 
                 if (animationIndex === undefined) {
                     return {"name": segmentName};
@@ -160,7 +149,9 @@ require([
                                     break;
                                 }
                             }
-                            segments.splice(i, 0, {"name": si.name, "id": id, "animation": si.animation});
+                            // Must be a copy as we bind this to a combo which will change action
+                            var animation = {"name":si.animation.name, "action":si.animation.action}
+                            segments.splice(i, 0, {"name":si.name, "id":id, "animation":animation});
                         }
                         else {
                             // Here to just append
@@ -191,14 +182,29 @@ require([
 
             // Observe selection changes to context menu - segment
             ractive.observe( 'selectedSegment.id', function ( newValue ) {
-                // TODO
-                //
                 console.info(newValue);
+
+                // Ignore initial update
+                if (newValue === undefined) {
+                    return;
+                }
+
+                // Update selected segment
+                dto.selectedSegment = util.findFirst(dto.segments,
+                    function (seg) {return seg.id === newValue;},
+                    function (seg) {return seg;});
+
+                // Force the selected animation to update to off TODO THIS PROBABLY DOESN'T WORK
+                if (dto.selectedSegment.animation === undefined) {
+                    dto.selectedSegment.animation = {"action": "off"};
+                }
+
+                // Update animation drop down
+                ractive.set(dto);
             });
 
             // Observe selection changes to context menu - animation
             ractive.observe( 'selectedSegment.animation.action', function ( newValue ) {
-
                 console.info(newValue);
 
                 var selectedSegmentId = dto.selectedSegment.id;
@@ -216,12 +222,20 @@ require([
                     dto.editButton.segments.splice(selectedButtonSegmentIndex, 1);
                 }
                 else {
-                    // otherwise update the segments action
-                    dto.editButton.segments[selectedButtonSegmentIndex].action = newValue;
+                    if (selectedButtonSegmentIndex === undefined) {
+                        // Here if segment was off, append a new button action with TODO: set default params
+                        if (dto.editButton.segments === undefined) {
+                            dto.editButton.segments = [];
+                        }
+                        dto.editButton.segments.push(
+                            {"segmentId": selectedSegmentId, "action":newValue, "params":808080});
+                    } else {
+                        // otherwise update the (existing) segments action TODO: set default params
+                        dto.editButton.segments[selectedButtonSegmentIndex].action = newValue;
+                    }
                 }
 
                 // Rebuild a custom list of all segment with appended actions specific for this button
-                // TODO ###
                 dto.segments = buildSegmentList(dto.editButton.segments);
                 ractive.set(dto);
             });
@@ -281,15 +295,6 @@ require([
                 else {
                     lights.runAnimations(button.segments);
                 }
-                // Single colour light button?
-                //else if (button.action === "allLights") {
-                //    //###
-                //    lights.allLights(button.params);
-                //}
-                //// Animation button
-                //else {
-                //    lights.animation(button.action);
-                //}
             });
 
             // Set up an on long press handler for all the buttons
