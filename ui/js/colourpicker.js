@@ -80,7 +80,8 @@ require([
             });
 
             ractive.on('cancelButtonHandler', function () {
-                nav.ret(undefined);
+                p.colour = undefined;
+                nav.ret(p);
             });
 
             updateUi();

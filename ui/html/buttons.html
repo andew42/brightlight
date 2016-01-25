@@ -43,6 +43,7 @@
         </div>
         <!-- Edit Menu -->
         <div id="edit-menu" class="edit-menu" style="display:none">
+            <!-- Button Name -->
             <div class="edit-menu-row">
                 <div class="floating-button-full-width-container">
                     <label>
@@ -50,34 +51,31 @@
                     </label>
                 </div>
             </div>
+            <!-- Segment (with attached animation) List -->
             <div class="edit-menu-row">
                 <div class="floating-button-full-width-container">
                     <label>
-                        <select class="edit-menu-select" value="{{selectedSegment.id}}">
-                            {{#segments}}
-                            <option value="{{id}}">{{name}}</option>
-                            {{/segments}}
+                        <select class="edit-menu-select" value="{{selectedSegment}}">
+                            {{#segmentAnimations}}
+                            <option value="{{segment}}">{{segment}} {{#animation}}({{animation}}){{/animation}}</option>
+                            {{/segmentAnimations}}
                         </select>
                     </label>
                 </div>
             </div>
+            <!-- Animation List -->
             <div class="edit-menu-row">
                 <div class="floating-button-full-width-container">
                     <label>
-                        <!--TODO: Maybe changing animation should update label?-->
-                        <select class="edit-menu-select" value="{{selectedSegment.animation.action}}">
+                        <select class="edit-menu-select" value="{{selectedAnimation}}">
                             {{#animations}}
-                            <option value="{{action}}">{{name}}</option>
+                            <option value="{{.}}">{{.}}</option>
                             {{/animations}}
                         </select>
                     </label>
                 </div>
             </div>
-            <div class="edit-menu-row">
-                <div class="floating-button-full-width-container">
-                    <div on-tap="tapHandler" id="menu-white" class="edit-menu-button">White</div>
-                </div>
-            </div>
+            <!-- Colour Button -->
             <div class="edit-menu-row">
                 <div class="floating-button-full-width-container">
                     <div on-tap="tapHandler" id="menu-colour" class="edit-menu-button">Colour</div>

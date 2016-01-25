@@ -12,26 +12,16 @@ require([
     function (doc, R, touch, lights, scroll, nav, util, sc) {
         'use strict';
 
-        // Ractive data binding object
-        var dto = {
-            buttons: undefined,
-            error: undefined,
-            editButton: undefined,
-            animations: sc.animations,
-            segments: undefined,
-            selectedSegment: undefined
-        };
-
-        // The button that was last long pressed
-        var buttonBeingEdited;
-
         // Page initialisation
         var init = function () {
+        // -----
             // Helper to find a button by id
             var findButtonById = function (id) {
+            // ---------------
                 if (dto.buttons === undefined) {
                     return;
                 }
+
                 var columns = ["leftColumn", "midColumn", "rightColumn"];
                 for (var i = 0; i < columns.length; i++) {
                     var buttons = dto.buttons[columns[i]];
@@ -41,13 +31,16 @@ require([
                         }
                     }
                 }
+
                 return undefined;
             };
 
             // Helper to save the updated button layout back to server
             var saveButtonLayout = function () {
+            // -----------------
                 // Copy buttons WITHOUT OK
                 var cloneEditableButtons = function () {
+                // ---------------------
                     var copy = {};
                     var columns = ["leftColumn", "midColumn", "rightColumn"];
                     for (var i = 0; i < columns.length; i++) {
@@ -61,6 +54,8 @@ require([
                     }
                     return copy;
                 };
+
+                // Save to server
                 util.putJson('../../config/user.json', cloneEditableButtons(),
                     function () {
                         // TODO LITTLE SAVE POPUP
@@ -74,6 +69,7 @@ require([
 
             // Helper to position menu div relative to mouse
             var positionMenu = function (menu, x, y) {
+            // -------------
                 // Ensure menu is visible so we can read width and height
                 menu.style.display = 'block';
                 var menuWidth = menu.clientWidth;
@@ -92,75 +88,237 @@ require([
                 menu.style.left = menuX + 'px';
             };
 
-            // Helper returns:
-            // { "name": segment display name (for segmentId) with active animation name appended,
+            // return {
+            //   "segment": segment name,
             //   "index": within the active segments iff the segment is active (so we can put active segments first)
-            //   "animation": the animation iff the segment has and active animation}
-            var getSegmentWithAnimationName = function (segmentId, activeSegments) {
-                // Look up the segment display name, given it's id
-                var segmentName = util.findFirst(sc.segments,
-                    function (seg) {return seg.id === segmentId;},
-                    function (seg) {return seg.name;});
-
-                // Give up if the segment id is unknown
-                if (segmentName === undefined) {
-                    return segmentName;
-                }
-
-                // Determine if the segment has an animation running
+            //   "animation": the animation iff the segment has and active animation,
+            //   "params": the animation parameters
+            // }
+            var getSegmentWithAnimation = function (segment, activeSegments) {
+            //-------------------------
+                // Determine if the segment has an animation running on this button
                 var activeSegmentIndex = util.findFirstIndex(activeSegments,
-                    function (seg) {return seg.segmentId === segmentId;});
+                    function (seg) {return seg.segment === segment;});
 
-                // Not active so just return segment name
+                // Not active so just return the segment name
                 if (activeSegmentIndex === undefined) {
-                    return {"name": segmentName};
+                    return {"segment": segment};
                 }
 
-                // Otherwise look up the actions display name
-                var action = activeSegments[activeSegmentIndex].action;
-                var animationIndex = util.findFirstIndex(sc.animations,
-                    function (animation) {return animation.action === action;});
-
-                if (animationIndex === undefined) {
-                    return {"name": segmentName};
-                }
-
-                // Finally return the composite "segment name (animation name)" index and animation
-                return {"name": segmentName + " (" + sc.animations[animationIndex].name + ")",
-                        "index": activeSegmentIndex,
-                        "animation": sc.animations[animationIndex]};
+                // Active, return segment with animation
+                return {
+                    "segment": segment,
+                    "index": activeSegmentIndex,
+                    "animation": activeSegments[activeSegmentIndex].animation,
+                    "params": activeSegments[activeSegmentIndex].params
+                };
             };
 
-            // Takes a button's active segment list and builds the full segment
-            // list which will include animation names for the active segments
-            var buildSegmentList = function(buttonsActiveSegments) {
-                // Build a custom list of all segment with appended actions specific for this button
+            // Takes a button's active segment list and builds the full
+            // segment list which will include any active button animation
+            var buildSegmentAnimations = function(buttonsActiveSegments) {
+            // -----------------------
+                // Build a custom list of all segments with animations specific for this button
                 var segments = [];
                 for (var s = 0; s < sc.segments.length; s++) {
-                    var id = sc.segments[s].id;
 
                     // Retrieve entry and insert into list respecting index (or append if no index)
-                    var si = getSegmentWithAnimationName(id, buttonsActiveSegments);
-                    if (si !== undefined) {
-                        if (si.index !== undefined) {
-                            // Here to insert at a specific index
-                            for (var i = 0; i < segments.length; i++) {
-                                if (segments[i].index === undefined || segments[i].index > si.index) {
-                                    break;
-                                }
+                    var sa = getSegmentWithAnimation(sc.segments[s], buttonsActiveSegments);
+                    if (sa.index !== undefined) {
+
+                        // Here to insert at a specific index
+                        for (var i = 0; i < segments.length; i++) {
+                            if (segments[i].index === undefined || segments[i].index > sa.index) {
+                                break;
                             }
-                            // Must be a copy as we bind this to a combo which will change action
-                            var animation = {"name":si.animation.name, "action":si.animation.action}
-                            segments.splice(i, 0, {"name":si.name, "id":id, "animation":animation});
                         }
-                        else {
-                            // Here to just append
-                            segments.push({"name": si.name, "id": id});
-                        }
+
+                        // Must be a copy as we bind this to a combo which will change action
+                        segments.splice(i, 0, sa);
+                    }
+                    else {
+                        // Here to just append
+                        segments.push(sa);
                     }
                 }
                 return segments;
             };
+
+            // Create the segment list for the button from segmentAnimations binding
+            var buildButtonSegments = function() {
+            // --------------------
+                var segments = [];
+                for (var i = 0; i < dto.segmentAnimations.length; i++) {
+                    var sa = dto.segmentAnimations[i];
+                    if (sa.animation !== undefined) {
+                        segments.push({
+                            "segment": sa.segment,
+                            "animation": sa.animation,
+                            "params": sa.params
+                        });
+                    }
+                }
+                return segments;
+            };
+
+            // Observe selection changes to context menu - segment
+            var observeSelectedSegment = function ( newValue ) {
+            // -----------------------
+                console.info(newValue);
+
+                // Ignore initial update
+                if (newValue === undefined) {
+                    return;
+                }
+
+                // Select animation attached to this segment (if any)
+                dto.selectedAnimation = util.findFirst(dto.segmentAnimations,
+                    function (seg) {return seg.segment === newValue;},
+                    function (seg) {return seg.animation;});
+
+                // Force the selected animation to update to off if undefined
+                if (dto.selectedAnimation === undefined) {
+                    dto.selectedAnimation = "Off";
+                }
+
+                // Update UI
+                ractive.set(dto);
+            };
+
+            // Observe selection changes to context menu - animation
+            var observeSelectedAnimation = function ( newValue ) {
+            // -------------------------
+                console.info(newValue);
+
+                // Ignore initial update
+                if (dto.segmentAnimations === undefined) {
+                    return;
+                }
+
+                // Find selected segment animations
+                var sa = util.findFirst(dto.segmentAnimations,
+                    function (s) {return s.segment === dto.selectedSegment;},
+                    function (s) {return s;});
+
+                // Update animation removing if Off (TODO: Set animation default params)
+                sa.animation = newValue === "Off" ? undefined : newValue;
+
+                // The segmentAnimation list may now be out of order (i.e. all
+                // animated segments may not be at the top) so we rebuild list
+                var buttonSegments = buildButtonSegments();
+                dto.segmentAnimations = buildSegmentAnimations(buttonSegments);
+
+                // Update UI
+                ractive.set(dto);
+            };
+
+            // Set up an on tap handler for all the buttons
+            var tapHandler = function (event) {
+            // -----------
+                // Close edit menu
+                var editMenu = document.getElementById("edit-menu");
+                editMenu.style.display = 'none';
+
+                // Check for edit context menu button taps
+                if (event.node.id === 'menu-colour') {
+
+                    console.info('COLOUR');
+
+                    // Get the colour of the selected button, may be undefined
+                    var selectedParams = util.findFirst(dto.segmentAnimations,
+                        function(s) {return s.segment === dto.selectedSegment;},
+                        function(s) {return s.params;});
+
+                    // Colour picker cares about colour, other parameters are just passed back
+                    nav.call("./colourpicker.html", "./buttons.html?rw=true", {
+                        colour: selectedParams,
+                        // Used to restore the edit menu so far
+                        editButton: dto.editButton,
+                        segmentAnimations: dto.segmentAnimations,
+                        selectedSegment: dto.selectedSegment,
+                        selectedAnimation: dto.selectedAnimation,
+                        // Used to restore the edit menu position
+                        menuPos: {x: editMenu.style.left, y: editMenu.style.top}
+                    });
+                }
+                else if (event.node.id === 'menu-ok') {
+
+                    console.info('OK');
+                    util.hideKeyboard();
+
+                    // Find the button we are editing and update it
+                    var buttonToUpdate = findButtonById(dto.editButton.id);
+
+                    // Update the button segment list from segmentAnimations menu
+                    buttonToUpdate.segments = buildButtonSegments();
+
+                    // Update the button name if it changed
+                    if (buttonToUpdate.name !== dto.editButton.name) {
+                        buttonToUpdate.name = dto.editButton.name;
+                        ractive.set(dto);
+                    }
+
+                    // Save changes to server
+                    saveButtonLayout();
+                }
+                else if (event.node.id === 'menu-cancel') {
+
+                    console.info('CANCEL');
+                    util.hideKeyboard();
+                }
+
+                // Lookup dynamic (user programmable) lighting buttons
+                var id = event.node.id;
+                var button = findButtonById(id);
+                if (button === undefined) {
+                    return;
+                }
+                // OK Button or lighting button?
+                if (button.action === "action-back") {
+                    window.location.href = "./index.html";
+                }
+                else {
+                    lights.runAnimations(button.segments);
+                }
+            };
+
+            // Set up an on long press handler for all the buttons
+            var pressHandler = function (event) {
+            // -------------
+                // Find the button being pressed
+                var id = event.node.id;
+                var buttonBeingEdited = findButtonById(id);
+                if (buttonBeingEdited === undefined) {
+                    return true;
+                }
+
+                console.info("Long Press " + buttonBeingEdited.name);
+
+                // Make a copy of id and name, so user can cancel edit
+                dto.editButton = {
+                    "name": buttonBeingEdited.name,
+                    "id": buttonBeingEdited.id
+                };
+
+                // Build a list of all segments with selected buttons animations attached
+                dto.segmentAnimations = buildSegmentAnimations(buttonBeingEdited.segments);
+
+                // Select the first segment segment
+                dto.selectedSegment = dto.segmentAnimations[0].segment;
+
+                // Select first segment animation
+                dto.selectedAnimation = dto.segmentAnimations[0].animation;
+
+                // Update the UI
+                ractive.set(dto);
+
+                // Show and position the edit menu near pressed button
+                var editMenu = document.getElementById("edit-menu");
+                positionMenu(editMenu, event.original.srcEvent.pageX, event.original.srcEvent.pageY);
+                return false;
+            };
+
+            // --- Init() --- Execution proper starts here
 
             // Read write mode gets OK button
             var isReadWrite = location.search.split('rw=')[1];
@@ -180,155 +338,6 @@ require([
                 data: dto
             });
 
-            // Observe selection changes to context menu - segment
-            ractive.observe( 'selectedSegment.id', function ( newValue ) {
-                console.info(newValue);
-
-                // Ignore initial update
-                if (newValue === undefined) {
-                    return;
-                }
-
-                // Update selected segment
-                dto.selectedSegment = util.findFirst(dto.segments,
-                    function (seg) {return seg.id === newValue;},
-                    function (seg) {return seg;});
-
-                // Force the selected animation to update to off TODO THIS PROBABLY DOESN'T WORK
-                if (dto.selectedSegment.animation === undefined) {
-                    dto.selectedSegment.animation = {"action": "off"};
-                }
-
-                // Update animation drop down
-                ractive.set(dto);
-            });
-
-            // Observe selection changes to context menu - animation
-            ractive.observe( 'selectedSegment.animation.action', function ( newValue ) {
-                console.info(newValue);
-
-                var selectedSegmentId = dto.selectedSegment.id;
-                // Ignore initial update
-                if (selectedSegmentId === undefined) {
-                    return;
-                }
-
-                // Find the selected segment in the buttons segment list
-                var selectedButtonSegmentIndex = util.findFirstIndex(dto.editButton.segments,
-                    function (s) {return s.segmentId === selectedSegmentId;});
-
-                // If the action if off, remove the segment for the button
-                if (newValue === 'off') {
-                    dto.editButton.segments.splice(selectedButtonSegmentIndex, 1);
-                }
-                else {
-                    if (selectedButtonSegmentIndex === undefined) {
-                        // Here if segment was off, append a new button action with TODO: set default params
-                        if (dto.editButton.segments === undefined) {
-                            dto.editButton.segments = [];
-                        }
-                        dto.editButton.segments.push(
-                            {"segmentId": selectedSegmentId, "action":newValue, "params":808080});
-                    } else {
-                        // otherwise update the (existing) segments action TODO: set default params
-                        dto.editButton.segments[selectedButtonSegmentIndex].action = newValue;
-                    }
-                }
-
-                // Rebuild a custom list of all segment with appended actions specific for this button
-                dto.segments = buildSegmentList(dto.editButton.segments);
-                ractive.set(dto);
-            });
-
-            // Set up an on tap handler for all the buttons
-            ractive.on('tapHandler', function (event) {
-                // Close edit menu
-                var editMenu = document.getElementById("edit-menu");
-                editMenu.style.display = 'none';
-
-                // Check for edit context menu button taps
-                if (event.node.id === 'menu-name') {
-                    // TODO
-                    console.info('NAME:' + buttonBeingEdited.name);
-                }
-                else if (event.node.id === 'menu-white') {
-                    // TODO
-                    console.info('WHITE');
-                }
-                else if (event.node.id === 'menu-colour') {
-                    console.info('COLOUR');
-                    // Colour picker cares about colour, other parameters are just passed back
-                    nav.call("./colourpicker.html", "./buttons.html?rw=true", {
-                        colour: dto.editButton.params,
-                        // TODO
-                        editButton: dto.editButton,
-                        menuPos: {x: editMenu.style.left, y: editMenu.style.top}
-                    });
-                }
-                else if (event.node.id === 'menu-ok') {
-                    console.info('OK');
-                    util.hideKeyboard();
-                    // Update button info TODO now for segments!!!
-                    var buttonToUpdate = findButtonById(dto.editButton.id);
-                    buttonToUpdate.name = dto.editButton.name;
-                    buttonToUpdate.params = dto.editButton.params;
-                    buttonToUpdate.action = dto.editButton.action;
-                    ractive.set(dto);
-                    // Save changes to server
-                    saveButtonLayout();
-                }
-                else if (event.node.id === 'menu-cancel') {
-                    console.info('CANCEL');
-                    util.hideKeyboard();
-                }
-
-                // Lookup dynamic (user programmable) lighting buttons
-                var id = event.node.id;
-                var button = findButtonById(id);
-                if (button === undefined) {
-                    return;
-                }
-                // OK Button?
-                if (button.action === "action-back") {
-                    window.location.href = "./index.html";
-                }
-                else {
-                    lights.runAnimations(button.segments);
-                }
-            });
-
-            // Set up an on long press handler for all the buttons
-            ractive.on('pressHandler', function (event) {
-                var id = event.node.id;
-                buttonBeingEdited = findButtonById(id);
-                if (buttonBeingEdited === undefined) {
-                    return true;
-                }
-                // Make a copy so user can cancel edit
-                dto.editButton = {
-                    "name": buttonBeingEdited.name,
-                    "id": buttonBeingEdited.id,
-                    "segments": []
-                };
-                // Copy across the zero or more active segments for this button
-                var buttonsActiveSegments = buttonBeingEdited.segments;
-                for (var s = 0; s < buttonsActiveSegments.length; s++) {
-                    var copy = {"segmentId": buttonsActiveSegments[s].segmentId, "action": buttonsActiveSegments[s].action};
-                    if (buttonsActiveSegments[s].params !== undefined) {
-                        copy.params = buttonsActiveSegments[s].params;
-                    }
-                    dto.editButton.segments.push(copy);
-                }
-                // Build a custom list of all segment with appended actions specific for this button
-                dto.segments = buildSegmentList(buttonsActiveSegments);
-                dto.selectedSegment = dto.segments[0];
-                ractive.set(dto);
-                console.info("Long Press " + buttonBeingEdited.name);
-                var editMenu = document.getElementById("edit-menu");
-                positionMenu(editMenu, event.original.srcEvent.pageX, event.original.srcEvent.pageY);
-                return false;
-            });
-
             // TODO: Update UI when Teensy connection status changes
             //lights.cbConnectionStatusChanged = function() {
             //    document.getElementById("status").innerHTML =  lights.lastCallStatus ? "OK" : "Not Connected";
@@ -344,23 +353,88 @@ require([
 
             // If we are returning from colour selection set new colour here
             var p = nav.getParam();
+
             // p will be undefined if user canceled dialog
             if (p !== undefined) {
-                // Retrieve the edit button info and update menu bindings
+
+                // Retrieve the edit button info we sent to colour editor
                 dto.editButton = p.editButton;
-                dto.editButton.params = p.colour;
-                dto.editButton.action = "allLights";
+                dto.segmentAnimations = p.segmentAnimations;
+                dto.selectedSegment = p.selectedSegment;
+                dto.selectedAnimation = p.selectedAnimation;
+
+                // Colour picker returns undefined colour for cancel
+                if (p.colour !== undefined) {
+
+                    // Get the colour of the selected button, may be undefined
+                    var selected = util.findFirst(dto.segmentAnimations,
+                        function (s) {return s.segment === dto.selectedSegment;},
+                        function (s) {return s;});
+
+                    if (selected !== undefined) {
+                        selected.params = p.colour;
+                    }
+                }
+
+                // Update the UI
                 ractive.set(dto);
+
                 // Show context menu at correct position
                 var editMenu = document.getElementById("edit-menu");
                 editMenu.style.display = 'block';
                 editMenu.style.left = p.menuPos.x;
                 editMenu.style.top = p.menuPos.y;
             }
+
+            // Hook up ractive handlers
+            ractive.observe('selectedSegment', observeSelectedSegment);
+            ractive.observe('selectedAnimation', observeSelectedAnimation);
+            ractive.on('tapHandler', tapHandler);
+            ractive.on('pressHandler', pressHandler);
+        };
+
+        // --- Page Execution Starts Here ---
+
+        // Ractive data binding object
+        var dto = {
+            // See default.json for the schema
+            buttons: undefined,
+
+            // Fatal error string returned from server
+            error: undefined,
+
+            // A copy of selected button id and name
+            // "id": "l1",
+            // "name": "OFF",
+            editButton: undefined,
+
+            // A list of animation names
+            // ["Off", "Static", "Rainbow"]
+            animations: sc.animations,
+
+            // A list of all segments with animation for edit button attached
+            // [
+            //   {
+            //     "segment": "All"
+            //   },
+            //   {
+            //     "segment": "Bedroom",
+            //     "animation": "Rainbow",
+            //     "params": "000000"
+            //   }
+            // ]
+            segmentAnimations: undefined,
+
+            // A segment name e.g. All
+            selectedSegment: undefined,
+
+            // An animation name e.g. Rainbow
+            selectedAnimation: undefined
         };
 
         // Initialise the page after loading button layout
         util.getJson('../../config/user.json',
+        //----------
             function (buttons) {
                 dto.buttons = buttons;
                 init();

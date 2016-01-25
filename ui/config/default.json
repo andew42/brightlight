@@ -5,8 +5,8 @@
       "name": "OFF",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "000000"
         }
       ]
@@ -16,13 +16,13 @@
       "name": "Two Tone",
       "segments": [
         {
-          "segmentId": "s1",
-          "action": "static",
+          "segment": "Bedroom",
+          "animation": "Static",
           "params": "6f16d4"
         },
         {
-          "segmentId": "s2",
-          "action": "static",
+          "segment": "Bathroom",
+          "animation": "Static",
           "params": "0016d4"
         }
       ]
@@ -32,8 +32,8 @@
       "name": "c8721f",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "c8721f"
         }
       ]
@@ -43,9 +43,25 @@
       "name": "d71e1e",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "d71e1e"
+        }
+      ]
+    },
+    {
+      "id": "l5",
+      "name": "Sweet Rainbow",
+      "segments": [
+        {
+          "segment": "Bedroom",
+          "animation": "Sweet Shop",
+          "params": "6f16d4"
+        },
+        {
+          "segment": "Bathroom",
+          "animation": "Rainbow",
+          "params": "0016d4"
         }
       ]
     }
@@ -56,8 +72,8 @@
       "name": "Full",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "ffffff"
         }
       ]
@@ -67,8 +83,8 @@
       "name": "High",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "e0e0e0"
         }
       ]
@@ -78,8 +94,8 @@
       "name": "Mid",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "808080"
         }
       ]
@@ -89,8 +105,8 @@
       "name": "Low",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "3f3f3f"
         }
       ]
@@ -100,8 +116,8 @@
       "name": "Very Low",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "101010"
         }
       ]
@@ -111,8 +127,8 @@
       "name": "Nearly Off",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "static",
+          "segment": "All",
+          "animation": "Static",
           "params": "020202"
         }
       ]
@@ -124,8 +140,8 @@
       "name": "Sweet Shop",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "sweetshop"
+          "segment": "All",
+          "animation": "Sweet Shop"
         }
       ]
     },
@@ -134,8 +150,8 @@
       "name": "Runner",
       "segments": [
         {
-          "segmentId": "s0",
-          "action": "runner"
+          "segment": "All",
+          "animation": "Runner"
         }
       ]
     },
@@ -144,8 +160,8 @@
       "name": "Rainbow",
       "segments": [
         {
-          "segmentId": "s3",
-          "action": "rainbow"
+          "segment": "Curtains",
+          "animation": "Rainbow"
         }
       ]
     },
@@ -154,8 +170,8 @@
       "name": "Candle",
       "segments": [
         {
-          "segmentId": "s3",
-          "action": "candle"
+          "segment": "Curtains",
+          "animation": "Candle"
         }
       ]
     }

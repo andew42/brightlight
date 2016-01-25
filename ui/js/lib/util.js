@@ -74,6 +74,11 @@ define(function () {
         // Given an array and predicate function returns first element predicate matches
         // If a select function is given its is applied to the found element and its result returned
         findFirst: function (array, predicate, select) {
+
+            if (array === undefined) {
+                return undefined;
+            }
+
             for (var i = 0; i < array.length; i++) {
                 if (predicate(array[i])) {
                     if (select === undefined) {
@@ -82,16 +87,23 @@ define(function () {
                     return select(array[i]);
                 }
             }
+
             return undefined;
         },
 
         // Given an array and predicate function returns index of first element predicate matches
         findFirstIndex: function (array, predicate) {
+
+            if (array === undefined) {
+                return undefined;
+            }
+
             for (var i = 0; i < array.length; i++) {
                 if (predicate(array[i])) {
                     return i;
                 }
             }
+
             return undefined;
         }
     };
