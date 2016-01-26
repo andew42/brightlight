@@ -208,6 +208,9 @@ require([
                 var buttonSegments = buildButtonSegments();
                 dto.segmentAnimations = buildSegmentAnimations(buttonSegments);
 
+                // Make sure room lights reflect new state (especially the all off state)
+                lights.runAnimations(buttonSegments);
+
                 // Update UI
                 ractive.set(dto);
             };
@@ -215,23 +218,29 @@ require([
             // Set up an on tap handler for all the buttons
             var tapHandler = function (event) {
             // -----------
-                // Close edit menu
-                var editMenu = document.getElementById("edit-menu");
-                editMenu.style.display = 'none';
 
                 // Check for edit context menu button taps
                 if (event.node.id === 'menu-colour') {
 
                     console.info('COLOUR');
 
-                    // Get the colour of the selected button, may be undefined
-                    var selectedParams = util.findFirst(dto.segmentAnimations,
+                    // Get the segment we are configuring, may be undefined
+                    var selectedSegment = util.findFirst(dto.segmentAnimations,
                         function(s) {return s.segment === dto.selectedSegment;},
-                        function(s) {return s.params;});
+                        function(s) {return s;});
 
-                    // Colour picker cares about colour, other parameters are just passed back
+                    // Currently we only support colour for static segments
+                    if (selectedSegment === undefined || selectedSegment.animation !== "Static") {
+                        return;
+                    }
+
+                    var editMenu = document.getElementById("edit-menu");
+
+                    // Colour picker cares about colour and segment,
+                    // other parameters are just passed back
                     nav.call("./colourpicker.html", "./buttons.html?rw=true", {
-                        colour: selectedParams,
+                        colour: selectedSegment.params,
+                        segment: selectedSegment.segment,
                         // Used to restore the edit menu so far
                         editButton: dto.editButton,
                         segmentAnimations: dto.segmentAnimations,
@@ -246,11 +255,19 @@ require([
                     console.info('OK');
                     util.hideKeyboard();
 
+                    // Close edit menu
+                    document.getElementById("edit-menu").style.display = 'none';
+
                     // Find the button we are editing and update it
                     var buttonToUpdate = findButtonById(dto.editButton.id);
 
                     // Update the button segment list from segmentAnimations menu
                     buttonToUpdate.segments = buildButtonSegments();
+
+                    // If all segments are off, replace with all off animation
+                    if (buttonToUpdate.segments === undefined || buttonToUpdate.segments.length === 0) {
+                        buttonToUpdate.segments = [{"segment": "All", "animation": "Static", "params": "000000"}];
+                    }
 
                     // Update the button name if it changed
                     if (buttonToUpdate.name !== dto.editButton.name) {
@@ -258,13 +275,25 @@ require([
                         ractive.set(dto);
                     }
 
+                    // Make sure room lights reflect new state (especially the all off state)
+                    lights.runAnimations(buttonToUpdate.segments);
+
                     // Save changes to server
                     saveButtonLayout();
                 }
                 else if (event.node.id === 'menu-cancel') {
 
+                    // Restore room lights to pre edit state
+                    var b = findButtonById(dto.editButton.id);
+                    if (b !== undefined && b.segments !== undefined) {
+                        lights.runAnimations(b.segments);
+                    }
+
                     console.info('CANCEL');
                     util.hideKeyboard();
+
+                    // Close edit menu
+                    document.getElementById("edit-menu").style.display = 'none';
                 }
 
                 // Lookup dynamic (user programmable) lighting buttons
@@ -293,6 +322,9 @@ require([
                 }
 
                 console.info("Long Press " + buttonBeingEdited.name);
+
+                // Make sure the room lights reflect edit button
+                lights.runAnimations(buttonBeingEdited.segments);
 
                 // Make a copy of id and name, so user can cancel edit
                 dto.editButton = {
