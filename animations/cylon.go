@@ -12,12 +12,12 @@ func newCylon() *cylon {
 	return &cylon{0, false}
 }
 
-func (c *cylon) animateNextFrame(seg framebuffer.Segment) {
+func (c *cylon) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
-	seg.Set(c.pos, framebuffer.NewRgb(0, 0, 0))
+	frame.Set(c.pos, framebuffer.NewRgb(0, 0, 0))
 
 	if c.dir {
-		if c.pos == seg.Len()-1 {
+		if c.pos == frame.Len()-1 {
 			c.dir = false
 		} else {
 			c.pos++
@@ -30,5 +30,5 @@ func (c *cylon) animateNextFrame(seg framebuffer.Segment) {
 		}
 	}
 
-	seg.Set(c.pos, framebuffer.NewRgb(255, 0, 0))
+	frame.Set(c.pos, framebuffer.NewRgb(255, 0, 0))
 }

@@ -22,7 +22,7 @@ func newChristmas(period time.Duration) *christmas {
 		lightColours: []framebuffer.Rgb{framebuffer.NewRgb(255, 0, 0), framebuffer.NewRgb(0, 255, 0), framebuffer.NewRgb(0, 0, 255)}}
 }
 
-func (s *christmas) animateNextFrame(seg framebuffer.Segment) {
+func (s *christmas) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	// Time to change lights
 	if time.Now().Sub(s.changeTime) > 0 {
@@ -37,15 +37,16 @@ func (s *christmas) animateNextFrame(seg framebuffer.Segment) {
 
 		// Set each LED appropriately
 		off := framebuffer.NewRgbFromInt(0)
-		for i := uint(0); i < seg.Len(); i++ {
+		for i := uint(0); i < frame.Len(); i++ {
+
 			// Which colour index should this be
 			c := (i / s.lightSize) % uint(len(s.lightColours))
 
 			// Either turn colour on or turn LED off
 			if c == s.nextColour {
-				seg.Set(i, s.lightColours[s.nextColour])
+				frame.Set(i, s.lightColours[s.nextColour])
 			} else {
-				seg.Set(i, off)
+				frame.Set(i, off)
 			}
 		}
 	}

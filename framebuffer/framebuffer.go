@@ -14,6 +14,15 @@ type FrameBuffer struct {
 	Strips []LedStrip
 }
 
+func (src *FrameBuffer) CloneFrameBuffer() *FrameBuffer {
+
+	clone := FrameBuffer{make([]LedStrip, 0, len(src.Strips))}
+	for _, s := range src.Strips {
+		clone.Strips = append(clone.Strips, *s.CloneLedStrip())
+	}
+	return &clone
+}
+
 // Create a frame buffer
 func NewFrameBuffer() *FrameBuffer {
 
@@ -140,7 +149,8 @@ func StartDriver(renderer chan *FrameBuffer) {
 					stats.AddFrameRenderDroppedFrame()
 				} else {
 					renderInProgress = true
-					renderer <- NewFrameBuffer()
+					// Send nil to signal render which is responsible for creating new frame buffer
+					renderer <- nil
 				}
 
 			// Process frame buffer render complete

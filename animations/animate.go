@@ -30,10 +30,7 @@ func RunAnimations(segments []SegmentAction) {
 
 func buildAnimatorList(segments []SegmentAction) []segNameAndAnimator {
 	// Build a slice of animators with segment names
-	animators := make([]segNameAndAnimator, 1, 4)
-
-	// Initial animation turns all lights off
-	animators[0] = segNameAndAnimator{"All", newStaticColour(framebuffer.NewRgbFromInt(0))}
+	animators := make([]segNameAndAnimator, 0, 4)
 
 	// Foreach supplied segment action
 	for _, seg := range segments {
@@ -111,24 +108,38 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 		// The animations in play from the UI (default all off)
 		var animators []segNameAndAnimator = make([]segNameAndAnimator, 1)
 		animators[0] = segNameAndAnimator{"All", newStaticColour(framebuffer.NewRgbFromInt(0))}
+		var lastRenderedFrameBuffer *framebuffer.FrameBuffer
+		frameCounter := 0
 		for {
 			select {
 			// Request to render a frame buffer
 			case fb := <-renderer:
 				renderStartTime := time.Now()
-				// Animate and return update frame buffer
+
+				// Create / Copy frame buffer to be rendered
+				if lastRenderedFrameBuffer == nil {
+					fb = framebuffer.NewFrameBuffer()
+				} else {
+					fb = lastRenderedFrameBuffer.CloneFrameBuffer()
+				}
+
+				// Animate and return updated frame buffer
 				for _, v := range animators {
-					// Resolve the segment to animate, based on string name, and animate it
+					// Resolve the segment to animate, based on string name
 					if seg, err := framebuffer.GetNamedSegment(fb, v.namedSegment); err == nil {
-						v.animator.animateNextFrame(seg)
+						v.animator.animateNextFrame(frameCounter, seg)
 					}
 				}
+
 				stats.AddFrameRenderTimeSample(time.Since(renderStartTime))
 				renderer <- fb
+				lastRenderedFrameBuffer = fb
 
 			// Request animation update
 			case currentAnimations := <-animationChanged:
 				animators = buildAnimatorList(currentAnimations)
+				lastRenderedFrameBuffer = nil
+				frameCounter = 0
 			}
 		}
 	}()

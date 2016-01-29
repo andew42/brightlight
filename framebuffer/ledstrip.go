@@ -5,6 +5,13 @@ type LedStrip struct {
 	Leds      []Rgb
 }
 
+func (src *LedStrip) CloneLedStrip() *LedStrip {
+
+	clone := LedStrip{src.Clockwise, make([]Rgb, 0, len(src.Leds))}
+	clone.Leds = append(clone.Leds, src.Leds...)
+	return &clone
+}
+
 func NewLedStrip(clockwise bool, len int) *LedStrip {
 
 	var s LedStrip

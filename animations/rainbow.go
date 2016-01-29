@@ -20,12 +20,12 @@ func newRainbow(period time.Duration) *rainbow {
 	return &r
 }
 
-func (r *rainbow) animateNextFrame(seg framebuffer.Segment) {
+func (r *rainbow) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	hue := r.startDegree
-	hueIncrement := 360.0 / float32(seg.Len())
-	for i := uint(0); i < seg.Len(); i++ {
-		seg.Set(i, framebuffer.NewRgbFromHsl(uint(hue), 100, 50))
+	hueIncrement := 360.0 / float32(frame.Len())
+	for i := uint(0); i < frame.Len(); i++ {
+		frame.Set(i, framebuffer.NewRgbFromHsl(uint(hue), 100, 50))
 		hue += hueIncrement
 	}
 	r.startDegree += r.degreesPerFrame
