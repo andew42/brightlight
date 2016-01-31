@@ -59,7 +59,7 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newCylon()})
 
 	case "Rainbow": // TODO MAKE TIME A PARAMETER
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRainbow(time.Second * 5)})
+		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRainbow(time.Second * 15)})
 
 	case "Sweet Shop": // TODO MAKE TIME A PARAMETER
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newSweetshop(time.Second * 1)})

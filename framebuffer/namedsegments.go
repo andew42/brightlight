@@ -22,54 +22,66 @@ func GetNamedSegment(fb *FrameBuffer, name string) (Segment, error) {
 		colonIndex := strings.IndexByte(name, ':')
 		if stripIndex, err := strconv.Atoi(name[1:colonIndex]); err == nil {
 			if len, err := strconv.Atoi(name[colonIndex+1:]); err == nil {
-				return NewSubSegment(NewPhySegment(fb.Strips[stripIndex:stripIndex+1]), 0, uint(len)), nil
+				return NewLogSegment(NewPhySegment(fb.Strips[stripIndex:stripIndex+1]), 0, uint(len)), nil
 			}
 		}
 	}
+
+	// Bedroom Ceiling
+	t := NewPhySegment([]LedStrip{
+		fb.Strips[11], fb.Strips[4], fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13]})
+	bedroomCeiling := NewLogSegment(t, 135, t.Len()-135)
+
+	// Bedroom Wall
+	t = NewPhySegment([]LedStrip{
+		fb.Strips[8], fb.Strips[2], fb.Strips[5], fb.Strips[15], fb.Strips[10]})
+	bedroomWall := NewLogSegment(t, 144, t.Len()-(144+241))
+
+	// Bathroom Ceiling
+	t = NewPhySegment([]LedStrip{fb.Strips[9], fb.Strips[11]})
+	bathroomCeiling := NewLogSegment(t, 0, t.Len()-27)
+
+	// Bathroom Wall
+	t = NewPhySegment([]LedStrip{fb.Strips[10], fb.Strips[8]})
+	bathroomWall := NewLogSegment(t, 50, t.Len()-(28+50))
 
 	switch name {
 	case "All":
 		// All physical strips, ceiling then wall
 		return NewPhySegment([]LedStrip{
-			fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4],
-			fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
-		nil
-
-	case "Ceiling":
+				fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4],
+				fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
+			nil
+	case "All Ceiling":
 		// Ceiling Strip starting at bed's corner
 		return NewPhySegment([]LedStrip{
-			fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4]}),
-		nil
-
-	case "Wall":
+				fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4]}),
+			nil
+	case "All Wall":
 		// Ceiling Strip starting at bed's corner
 		return NewPhySegment([]LedStrip{
-			fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
-		nil
+				fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
+			nil
 
 	case "Bedroom":
-		// Crude representation of bedroom just controller 1 (TODO)
-		return NewPhySegment([]LedStrip{
-				fb.Strips[2], fb.Strips[3], fb.Strips[4], fb.Strips[5], fb.Strips[6], fb.Strips[7]}),
-			nil
+		return NewCombinedSegment(bedroomCeiling, bedroomWall), nil
+	case "Bedroom Ceiling":
+		return bedroomCeiling, nil
+	case "Bedroom Wall":
+		return bedroomWall, nil
 
 	case "Bathroom":
-		// Crude representation of bathroom just controller 2 (TODO)
-		return NewPhySegment([]LedStrip{
-				fb.Strips[8], fb.Strips[9], fb.Strips[10], fb.Strips[11], fb.Strips[13], fb.Strips[14], fb.Strips[15]}),
-			nil
+		return NewCombinedSegment(bathroomCeiling, bathroomWall), nil
+	case "Bathroom Ceiling":
+		return bathroomCeiling, nil
+	case "Bathroom Wall":
+		return bathroomWall, nil
 
 	case "Curtains":
 		// Strip above curtains
 		return NewPhySegment([]LedStrip{fb.Strips[3], fb.Strips[7]}),
 			nil
 
-	case "Test 4":
-		return NewPhySegment([]LedStrip{fb.Strips[4]}),
-			nil
-	case "Test 5":
-		return NewPhySegment([]LedStrip{fb.Strips[5]}),
-			nil
 	default:
 		log.WithField("name", name).Warn("Unknown named segment")
 		return nil, errors.New("Unknown named segment")

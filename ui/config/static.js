@@ -17,13 +17,18 @@ define(function () {
         // Logical segments for constructing scenes TODO GENERATE FROM GO NamedSegments
         segments: [
             "All",
-            "Ceiling",
-            "Wall",
+            "All Ceiling",
+            "All Wall",
+
             "Bedroom",
+            "Bedroom Ceiling",
+            "Bedroom Wall",
+
             "Bathroom",
-            "Curtains",
-            "Test 4",
-            "Test 5"
+            "Bathroom Ceiling",
+            "Bathroom Wall",
+
+            "Curtains"
         ]
     };
 });

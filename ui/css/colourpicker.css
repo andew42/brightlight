@@ -1,17 +1,11 @@
 .cp-sample {
-    height: 106px;
+    height: 40px;
     margin: 20px;
-}
-
-.cp-sample-anno {
-    margin: 2px;
-    color: #808080;
-    font-size: xx-small;
 }
 
 .cp-sliders {
     position: fixed;
-    top: 150px;
+    top: 60px;
     bottom: 80px;
 }
 
