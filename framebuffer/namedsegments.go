@@ -29,23 +29,41 @@ func GetNamedSegment(fb *FrameBuffer, name string) (Segment, error) {
 
 	switch name {
 	case "All":
-		// All physical strips in no particular order
-		return NewPhySegment(fb.Strips),
-			nil
+		// All physical strips, ceiling then wall
+		return NewPhySegment([]LedStrip{
+			fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4],
+			fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
+		nil
+
+	case "Ceiling":
+		// Ceiling Strip starting at bed's corner
+		return NewPhySegment([]LedStrip{
+			fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4]}),
+		nil
+
+	case "Wall":
+		// Ceiling Strip starting at bed's corner
+		return NewPhySegment([]LedStrip{
+			fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
+		nil
+
 	case "Bedroom":
 		// Crude representation of bedroom just controller 1 (TODO)
 		return NewPhySegment([]LedStrip{
 				fb.Strips[2], fb.Strips[3], fb.Strips[4], fb.Strips[5], fb.Strips[6], fb.Strips[7]}),
 			nil
+
 	case "Bathroom":
 		// Crude representation of bathroom just controller 2 (TODO)
 		return NewPhySegment([]LedStrip{
 				fb.Strips[8], fb.Strips[9], fb.Strips[10], fb.Strips[11], fb.Strips[13], fb.Strips[14], fb.Strips[15]}),
 			nil
+
 	case "Curtains":
 		// Strip above curtains
 		return NewPhySegment([]LedStrip{fb.Strips[3], fb.Strips[7]}),
 			nil
+
 	case "Test 4":
 		return NewPhySegment([]LedStrip{fb.Strips[4]}),
 			nil

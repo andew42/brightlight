@@ -219,6 +219,8 @@ require([
             var tapHandler = function (event) {
             // -----------
 
+                var editMenu = document.getElementById("edit-menu");
+
                 // Check for edit context menu button taps
                 if (event.node.id === 'menu-colour') {
 
@@ -233,8 +235,6 @@ require([
                     if (selectedSegment === undefined || selectedSegment.animation !== "Static") {
                         return;
                     }
-
-                    var editMenu = document.getElementById("edit-menu");
 
                     // Colour picker cares about colour and segment,
                     // other parameters are just passed back
@@ -256,7 +256,7 @@ require([
                     util.hideKeyboard();
 
                     // Close edit menu
-                    document.getElementById("edit-menu").style.display = 'none';
+                    editMenu.style.display = 'none';
 
                     // Find the button we are editing and update it
                     var buttonToUpdate = findButtonById(dto.editButton.id);
@@ -293,7 +293,12 @@ require([
                     util.hideKeyboard();
 
                     // Close edit menu
-                    document.getElementById("edit-menu").style.display = 'none';
+                    editMenu.style.display = 'none';
+                }
+
+                // If the edit menu is visible, other buttons are disabled
+                if (editMenu.style.display !== 'none') {
+                    return;
                 }
 
                 // Lookup dynamic (user programmable) lighting buttons

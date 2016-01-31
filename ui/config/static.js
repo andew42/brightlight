@@ -17,6 +17,8 @@ define(function () {
         // Logical segments for constructing scenes TODO GENERATE FROM GO NamedSegments
         segments: [
             "All",
+            "Ceiling",
+            "Wall",
             "Bedroom",
             "Bathroom",
             "Curtains",
