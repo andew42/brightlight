@@ -19,7 +19,7 @@
         <div class="cp-sample" style="background:#{{colour}}"></div>
 
         <div class="cp-sliders">
-            <div class="cp-slider">
+            <div class="cp-slider cp-slider-hue">
                 <div class="cp-slider-track cp-slider-track-hue">
                     <div class="cp-slider-thumb-container" style="top:{{(360 - hue) / 3.6}}%">
                         <div class="cp-slider-thumb"></div>
@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div class="cp-slider">
+            <div class="cp-slider cp-slider-saturation">
                 <div class="cp-slider-track cp-slider-track-saturation" style="background-color:{{hueColour}}">
                     <div class="cp-slider-thumb-container" style="top:{{100 - saturation}}%">
                         <div class="cp-slider-thumb"></div>
@@ -37,7 +37,7 @@
                 </div>
             </div>
 
-            <div class="cp-slider-thin">
+            <div class="cp-slider-thin cp-slider-value">
                 <div class="cp-slider-track cp-slider-track-value"
                      style="background-color:{{hueColour}}">
                     <div class="cp-slider-thumb-container" style="top:{{100 - value}}%">

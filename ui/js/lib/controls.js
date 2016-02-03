@@ -59,37 +59,68 @@ define(['./util'], function (util) {
 
         // Touch slider control (adjusts value based on position on track)
         verticalTouchSlider: function (el, onValueChange, min, max) {
+
+            // We expect the element to have some padding which will be
+            // treated as a dead zone to allow easy selection of min max
+            // values. Padding is expected to be in pixels
+            var padding = parseInt(window.getComputedStyle(el,null).padding, 10);
+            if (padding === undefined) {
+                padding = 0;
+            }
+
+            // Control range (typically 360 or 100)
             var range = max - min;
 
-            // ### Touch support for iOS ###
+            // Helper converts pixel positions into range position and calls onValueChange
+            var updatePosition = function(mouseX, mouseY) {
 
-            // Track touch movement over track
-            el.addEventListener('touchmove', function (evt) {
-                // Calculate position in pixels
                 var r = el.getBoundingClientRect();
-                var pos = r.bottom - evt.targetTouches[0].clientY;
 
-                // Convert to value between min and max
-                pos = (pos / r.height) * range + min;
-
-                // Ensue position falls withing range
-                if (pos < min) {
-                    pos = min;
+                // Ensure mouse / finger is within control
+                if (mouseX < r.left || mouseX > r.right || mouseY > r.bottom || mouseY < r.top) {
+                    return;
                 }
-                else if (pos > max) {
+
+                // Where is the mouse positioned within track
+                var pos;
+                if ((r.bottom - mouseY) < padding) {
+                    // Position is in the lower dead zone
+                    pos = 0;
+                } else if (mouseY < (r.bottom - r.height + padding)) {
+                    // Position is in the upper dead zone
                     pos = max;
+                } else {
+                    // Calculate position in pixels
+                    pos = (r.bottom - padding) - mouseY;
+                    // Convert to value between min and max
+                    pos = (pos / (r.height - 2 * padding)) * range + min;
                 }
+                // Inform the caller
                 onValueChange(pos);
+            };
+
+            // === Touch support for iOS ===
+
+            // Respond to initial touch
+            el.addEventListener('touchstart', function (evt) {
+                updatePosition(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY);
                 evt.preventDefault();
             });
 
-            // ### Mouse support for desktop browsers ###
+            // Track touch movement over track
+            el.addEventListener('touchmove', function (evt) {
+                updatePosition(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY);
+                evt.preventDefault();
+            });
+
+            // === Mouse support for desktop browsers ===
 
             var mousedown = false;
 
             // Track mouse downs over document
-            document.addEventListener('mousedown', function () {
+            document.addEventListener('mousedown', function (evt) {
                 mousedown = true;
+                updatePosition(evt.clientX, evt.clientY);
             });
 
             // Track mouse up over document
@@ -99,26 +130,9 @@ define(['./util'], function (util) {
 
             // Track mouse move over slider track
             el.addEventListener('mousemove', function (evt) {
-
-                if (!mousedown) {
-                    return;
+                if (mousedown) {
+                    updatePosition(evt.clientX, evt.clientY);
                 }
-
-                // Calculate position in pixels
-                var r = el.getBoundingClientRect();
-                var pos = r.bottom - evt.clientY;
-
-                // Convert to value between min and max
-                pos = (pos / r.height) * range + min;
-
-                // Ensue position falls withing range
-                if (pos < min) {
-                    pos = min;
-                }
-                else if (pos > max) {
-                    pos = max;
-                }
-                onValueChange(pos);
             }, true);
         }
     };

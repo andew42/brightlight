@@ -41,17 +41,17 @@ require([
                 data: dto
             });
 
-            controls.verticalTouchSlider(document.getElementsByClassName("cp-slider-track-hue")[0], function (pos) {
+            controls.verticalTouchSlider(document.getElementsByClassName("cp-slider-hue")[0], function (pos) {
                 dto.hue = pos;
                 updateUi();
             }, 0, 360);
 
-            controls.verticalTouchSlider(document.getElementsByClassName("cp-slider-track-saturation")[0], function (pos) {
+            controls.verticalTouchSlider(document.getElementsByClassName("cp-slider-saturation")[0], function (pos) {
                 dto.saturation = pos;
                 updateUi();
             }, 0, 100);
 
-            controls.verticalTouchSlider(document.getElementsByClassName("cp-slider-track-value")[0], function (pos) {
+            controls.verticalTouchSlider(document.getElementsByClassName("cp-slider-value")[0], function (pos) {
                 dto.value = pos;
                 updateUi();
             }, 0, 100);

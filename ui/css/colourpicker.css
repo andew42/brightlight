@@ -13,14 +13,14 @@
     float: left;
     width: 82px;
     height: 100%;
-    margin: 20px;
+    padding: 20px;
 }
 
 .cp-slider-thin {
     float: left;
     width: 30px;
     height: 100%;
-    margin: 20px;
+    padding: 20px;
 }
 
 .cp-slider-track {
@@ -103,6 +103,6 @@ and (orientation: portrait) {
         float: left;
         width: 105px;
         height: 100%;
-        margin: 20px;
+        padding: 20px;
     }
 }
