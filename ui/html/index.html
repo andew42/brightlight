@@ -41,6 +41,19 @@
             </div>
             {{/buttons.rightColumn}}
         </div>
+        <div style="position: absolute; float: bottom; bottom: 20px">
+            <!-- 'Output mapping curve -->
+            <div style="margin: 10px">
+                <label style="color: lightgray">
+                    Output Mapping
+                    <select value="{{selectedOutputMapping}}">
+                        {{#outputMappings}}
+                        <option value="{{.}}">{{.}}</option>
+                        {{/outputMappings}}
+                    </select>
+                </label>
+            </div>
+        </div>
     </script>
 </div>
 </body>

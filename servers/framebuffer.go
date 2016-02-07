@@ -12,23 +12,21 @@ import (
 var frameBufferListenerId = 0
 
 // Handle frame buffer web socket requests (web socket is closed when we return)
-func GetFrameBufferHandler() func(ws *websocket.Conn) {
+func FrameBufferHandler(ws *websocket.Conn) {
 
-	return func(ws *websocket.Conn) {
-		// Not thread safe but good enough for debug output
-		frameBufferListenerId++
-		src, done := framebuffer.AddListener("Virtual Frame Buffer "+strconv.Itoa(frameBufferListenerId), false)
-		for {
-			select {
-			// src sends us frame buffer updates
-			case fb := <-src:
-				// Fails if the client has disappeared
-				if err := sendFrameBufferToWebSocket(fb, ws); err != nil {
-					log.Info("frameBufferSocketHandler " + err.Error())
-					// Un-subscribe before returning and closing connection
-					done <- src
-					return
-				}
+	// Not thread safe but good enough for debug output
+	frameBufferListenerId++
+	src, done := framebuffer.AddListener("Virtual Frame Buffer "+strconv.Itoa(frameBufferListenerId), false)
+	for {
+		select {
+		// src sends us frame buffer updates
+		case fb := <-src:
+			// Fails if the client has disappeared
+			if err := sendFrameBufferToWebSocket(fb, ws); err != nil {
+				log.Info("frameBufferSocketHandler " + err.Error())
+				// Un-subscribe before returning and closing connection
+				done <- src
+				return
 			}
 		}
 	}

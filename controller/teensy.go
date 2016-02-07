@@ -78,8 +78,9 @@ func teensyDriver(driverIndex int) {
 								i++
 							}
 						} else {
+							// Perform the output mapping here
+							rgb := mapOutput(fb.Strips[s].Leds[l])
 							// Colours are sent as 4 bytes with leading 0x00
-							rgb := fb.Strips[s].Leds[l]
 							data[i] = 0
 							i++
 							data[i] = rgb.Red

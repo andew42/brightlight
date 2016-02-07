@@ -70,6 +70,9 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 	case "Christmas": // TODO MAKE TIME A PARAMETER
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newChristmas(time.Second * 1)})
 
+	case "Pulse":
+		*animators = append(*animators, segNameAndAnimator{seg.Segment, newPulse()})
+
 	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animataion action")
 	}
@@ -131,6 +134,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 					}
 				}
 
+				// Report render time and send buffer
 				stats.AddFrameRenderTimeSample(time.Since(renderStartTime))
 				renderer <- fb
 				lastRenderedFrameBuffer = fb

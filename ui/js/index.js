@@ -11,7 +11,9 @@ require([
 
         // Ractive data binding object
         var dto = {
-            buttons: undefined
+            buttons: undefined,
+            outputMappings: ["Linear", "Linear 128", "Cie 256", "Cie 128"],
+            selectedOutputMapping: "Linear 128"
         };
 
         // Page initialisation
@@ -58,6 +60,15 @@ require([
                 } else {
                     lights.animation(action);
                 }
+            });
+
+
+            ractive.observe('selectedOutputMapping', function(newMapping) {
+                console.info(newMapping);
+                var req = new XMLHttpRequest();
+                req.open("POST", "/option/");
+                req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                req.send(JSON.stringify({"cmd": "outputMapping", "param": newMapping}));
             });
 
             // TODO: Update UI when connection status changes

@@ -14,7 +14,7 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// JSON body of form
 	// [{"segmentId": "s1", "action": "static", "params": "6f16d4"},
-	//  {"segmentId": "s2", "action": "static", "params": "6f16d4"}]}
+	//  {"segmentId": "s2", "action": "static", "params": "6f16d4"}]
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.WithField("err", err.Error()).Error("RunAnimationsHandler bad body")

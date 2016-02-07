@@ -12,7 +12,8 @@ define(function () {
             "Runner",
             "Sweet Shop",
             "Candle",
-            "Christmas"
+            "Christmas",
+            "Pulse",
         ],
         // Logical segments for constructing scenes TODO GENERATE FROM GO NamedSegments
         segments: [
@@ -28,7 +29,7 @@ define(function () {
             "Bathroom Ceiling",
             "Bathroom Wall",
 
-            "Curtains"
+            "Curtains",
         ]
     };
 });

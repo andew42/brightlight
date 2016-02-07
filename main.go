@@ -50,13 +50,16 @@ func main() {
 	http.HandleFunc("/RunAnimations/", servers.RunAnimationsHandler)
 
 	// Requests to show a strip length on the room lights
-	http.HandleFunc("/StripLength/", servers.GetStripLenHandler())
+	http.HandleFunc("/StripLength/", servers.StripLenHandler)
 
 	// Push frame buffer changes over a web socket
-	http.Handle("/FrameBuffer", websocket.Handler(servers.GetFrameBufferHandler()))
+	http.Handle("/FrameBuffer", websocket.Handler(servers.FrameBufferHandler))
 
 	// Push stats info over a web socket
-	http.Handle("/Stats", websocket.Handler(servers.GetStatsHandler()))
+	http.Handle("/Stats", websocket.Handler(servers.StatsHandler))
+
+	// Start the option server
+	http.HandleFunc("/option/", servers.OptionHandler)
 
 	// Start web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {

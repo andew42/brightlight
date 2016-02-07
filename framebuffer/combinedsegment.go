@@ -31,8 +31,8 @@ func (s CombinedSegment) Set(pos uint, colour Rgb) {
 	}
 
 	// Set in seg 1 or seg 2
-	if (pos >= s.Seg1.Len()) {
-		s.Seg2.Set(pos - s.Seg1.Len(), colour)
+	if pos >= s.Seg1.Len() {
+		s.Seg2.Set(pos-s.Seg1.Len(), colour)
 	} else {
 		s.Seg1.Set(pos, colour)
 	}
