@@ -14,18 +14,17 @@ Segment layout and names used when creating a lighting scene
 
 TODO
 ----
-- Turn off animation not reflected in room
-- iPhone cache hangs on to old style sheet
+- Setting segment colour switches off other animations
+- Some buttons on index screen don't work!
 
+- Use typescript
+- HTTP2 support
 - Spacial transitions between abutting segments
 - Temporal transitions between sequential animations
 - Pattern based animations
 - Sunrise / Sunset animations
-- Setting segment colour switches off other animations
 - Support white 'colour' with warmth
-- Gama correction with max brightness limit
 - Relay to support switching off power supplies
 - iPad (large screen) programming mode
 - Overlay segments (i.e. allow overlapping) and resolve with segment priority
-- Startup page to show "Connect to House Wifi"
 - Clock animation

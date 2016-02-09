@@ -208,6 +208,11 @@ require([
                 var buttonSegments = buildButtonSegments();
                 dto.segmentAnimations = buildSegmentAnimations(buttonSegments);
 
+                // If all segments are off, replace with all off animation
+                if (buttonSegments.length === 0) {
+                    buttonSegments = [{"segment": "All", "animation": "Static", "params": "000000"}];
+                }
+
                 // Make sure room lights reflect new state (especially the all off state)
                 lights.runAnimations(buttonSegments);
 
@@ -265,7 +270,7 @@ require([
                     buttonToUpdate.segments = buildButtonSegments();
 
                     // If all segments are off, replace with all off animation
-                    if (buttonToUpdate.segments === undefined || buttonToUpdate.segments.length === 0) {
+                    if (buttonToUpdate.segments.length === 0) {
                         buttonToUpdate.segments = [{"segment": "All", "animation": "Static", "params": "000000"}];
                     }
 
