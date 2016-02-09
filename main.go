@@ -13,6 +13,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"mime"
 )
 
 func main() {
@@ -40,6 +41,7 @@ func main() {
 	log.WithField("contentPath", contentPath).Info("Serving content")
 
 	// Set up web routes (first static content)
+	mime.AddExtensionType(".manifest", "text/cache-manifest")
 	fs := http.FileServer(http.Dir(contentPath))
 	http.Handle("/", fs)
 
