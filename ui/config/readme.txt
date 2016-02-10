@@ -15,7 +15,6 @@ Segment layout and names used when creating a lighting scene
 TODO
 ----
 - Setting segment colour switches off other animations
-- Some buttons on index screen don't work!
 
 - Use typescript
 - HTTP2 support

@@ -18,21 +18,46 @@ require([
 
         // Page initialisation
         var init = function () {
+            // jshint multistr: true
             // json description of button mappings
             dto.buttons = {
                 leftColumn: [
-                    {name: "OFF", action: "allLights", params: "000000"},
+                    {name: "OFF", action: "action-animate", "params": '[\
+                        {\
+                            "segment": "All",\
+                            "animation": "Static",\
+                            "params": "000000"\
+                        }\
+                    ]'},
                     {name: "Buttons RO", action: "action-navigate", params: "./buttons.html"},
                     {name: "Virtual", action: "action-navigate", params: "./virtual.html"}
                 ],
                 midColumn: [
-                    {name: "High", action: "allLights", params: "e0e0e0"},
+                    {name: "High", action: "action-animate", "params": '[\
+                        {\
+                            "segment": "All",\
+                            "animation": "Static",\
+                            "params": "e0e0e0"\
+                        }\
+                    ]'},
                     {name: "Buttons RW", action: "action-navigate", params: "./buttons.html?rw=true"},
                     {name: "Strip Length", action: "action-navigate", params: "./striplength.html"}
                 ],
                 rightColumn: [
-                    {name: "Purple", action: "allLights", params: "6f16d4"},
-                    {name: "Rainbow", action: "rainbow", params: ""},
+                    {name: "Purple", action: "action-animate", "params": '[\
+                        {\
+                            "segment": "All",\
+                            "animation": "Static",\
+                            "params": "6f16d4"\
+                        }\
+                    ]'},
+                    {name: "Rainbow", action: "action-animate", "params": '[\
+                        {\
+                            "segment": "All",\
+                            "animation": "Rainbow",\
+                            "params": "000000"\
+                        }\
+                    ]'},
                     {name: "Stats", action: "action-navigate", params: "./stats.html"}
                 ]
             };
@@ -51,30 +76,21 @@ require([
 
             // Set up an on tap handler for all the buttons
             ractive.on('buttonHandler', function (event) {
-                var action = event.node.attributes["button-action"].value;
-                var params = event.node.attributes["button-params"].value;
+                var action = event.node.dataset.action;
+                var params = event.node.dataset.params;
                 if (action === "action-navigate") {
                     window.location.href = params;
-                } else if (action === "allLights") {
-                    lights.allLights(params);
-                } else {
-                    lights.animation(action);
+                } else if (action === "action-animate") {
+                    lights.runAnimations(JSON.parse(params));
                 }
             });
 
-
             ractive.observe('selectedOutputMapping', function(newMapping) {
-                console.info(newMapping);
                 var req = new XMLHttpRequest();
                 req.open("POST", "/option/");
                 req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 req.send(JSON.stringify({"cmd": "outputMapping", "param": newMapping}));
             });
-
-            // TODO: Update UI when connection status changes
-            //lights.cbConnectionStatusChanged = function() {
-            //    document.getElementById("status").innerHTML =  lights.lastCallStatus ? "OK" : "Not Connected";
-            //}
 
             // Allow button column scrolling
             scroll.enable(document.getElementsByClassName("left-column")[0]);

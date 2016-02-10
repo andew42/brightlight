@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# Version 1 (increment when any resource is updated)
+# Version 2 (increment when any resource is updated)
 # This is an attempt to get iOS Safari to flush it's cache of web app resources
 NETWORK:
 *
