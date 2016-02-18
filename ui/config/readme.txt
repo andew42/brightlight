@@ -14,7 +14,7 @@ Segment layout and names used when creating a lighting scene
 
 TODO
 ----
-- Setting segment colour switches off other animations
+- Brightness on main button screen
 
 - Use typescript
 - HTTP2 support

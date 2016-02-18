@@ -22,8 +22,10 @@ require([
             asRgb: undefined
         };
 
-        // Segment to update to show selected colour
-        var segmentToUpdate;
+        // Segments to animate to show selected colour in the room
+        var roomSegments;
+        // Reference to segment to edit within roomSegments
+        var editSegment;
 
         function init() {
             // Disable scrolling on everything
@@ -69,38 +71,37 @@ require([
                 ractive.set(dto);
 
                 // Update the room lights
-                segmentToUpdate.params = dto.colour;
-                lights.runAnimations([segmentToUpdate]);
+                editSegment.params = dto.colour;
+                lights.runAnimations(roomSegments);
             };
 
-            // We expect to be passed a string colour parameter e.g. "FF0000" and a segment to update
+            // We expect to be passed roomSegments (all the animations active in the room)
+            // plus editSegmentIndex which is a relative to roomSegments
+            var initialColour;
             var p = nav.getParam();
             if (p !== undefined) {
-                var c = tinycolor(p.colour).toHsv();
-                segmentToUpdate = {
-                    "segment": p.segment,
-                    "animation": "Static",
-                    "params": p.colour};
+                roomSegments = p.roomSegments;
+                editSegment = p.roomSegments[p.editSegmentIndex];
+                initialColour = editSegment.params;
+                var c = tinycolor(initialColour).toHsv();
                 dto.hue = c.h;
                 dto.saturation = c.s * 100;
                 dto.value = c.v * 100;
                 updateUi();
             }
 
-            // OK Cancel buttons
+            // OK button hit, return new colour
             ractive.on('okButtonHandler', function () {
-                p.colour = dto.colour;
+                p.newColour = editSegment.params;
                 nav.ret(p);
             });
 
+            // Cancel button hit
             ractive.on('cancelButtonHandler', function () {
 
                 // Restore original room light colour before returning
-                segmentToUpdate.params = p.colour;
-                lights.runAnimations([segmentToUpdate]);
-
-                // Indicate we canceled
-                p.colour = undefined;
+                editSegment.params = initialColour;
+                lights.runAnimations(roomSegments);
                 nav.ret(p);
             });
 

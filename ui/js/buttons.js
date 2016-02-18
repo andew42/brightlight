@@ -231,8 +231,11 @@ require([
 
                     console.info('COLOUR');
 
+                    // Build active segments so colour picker and update room lights
+                    var activeSegments = buildButtonSegments();
+
                     // Get the segment we are configuring, may be undefined
-                    var selectedSegment = util.findFirst(dto.segmentAnimations,
+                    var selectedSegment = util.findFirst(activeSegments,
                         function(s) {return s.segment === dto.selectedSegment;},
                         function(s) {return s;});
 
@@ -241,11 +244,12 @@ require([
                         return;
                     }
 
-                    // Colour picker cares about colour and segment,
+                    // Colour picker cares about roomSegments and editSegmentIndex,
                     // other parameters are just passed back
                     nav.call("./colourpicker.html", "./buttons.html?rw=true", {
-                        colour: selectedSegment.params,
-                        segment: selectedSegment.segment,
+                        roomSegments: activeSegments,
+                        editSegmentIndex: util.findFirstIndex(activeSegments,
+                            function(s) {return s.segment === selectedSegment.segment;}),
                         // Used to restore the edit menu so far
                         editButton: dto.editButton,
                         segmentAnimations: dto.segmentAnimations,
@@ -405,16 +409,16 @@ require([
                 dto.selectedSegment = p.selectedSegment;
                 dto.selectedAnimation = p.selectedAnimation;
 
-                // Colour picker returns undefined colour for cancel
-                if (p.colour !== undefined) {
+                // Colour picker returns undefined newColour for cancel
+                if (p.newColour !== undefined) {
 
-                    // Get the colour of the selected button, may be undefined
+                    // Update selected segment with new colour
                     var selected = util.findFirst(dto.segmentAnimations,
                         function (s) {return s.segment === dto.selectedSegment;},
                         function (s) {return s;});
 
                     if (selected !== undefined) {
-                        selected.params = p.colour;
+                        selected.params = p.newColour;
                     }
                 }
 
