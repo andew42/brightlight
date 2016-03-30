@@ -5,48 +5,44 @@ import (
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/stats"
-	"io"
-	"os"
-	"os/exec"
-	"runtime"
 	"time"
 )
 
-var driverStarted bool
+var teensyDriverStarted bool
 
 // Run driver or two as a go routine
-func StartDriver() {
+func StartTeensyDriver() {
 
-	if driverStarted {
+	if teensyDriverStarted {
 		log.Panic("Teensy driver started twice")
 	}
-	driverStarted = true
+	teensyDriverStarted = true
 
 	// Start 2 sub drivers (16 channels)
 	go teensyDriver(0)
 	go teensyDriver(1)
 }
 
-func IsDriverConnected() bool {
+func TeensyConnections() []bool {
 
-	return usbConnected
+	return teensyConnections
 }
 
-var usbConnected bool
+var teensyConnections = make([]bool, 2)
 
 // Monitors changes to frame buffer and update Teensy via USB
 func teensyDriver(driverIndex int) {
 
-	port := getPortName(driverIndex)
+	port := getPortName(teensyPortMappings, driverIndex)
 	if port == "" {
 		log.WithField("driverIndex", driverIndex).Warn("teensyDriver unknown port name")
 		return
 	}
 
 	for {
-		usbConnected = false
-		f := openUsbPort(port)
-		usbConnected = true
+		teensyConnections[driverIndex] = false
+		f := openUsbPortWithRetry(port)
+		teensyConnections[driverIndex] = true
 
 		// Allocate buffer once to avoid garbage collections in loop
 		var data = make([]byte, 4+config.MaxLedStripLen*8*4+4)
@@ -101,13 +97,8 @@ func teensyDriver(driverIndex int) {
 					i++
 				}
 
-				// Send the frame buffer
-				n, err := f.Write(data)
-				if err == nil && n < len(data) {
-					err = io.ErrShortWrite
-				}
-				if err != nil {
-					log.WithField("err", err).Warn("teensyDriver")
+				if _, err := f.Write(data); err != nil {
+					log.WithField("error", err.Error()).Warn("teensyDriver send failed")
 					f.Close()
 
 					// Close down listener
@@ -120,66 +111,4 @@ func teensyDriver(driverIndex int) {
 			}
 		}
 	}
-}
-
-// Retry port open until it succeeds
-func openUsbPort(port string) *os.File {
-
-	errorLogged := false
-	for {
-		f, err := os.OpenFile(port, os.O_RDWR, 0)
-		if err == nil {
-			log.WithField("port", port).Info("openUsbPort connected")
-
-			// Set raw mode on raspberry pi, if we don't set raw mode
-			// xon/xoff character in the frame buffer cause problems
-			if runtime.GOOS == "linux" {
-				cmd := exec.Command("stty", "-F", port, "raw")
-				if err := cmd.Run(); err != nil {
-					log.WithField("error", err.Error()).Error("Failed to set stty raw mode")
-				}
-			}
-
-			return f
-		}
-
-		if !errorLogged {
-			log.WithField("err", err).Warn("openUsbPort")
-			errorLogged = true
-		}
-
-		// Try again in a second
-		time.Sleep(1000 * time.Millisecond)
-	}
-}
-
-// Determine port name based on index and OS
-func getPortName(index int) string {
-
-	if runtime.GOOS == "darwin" {
-		// OSX
-		switch index {
-		case 0:
-			return "/dev/cu.usbmodem288181"
-			// Teensy 3.0 "/dev/cu.usbmodem103721"
-			// Teensy 3.1 "/dev/cu.usbmodem103101"
-		}
-	} else if runtime.GOOS == "windows" {
-		// Windows
-		switch index {
-		case 0:
-			return "COM3"
-		case 1:
-			return "COM4"
-		}
-	} else {
-		// Raspberry pi
-		switch index {
-		case 0:
-			return "/dev/ttyACM0"
-		case 1:
-			return "/dev/ttyACM1"
-		}
-	}
-	return ""
 }

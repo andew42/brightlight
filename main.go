@@ -30,7 +30,8 @@ func main() {
 		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).Info("Brightlight")
 
 	// Start drivers
-	controller.StartDriver()
+	controller.StartTeensyDriver()
+	controller.StartRelayDriver()
 	renderer := make(chan *framebuffer.FrameBuffer)
 	framebuffer.StartDriver(renderer)
 	animations.StartDriver(renderer)

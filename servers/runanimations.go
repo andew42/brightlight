@@ -37,6 +37,10 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 	animations.RunAnimations(segments)
 
 	// Return controller status
-	d, _ := json.Marshal(controller.IsDriverConnected())
+	allConnected := true
+	for _, v := range(controller.TeensyConnections()) {
+		allConnected = allConnected && v
+	}
+	d, _ := json.Marshal(allConnected)
 	w.Write(d)
 }

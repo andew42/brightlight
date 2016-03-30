@@ -38,6 +38,7 @@
       <w>usbmodem</w>
       <w>webapp</w>
       <w>websocket</w>
+      <w>xoff</w>
     </words>
   </dictionary>
 </component>

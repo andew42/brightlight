@@ -100,3 +100,7 @@ func h2rgb(v1 uint, v2 uint, hue uint) uint {
 	}
 	return v1 * 60
 }
+
+func (led Rgb) IsLedOn () bool {
+	return led.Red != 0 || led.Green != 0 || led.Blue != 0
+}
