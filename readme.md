@@ -78,4 +78,3 @@ With ANSI terminal emulator enabled for logrus
 #### To Do
 * Doesn't support landscape well (as home screen app)
 * Doesn't support on call bar well (as home screen app)
-* Colour picker doesn't adjust the room lights

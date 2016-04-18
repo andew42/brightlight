@@ -12,7 +12,7 @@ import (
 var relayPortMappings = map[string][]string{
 	"darwin": {"/dev/cu.usbserial"},
 	"windows": {""},
-	"linux": {""},
+	"linux": {"/dev/ttyUSB0"},
 }
 
 // By OS a list of teensy port names in index order
