@@ -39,7 +39,14 @@ func relayDriver() {
 		return
 	}
 
-connectLoop:
+	// TODO: On Raspberry Pi if we unplug and replug the relay controller
+	// before we notice (which can be minutes) a new USB port name is assigned
+	// for the controller because the exiting one hasn't yet been closed.
+	// i.e. /dev/ttyUSB0 -> /dev/ttyUSB1 This can't be fixed by updating the
+	// controller even if it hasn't changed because the relay is quickly pulsed
+	// off before setting the correct state
+
+	connectLoop:
 	for {
 		relayUsbConnected = false
 		f := openUsbPortWithRetry(port)

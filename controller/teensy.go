@@ -25,6 +25,7 @@ func StartTeensyDriver() {
 
 func TeensyConnections() []bool {
 
+	// TODO: 1 of 2 Returning here causes race detector to fail
 	return teensyConnections
 }
 
@@ -40,6 +41,7 @@ func teensyDriver(driverIndex int) {
 	}
 
 	for {
+		// TODO: 2 of 2 Writing here causes race detector to fail
 		teensyConnections[driverIndex] = false
 		f := openUsbPortWithRetry(port)
 		teensyConnections[driverIndex] = true
