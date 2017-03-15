@@ -88,7 +88,7 @@ func teensyDriver(driverIndex int) {
 							data[i] = rgb.Blue
 							i++
 							// Update the checksum
-							checksum += ((int32(rgb.Red) << 16) + (int32(rgb.Green) << 8) + int32(rgb.Blue))
+							checksum += (int32(rgb.Red) << 16) + (int32(rgb.Green) << 8) + int32(rgb.Blue)
 						}
 					}
 				}

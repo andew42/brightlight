@@ -13,9 +13,7 @@ func newStaticColour(colour framebuffer.Rgb) *staticColour {
 
 func (sc *staticColour) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
-	if frameCount == 0 {
-		for s := uint(0); s < frame.Len(); s++ {
-			frame.Set(s, sc.colour)
-		}
+	for s := uint(0); s < frame.Len(); s++ {
+		frame.Set(s, sc.colour)
 	}
 }

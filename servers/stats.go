@@ -20,9 +20,9 @@ func StatsHandler(ws *websocket.Conn) {
 	for {
 		select {
 		// src sends us stats updates
-		case stats := <-src:
+		case statsUpdate := <-src:
 			// Render the stats as JSON (fails if the client has disappeared)
-			if rc, err := json.MarshalIndent(stats, "", " "); err == nil {
+			if rc, err := json.MarshalIndent(statsUpdate, "", " "); err == nil {
 				_, err = ws.Write(rc)
 			} else {
 				log.Info("statsSocketHandler" + err.Error())

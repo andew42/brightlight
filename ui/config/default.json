@@ -29,12 +29,11 @@
     },
     {
       "id": "l3",
-      "name": "c8721f",
+      "name": "Twinkle",
       "segments": [
         {
           "segment": "All",
-          "animation": "Static",
-          "params": "c8721f"
+          "animation": "Twinkle"
         }
       ]
     },

@@ -85,8 +85,8 @@ func mapOutput(in framebuffer.Rgb) framebuffer.Rgb {
 		return in
 	} else {
 		return framebuffer.Rgb{
-			outputMappingTable[in.Red],
-			outputMappingTable[in.Green],
-			outputMappingTable[in.Blue]}
+			Red:   outputMappingTable[in.Red],
+			Green: outputMappingTable[in.Green],
+			Blue:  outputMappingTable[in.Blue]}
 	}
 }

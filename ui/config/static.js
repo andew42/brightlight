@@ -14,6 +14,8 @@ define(function () {
             "Candle",
             "Christmas",
             "Pulse",
+            "Twinkle",
+            "Test"
         ],
         // Logical segments for constructing scenes TODO GENERATE FROM GO NamedSegments
         segments: [
@@ -30,6 +32,9 @@ define(function () {
             "Bathroom Wall",
 
             "Curtains",
+
+            "Strip Three",
+            "Strip Five"
         ]
     };
 });

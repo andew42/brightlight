@@ -1,11 +1,11 @@
 package animations
 
 import (
+	"strconv"
+	"time"
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/stats"
-	"strconv"
-	"time"
 )
 
 // Animation action to perform on a segment (from UI)
@@ -23,7 +23,7 @@ type segNameAndAnimator struct {
 	animator     animator
 }
 
-// Animate a bunch of segments supplied by a UI button press
+// RunAnimations animates a bunch of segments supplied by a UI button press
 func RunAnimations(segments []SegmentAction) {
 	animationChanged <- segments
 }
@@ -46,14 +46,14 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 	case "Static":
 		if colour, err := strconv.ParseInt(seg.Params, 16, 32); err == nil {
 			*animators = append(*animators, segNameAndAnimator{seg.Segment,
-				newStaticColour(framebuffer.NewRgbFromInt(int(colour)))})
+															   newStaticColour(framebuffer.NewRgbFromInt(int(colour)))})
 		} else {
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animataion parameter")
 		}
 
 	case "Runner":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment,
-			newRunner(framebuffer.NewRgb(0, 0, 255))})
+														   newRunner(framebuffer.NewRgb(0, 0, 255))})
 
 	case "Cylon":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newCylon()})
@@ -72,6 +72,22 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 
 	case "Pulse":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newPulse()})
+
+	case "Twinkle":
+		*animators = append(*animators, segNameAndAnimator{seg.Segment, newTwinkle()})
+
+	case "Test":
+		// Test new animators
+		*animators = append(*animators, segNameAndAnimator{seg.Segment,
+			// newRepeater(
+			// 	newStack(newStaticColour(framebuffer.NewRgb(255, 0, 0)), newStaticColour(framebuffer.NewRgb(0, 0, 255))),
+			// 	4)})
+
+			// newRepeater(
+			// 	newStack(newRainbow(time.Second*15)),
+			// 	10)})
+
+			newTwinkle()})
 
 	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animataion action")
@@ -96,7 +112,7 @@ func AnimateStripLength(stripIndex uint, stripLength uint) {
 		segId := "p" + strconv.Itoa(int(stripIndex)) + ":" + strconv.Itoa(int(stripLength))
 		segments = append(segments, SegmentAction{segId, "Static", "808080"})
 	} else {
-		// Invalid request, light all LEDS red
+		// Invalid request, light all LEDs red
 		segments = append(segments, SegmentAction{"All", "Static", "800000"})
 	}
 
@@ -109,7 +125,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 	// Start the animator go routine
 	go func() {
 		// The animations in play from the UI (default all off)
-		var animators []segNameAndAnimator = make([]segNameAndAnimator, 1)
+		var animators = make([]segNameAndAnimator, 1)
 		animators[0] = segNameAndAnimator{"All", newStaticColour(framebuffer.NewRgbFromInt(0))}
 		var lastRenderedFrameBuffer *framebuffer.FrameBuffer
 		frameCounter := 0
@@ -138,6 +154,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 				stats.AddFrameRenderTimeSample(time.Since(renderStartTime))
 				renderer <- fb
 				lastRenderedFrameBuffer = fb
+				frameCounter++
 
 			// Request animation update
 			case currentAnimations := <-animationChanged:

@@ -19,7 +19,7 @@ type christmas struct {
 func newChristmas(period time.Duration) *christmas {
 
 	return &christmas{period: period, lightSize: 3,
-		lightColours: []framebuffer.Rgb{framebuffer.NewRgb(255, 0, 0), framebuffer.NewRgb(0, 255, 0), framebuffer.NewRgb(0, 0, 255)}}
+		lightColours:         []framebuffer.Rgb{framebuffer.NewRgb(255, 0, 0), framebuffer.NewRgb(0, 255, 0), framebuffer.NewRgb(0, 0, 255)}}
 }
 
 func (s *christmas) animateNextFrame(frameCount int, frame framebuffer.Segment) {

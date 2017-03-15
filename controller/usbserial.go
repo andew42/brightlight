@@ -1,4 +1,5 @@
 package controller
+
 import (
 	log "github.com/Sirupsen/logrus"
 	"runtime"
@@ -10,24 +11,24 @@ import (
 
 // By OS a list of relay port names in index order
 var relayPortMappings = map[string][]string{
-	"darwin": {"/dev/cu.usbserial"},
+	"darwin":  {"/dev/cu.usbserial"},
 	"windows": {""},
-	"linux": {"/dev/ttyUSB0"},
+	"linux":   {"/dev/ttyUSB0"},
 }
 
 // By OS a list of teensy port names in index order
 var teensyPortMappings = map[string][]string{
 	// Teensy 3.0 "/dev/cu.usbmodem103721"
 	// Teensy 3.1 "/dev/cu.usbmodem103101"
-	"darwin": {"/dev/cu.usbmodem288181"},
+	"darwin":  {"/dev/cu.usbmodem288181"},
 	"windows": {"COM3", "COM34"},
-	"linux": {"/dev/ttyACM0", "/dev/ttyACM1"},
+	"linux":   {"/dev/ttyACM0", "/dev/ttyACM1"},
 }
 
 // Determine port name based on OS index and mapping table
 func getPortName(portMappings map[string][]string, index int) string {
 
-	portNames, ok := portMappings[runtime.GOOS];
+	portNames, ok := portMappings[runtime.GOOS]
 	if !ok {
 		log.WithField("os", runtime.GOOS).Warn("No port mappings for OS")
 		return ""
@@ -78,12 +79,12 @@ var readTimeoutError = errors.New("readUntilBufferFull timeout")
 func readUntilBufferFull(f *os.File, data []byte, timeout time.Duration) error {
 
 	doneTime := time.Now().Add(timeout)
-	len, err := f.Read(data)
-	for err == nil && len == 0 {
+	length, err := f.Read(data)
+	for err == nil && length == 0 {
 		if time.Now().After(doneTime) {
 			return readTimeoutError
 		}
-		len, err = f.Read(data)
+		length, err = f.Read(data)
 	}
 	return err
 }

@@ -46,7 +46,7 @@ func relayDriver() {
 	// controller even if it hasn't changed because the relay is quickly pulsed
 	// off before setting the correct state
 
-	connectLoop:
+connectLoop:
 	for {
 		relayUsbConnected = false
 		f := openUsbPortWithRetry(port)

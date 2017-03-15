@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	statFrameRenderTime = iota
+	statFrameRenderTime         = iota
 	statFrameSyncJitter
 	statSerialSendTime
 	statSerialDroppedFrame
@@ -83,7 +83,7 @@ func StartDriver() {
 					stats.GcPauseTime = strconv.FormatFloat(pauseTime, 'f', 2, 64)
 				}
 				// Send to all listeners, that are idle, the most recent frame buffer
-				for k, _ := range listeners {
+				for k := range listeners {
 					// Send a the latest stats if listener has processed the last one
 					select {
 					case k <- stats:

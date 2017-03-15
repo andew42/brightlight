@@ -38,7 +38,7 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return controller status
 	allConnected := true
-	for _, v := range(controller.TeensyConnections()) {
+	for _, v := range controller.TeensyConnections() {
 		allConnected = allConnected && v
 	}
 	d, _ := json.Marshal(allConnected)

@@ -2,9 +2,10 @@ package framebuffer
 
 import (
 	"errors"
-	log "github.com/Sirupsen/logrus"
 	"strconv"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // The list of names segment used to build scene in the UI
@@ -21,8 +22,8 @@ func GetNamedSegment(fb *FrameBuffer, name string) (Segment, error) {
 	if len(name) > 3 && name[0] == 'p' && strings.IndexByte(name, ':') != -1 {
 		colonIndex := strings.IndexByte(name, ':')
 		if stripIndex, err := strconv.Atoi(name[1:colonIndex]); err == nil {
-			if len, err := strconv.Atoi(name[colonIndex+1:]); err == nil {
-				return NewLogSegment(NewPhySegment(fb.Strips[stripIndex:stripIndex+1]), 0, uint(len)), nil
+			if length, err := strconv.Atoi(name[colonIndex+1:]); err == nil {
+				return NewLogSegment(NewPhySegment(fb.Strips[stripIndex:stripIndex+1]), 0, uint(length)), nil
 			}
 		}
 	}
@@ -49,18 +50,18 @@ func GetNamedSegment(fb *FrameBuffer, name string) (Segment, error) {
 	case "All":
 		// All physical strips, ceiling then wall
 		return NewPhySegment([]LedStrip{
-				fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4],
-				fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
+			fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4],
+			fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
 			nil
 	case "All Ceiling":
 		// Ceiling Strip starting at bed's corner
 		return NewPhySegment([]LedStrip{
-				fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4]}),
+			fb.Strips[3], fb.Strips[7], fb.Strips[6], fb.Strips[14], fb.Strips[13], fb.Strips[9], fb.Strips[11], fb.Strips[4]}),
 			nil
 	case "All Wall":
 		// Ceiling Strip starting at bed's corner
 		return NewPhySegment([]LedStrip{
-				fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
+			fb.Strips[5], fb.Strips[15], fb.Strips[10], fb.Strips[8], fb.Strips[2]}),
 			nil
 
 	case "Bedroom":
@@ -81,6 +82,13 @@ func GetNamedSegment(fb *FrameBuffer, name string) (Segment, error) {
 		// Strip above curtains
 		return NewPhySegment([]LedStrip{fb.Strips[3], fb.Strips[7]}),
 			nil
+
+	case "Strip Three":
+		// Useful for testing in virtual mode (first 20 leds)
+		return NewLogSegment(NewPhySegment([]LedStrip{fb.Strips[3]}), 0, 20), nil
+	case "Strip Five":
+		// Useful for testing in virtual mode (first 19 leds)
+		return NewLogSegment(NewPhySegment([]LedStrip{fb.Strips[5]}), 0, 19), nil
 
 	default:
 		log.WithField("name", name).Warn("Unknown named segment")
