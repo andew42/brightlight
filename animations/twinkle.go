@@ -27,6 +27,11 @@ func newTwinkle() *twinkle {
 	return &t
 }
 
+func (t *twinkle) clone() animator {
+	// TODO: DEEP COPY
+	panic("Not Implemented")
+}
+
 func randInt31Between(min int, max int) int {
 	x := max - min
 	return rand.Intn(x) + min

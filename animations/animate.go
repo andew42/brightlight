@@ -76,6 +76,10 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 	case "Twinkle":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newTwinkle()})
 
+	case "BabyBows":
+		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
+			newRainbow(time.Second*8), 15)})
+
 	case "Test":
 		// Test new animators
 		*animators = append(*animators, segNameAndAnimator{seg.Segment,
@@ -89,7 +93,6 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 
 			newTwinkle()})
 
-	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animataion action")
 	}
 }

@@ -20,6 +20,11 @@ func newRainbow(period time.Duration) *rainbow {
 	return &r
 }
 
+func (r *rainbow) clone() animator {
+	clone := *r
+	return &clone
+}
+
 func (r *rainbow) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	hue := r.startDegree

@@ -15,6 +15,7 @@ define(function () {
             "Christmas",
             "Pulse",
             "Twinkle",
+            "BabyBows",
             "Test"
         ],
         // Logical segments for constructing scenes TODO GENERATE FROM GO NamedSegments

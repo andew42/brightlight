@@ -18,12 +18,12 @@
         {
           "segment": "Bedroom",
           "animation": "Static",
-          "params": "6f16d4"
+          "params": "0004e5"
         },
         {
           "segment": "Bathroom",
           "animation": "Static",
-          "params": "0016d4"
+          "params": "e400e3"
         }
       ]
     },
@@ -39,12 +39,11 @@
     },
     {
       "id": "l4",
-      "name": "d71e1e",
+      "name": "Baby Bows",
       "segments": [
         {
           "segment": "All",
-          "animation": "Static",
-          "params": "d71e1e"
+          "animation": "BabyBows"
         }
       ]
     },

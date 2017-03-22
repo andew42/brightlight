@@ -12,6 +12,11 @@ func newRunner(colour framebuffer.Rgb) *runner {
 	return &runner{colour, 0}
 }
 
+func (r *runner) clone() animator {
+	clone := *r
+	return &clone
+}
+
 func (r *runner) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	frame.Set(r.pos, framebuffer.NewRgb(0, 0, 0))

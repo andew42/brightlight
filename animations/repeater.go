@@ -16,6 +16,11 @@ func newRepeater(animator animator, repeatLength uint) *repeater {
 	return &r
 }
 
+func (r *repeater) clone() animator {
+	// TODO: DEEP COPY?
+	panic("Not Implemented")
+}
+
 func (r *repeater) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	// Number of repeats and remaining pixels
@@ -28,7 +33,13 @@ func (r *repeater) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 	for i := uint(0); i < repeat; i++ {
 		// Create a logical segment for this animation
 		seg := framebuffer.NewLogSegment(frame, startOffset+i*r.repeatLength, r.repeatLength)
-		// Animate over the logical segment
-		r.animator.animateNextFrame(frameCount, seg)
+		// Animate over the logical segment using a clone except for the last animation
+		// this ensures we get the same result for each repeat but an update for last
+		if i+1 == repeat {
+			// Last in repeat sequence
+			r.animator.animateNextFrame(frameCount, seg)
+		} else {
+			r.animator.clone().animateNextFrame(frameCount, seg)
+		}
 	}
 }

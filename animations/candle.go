@@ -15,6 +15,11 @@ func newCandle() *candle {
 	return &candle{}
 }
 
+func (c *candle) clone() animator {
+	clone := *c
+	return &clone
+}
+
 func (c *candle) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	// Yellow

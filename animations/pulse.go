@@ -12,6 +12,11 @@ func newPulse() *pulse {
 	return &pulse{}
 }
 
+func (p *pulse) clone() animator {
+	clone := *p
+	return &clone
+}
+
 func (p *pulse) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	if p.up {

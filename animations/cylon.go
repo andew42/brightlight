@@ -12,6 +12,11 @@ func newCylon() *cylon {
 	return &cylon{0, false}
 }
 
+func (c *cylon) clone() animator {
+	clone := *c
+	return &clone
+}
+
 func (c *cylon) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	frame.Set(c.pos, framebuffer.NewRgb(0, 0, 0))

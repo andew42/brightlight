@@ -15,6 +15,11 @@ func newStack(args ...animator) *stack {
 	return &s
 }
 
+func (s *stack) clone() animator {
+	// TODO: DEEP COPY
+	panic("Not Implemented")
+}
+
 func (s *stack) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	// Number of pixels per animation

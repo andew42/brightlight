@@ -22,6 +22,11 @@ func newChristmas(period time.Duration) *christmas {
 		lightColours:         []framebuffer.Rgb{framebuffer.NewRgb(255, 0, 0), framebuffer.NewRgb(0, 255, 0), framebuffer.NewRgb(0, 0, 255)}}
 }
 
+func (s *christmas) clone() animator {
+	clone := *s
+	return &clone
+}
+
 func (s *christmas) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	// Time to change lights

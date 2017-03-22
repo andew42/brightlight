@@ -16,6 +16,11 @@ func newSweetshop(period time.Duration) *sweetshop {
 	return &sweetshop{period: period}
 }
 
+func (s *sweetshop) clone() animator {
+	clone := *s
+	return &clone
+}
+
 func (s *sweetshop) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 
 	if time.Now().Sub(s.changeTime) > 0 {
