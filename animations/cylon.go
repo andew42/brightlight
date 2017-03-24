@@ -3,37 +3,26 @@ package animations
 import "github.com/andew42/brightlight/framebuffer"
 
 type cylon struct {
-	pos uint
-	dir bool
 }
 
 func newCylon() *cylon {
 
-	return &cylon{0, false}
+	return &cylon{}
 }
 
-func (c *cylon) clone() animator {
-	clone := *c
-	return &clone
-}
+func (c *cylon) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
-func (c *cylon) animateNextFrame(frameCount int, frame framebuffer.Segment) {
-
-	frame.Set(c.pos, framebuffer.NewRgb(0, 0, 0))
-
-	if c.dir {
-		if c.pos == frame.Len()-1 {
-			c.dir = false
-		} else {
-			c.pos++
-		}
-	} else {
-		if c.pos == 0 {
-			c.dir = true
-		} else {
-			c.pos--
-		}
+	if frame.Len() == 0 {
+		return;
 	}
 
-	frame.Set(c.pos, framebuffer.NewRgb(255, 0, 0))
+	// Get an incrementing position twice the frame length (forward then backwards)
+	pos := uint(frameCount) % (frame.Len() * 2)
+	if pos >= frame.Len() {
+		// Backwards
+		pos = 2*frame.Len() - pos - 1
+	}
+	frame.Set(pos, framebuffer.NewRgb(255, 0, 0))
+
+	// TODO ADD Trail
 }

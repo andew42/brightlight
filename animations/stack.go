@@ -15,12 +15,7 @@ func newStack(args ...animator) *stack {
 	return &s
 }
 
-func (s *stack) clone() animator {
-	// TODO: DEEP COPY
-	panic("Not Implemented")
-}
-
-func (s *stack) animateNextFrame(frameCount int, frame framebuffer.Segment) {
+func (s *stack) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
 	// Number of pixels per animation
 	segLength := frame.Len() / uint(len(s.animators))
@@ -30,6 +25,6 @@ func (s *stack) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 		// Create a logical segment for this animation
 		seg := framebuffer.NewLogSegment(frame, i*segLength, segLength)
 		// Animate over the logical segment
-		s.animators[i].animateNextFrame(frameCount, seg)
+		s.animators[i].animateFrame(frameCount, seg)
 	}
 }

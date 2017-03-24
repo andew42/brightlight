@@ -4,22 +4,14 @@ import "github.com/andew42/brightlight/framebuffer"
 
 type runner struct {
 	colour framebuffer.Rgb
-	pos    uint
 }
 
 func newRunner(colour framebuffer.Rgb) *runner {
 
-	return &runner{colour, 0}
+	return &runner{colour}
 }
 
-func (r *runner) clone() animator {
-	clone := *r
-	return &clone
-}
+func (r *runner) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
-func (r *runner) animateNextFrame(frameCount int, frame framebuffer.Segment) {
-
-	frame.Set(r.pos, framebuffer.NewRgb(0, 0, 0))
-	r.pos = nextPos(r.pos, frame.Len())
-	frame.Set(r.pos, r.colour)
+	frame.Set(uint(frameCount)%frame.Len(), r.colour)
 }

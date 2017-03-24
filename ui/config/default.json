@@ -165,11 +165,11 @@
     },
     {
       "id": "r4",
-      "name": "Candle",
+      "name": "Cylon",
       "segments": [
         {
           "segment": "Curtains",
-          "animation": "Candle"
+          "animation": "Cylon"
         }
       ]
     }

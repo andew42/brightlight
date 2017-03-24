@@ -64,15 +64,6 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 	case "Sweet Shop": // TODO MAKE TIME A PARAMETER
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newSweetshop(time.Second * 1)})
 
-	case "Candle": // TODO MAKE POSITION AND REPEAT PARAMETERS
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newCandle()})
-
-	case "Christmas": // TODO MAKE TIME A PARAMETER
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newChristmas(time.Second * 1)})
-
-	case "Pulse":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newPulse()})
-
 	case "Twinkle":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newTwinkle()})
 
@@ -80,19 +71,7 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
 			newRainbow(time.Second*8), 15)})
 
-	case "Test":
-		// Test new animators
-		*animators = append(*animators, segNameAndAnimator{seg.Segment,
-			// newRepeater(
-			// 	newStack(newStaticColour(framebuffer.NewRgb(255, 0, 0)), newStaticColour(framebuffer.NewRgb(0, 0, 255))),
-			// 	4)})
-
-			// newRepeater(
-			// 	newStack(newRainbow(time.Second*15)),
-			// 	10)})
-
-			newTwinkle()})
-
+	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animataion action")
 	}
 }
@@ -130,39 +109,31 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 		// The animations in play from the UI (default all off)
 		var animators = make([]segNameAndAnimator, 1)
 		animators[0] = segNameAndAnimator{"All", newStaticColour(framebuffer.NewRgbFromInt(0))}
-		var lastRenderedFrameBuffer *framebuffer.FrameBuffer
-		frameCounter := 0
+		frameCounter := uint(0)
 		for {
 			select {
 			// Request to render a frame buffer
 			case fb := <-renderer:
 				renderStartTime := time.Now()
 
-				// Create / Copy frame buffer to be rendered
-				if lastRenderedFrameBuffer == nil {
-					fb = framebuffer.NewFrameBuffer()
-				} else {
-					fb = lastRenderedFrameBuffer.CloneFrameBuffer()
-				}
+				fb = framebuffer.NewFrameBuffer()
 
 				// Animate and return updated frame buffer
 				for _, v := range animators {
 					// Resolve the segment to animate, based on string name
 					if seg, err := framebuffer.GetNamedSegment(fb, v.namedSegment); err == nil {
-						v.animator.animateNextFrame(frameCounter, seg)
+						v.animator.animateFrame(frameCounter, seg)
 					}
 				}
 
 				// Report render time and send buffer
 				stats.AddFrameRenderTimeSample(time.Since(renderStartTime))
 				renderer <- fb
-				lastRenderedFrameBuffer = fb
 				frameCounter++
 
 			// Request animation update
 			case currentAnimations := <-animationChanged:
 				animators = buildAnimatorList(currentAnimations)
-				lastRenderedFrameBuffer = nil
 				frameCounter = 0
 			}
 		}

@@ -2,13 +2,13 @@ package animations
 
 import (
 	"github.com/andew42/brightlight/framebuffer"
-	"math/rand"
 	"time"
 )
 
 type sweetshop struct {
 	period     time.Duration
 	changeTime time.Time
+	pixies     []framebuffer.Rgb
 }
 
 func newSweetshop(period time.Duration) *sweetshop {
@@ -16,13 +16,14 @@ func newSweetshop(period time.Duration) *sweetshop {
 	return &sweetshop{period: period}
 }
 
-func (s *sweetshop) clone() animator {
-	clone := *s
-	return &clone
-}
+func (s *sweetshop) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
-func (s *sweetshop) animateNextFrame(frameCount int, frame framebuffer.Segment) {
+	// Create the pixies?
+	if uint(len(s.pixies)) != frame.Len() {
+		s.pixies = make([]framebuffer.Rgb, frame.Len())
+	}
 
+	// Time to change the pixies?
 	if time.Now().Sub(s.changeTime) > 0 {
 
 		// Set next change time
@@ -30,7 +31,12 @@ func (s *sweetshop) animateNextFrame(frameCount int, frame framebuffer.Segment) 
 
 		// Refresh the random colours
 		for i := uint(0); i < frame.Len(); i++ {
-			frame.Set(i, framebuffer.NewRgbFromInt(rand.Int()&(1<<24-1)))
+			s.pixies[i] = framebuffer.NewRgbFromHsl(randBetween(0, 359), randBetween(50, 100),50)
 		}
+	}
+
+	// Update the frame buffer from the pixies
+	for i := uint(0); i < frame.Len(); i++ {
+		frame.Set(i, s.pixies[i])
 	}
 }

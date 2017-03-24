@@ -27,14 +27,9 @@ func newTwinkle() *twinkle {
 	return &t
 }
 
-func (t *twinkle) clone() animator {
-	// TODO: DEEP COPY
-	panic("Not Implemented")
-}
-
-func randInt31Between(min int, max int) int {
+func randBetween(min int, max int) uint {
 	x := max - min
-	return rand.Intn(x) + min
+	return uint(rand.Intn(x)) + uint(min)
 }
 
 // 8 bit saturation math subtraction
@@ -46,7 +41,7 @@ func qsub8(left uint8, right uint8) uint8 {
 }
 
 // animation interface
-func (t *twinkle) animateNextFrame(frameCount int, frame framebuffer.Segment) {
+func (t *twinkle) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
 	// Create the pixies if not already created
 	if t.pixies == nil {
@@ -68,7 +63,7 @@ func (t *twinkle) animateNextFrame(frameCount int, frame framebuffer.Segment) {
 		}
 		for j := 0; j < numPixiesToHeat; j++ {
 			index := rand.Intn(len(t.pixies) - 1)
-			heat := uint8(randInt31Between(50, 255))
+			heat := uint8(randBetween(50, 255))
 			if heat > t.pixies[index] {
 				t.pixies[index] = heat
 			}

@@ -3,9 +3,8 @@ package animations
 import "github.com/andew42/brightlight/framebuffer"
 
 type animator interface {
-	// clone returns a deep copy of animator (used by repeater)
-	clone() animator
-
-	// animateNextFrame fills frame with next frame
-	animateNextFrame(frameCount int, frame framebuffer.Segment)
+	// animateFrame fills frame with content for frameCount
+	// frame is initially clear (or contains contents of a
+	// lower layer animation (i.e. no need to initially clear)
+	animateFrame(frameCount uint, frame framebuffer.Segment)
 }
