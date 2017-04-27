@@ -78,3 +78,17 @@ With ANSI terminal emulator enabled for logrus
 #### To Do
 * Doesn't support landscape well (as home screen app)
 * Doesn't support on call bar well (as home screen app)
+* Candle
+* Fair ground light chasers
+* Static string (Gazebo lights)
+* Overlay pieces (corner + mirror)
+* Clock
+* Security indicators
+* Fade between animations
+* Cylon stacking
+* Twinkle colours
+* UI to change speed / length on animations
+* Hue controller support for alexa
+
+#### Building for pi
+env GOOS=linux GOARCH=arm go build -o ./pi

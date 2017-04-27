@@ -10,6 +10,7 @@
       <w>logrus</w>
       <w>qsub</w>
       <w>teensy</w>
+      <w>upnp</w>
       <w>usbmodem</w>
       <w>xoff</w>
     </words>
