@@ -13,7 +13,7 @@ func newCylon() *cylon {
 func (c *cylon) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
 	if frame.Len() == 0 {
-		return;
+		return
 	}
 
 	// Get an incrementing position twice the frame length (forward then backwards)

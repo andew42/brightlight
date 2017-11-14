@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	statFrameRenderTime         = iota
+	statFrameRenderTime = iota
 	statFrameSyncJitter
 	statSerialSendTime
 	statSerialDroppedFrame

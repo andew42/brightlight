@@ -1,8 +1,8 @@
 package animations
 
 import (
-	"math/rand"
 	"github.com/andew42/brightlight/framebuffer"
+	"math/rand"
 )
 
 // import "github.com/pborges/huejack"

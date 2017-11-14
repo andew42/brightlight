@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"errors"
 	log "github.com/Sirupsen/logrus"
+	"os"
+	"os/exec"
 	"runtime"
 	"time"
-	"os/exec"
-	"os"
-	"errors"
 )
 
 // By OS a list of relay port names in index order

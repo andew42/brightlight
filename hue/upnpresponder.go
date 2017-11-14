@@ -3,8 +3,8 @@ package hue
 import (
 	"bytes"
 	log "github.com/Sirupsen/logrus"
-	"text/template"
 	"net"
+	"text/template"
 )
 
 type upnpResponse struct {
@@ -48,15 +48,18 @@ func (r upnpResponse) respond(c *net.UDPConn, address *net.UDPAddr) {
 
 	l, err := c.WriteToUDP(r.Bytes(), address)
 	if err != nil {
-		log.WithFields(
-			log.Fields{"address": address.String(), "error": err}).
-			Error("Hue UPNP WriteToUDP failed")
+		log.WithFields(log.Fields{
+			"Address": address.String(),
+			"Error":   err}).
+			Error("Hue API UPNP WriteToUDP failed")
 		return
 	}
 
-	log.WithFields(
-		log.Fields{"address": address.String(), "length": l, "body": string(r.Bytes())}).
-		Info("Hue UPNP Response Sent")
+	_ = l
+	// TODO: Excessive Logging
+	//log.WithFields(
+	//	log.Fields{"address": address.String(), "length": l, "body": string(r.Bytes())}).
+	//	Info("Hue UPNP Response Sent")
 }
 
 // Start listening to UPNP discovery address and respond to requests
@@ -75,7 +78,8 @@ func upnpResponder(httpAddress string) {
 	// Listen to the UPNP discovery address
 	c, err := net.ListenMulticastUDP("udp4", nil, upnpDiscoveryAddress)
 	if err != nil {
-		log.WithField("error", err).Error("Hue UPNP ListenMulticastUDP failed")
+		log.WithField("Error", err).
+			Error("Hue API UPNP ListenMulticastUDP failed")
 		return
 	}
 
@@ -85,13 +89,16 @@ func upnpResponder(httpAddress string) {
 		b := make([]byte, 1024)
 		n, src, err := c.ReadFromUDP(b)
 		if err != nil {
-			log.WithField("error", err).Error("Hue UPNP ReadFromUDP failed")
+			log.WithField("Error", err).
+				Error("Hue API UPNP ReadFromUDP failed")
 			continue
 		}
 
-		log.WithFields(
-			log.Fields{"source": src.String(), "body": string(b[:n])}).
-			Info("Hue UPNP discovery packet received")
+		_ = n
+		// TODO: Excessive Logging
+		//log.WithFields(
+		//	log.Fields{"source": src.String(), "body": string(b[:n])}).
+		//	Info("Hue UPNP discovery packet received")
 
 		// Respond to request on it's own go routine
 		go response.respond(c, src)

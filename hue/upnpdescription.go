@@ -1,9 +1,9 @@
 package hue
 
 import (
-	"net/http"
-	log "github.com/Sirupsen/logrus"
 	"bytes"
+	log "github.com/Sirupsen/logrus"
+	"net/http"
 	"text/template"
 )
 
@@ -73,7 +73,8 @@ func GetUpnpDescriptionHandler(httpAddress string) (func(http.ResponseWriter, *h
 		w.Header().Set("Content-Type", "application/xml")
 		l, err := w.Write(descriptionBody)
 		if err != nil || l != len(descriptionBody) {
-			log.WithField("error", err).Error("Hue UPNP failed to serve description.xml")
+			log.WithField("Error", err).
+				Error("Hue API UPNP failed to serve description.xml")
 		}
 	}, nil
 }

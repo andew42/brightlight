@@ -31,7 +31,7 @@ func (s *sweetshop) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
 		// Refresh the random colours
 		for i := uint(0); i < frame.Len(); i++ {
-			s.pixies[i] = framebuffer.NewRgbFromHsl(randBetween(0, 359), randBetween(50, 100),50)
+			s.pixies[i] = framebuffer.NewRgbFromHsl(randBetween(0, 359), randBetween(50, 100), 50)
 		}
 	}
 
