@@ -4,18 +4,19 @@ import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
+	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/framebuffer"
+	"github.com/andew42/brightlight/hue"
 	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/stats"
 	"golang.org/x/net/websocket"
+	"mime"
 	"net/http"
 	"os"
 	"path"
 	"runtime"
-	"mime"
-	"github.com/andew42/brightlight/hue"
-	"github.com/andew42/brightlight/config"
+	"github.com/andew42/brightlight/segments"
 )
 
 // Wrap a Dir file system server object to log failures
@@ -23,11 +24,13 @@ type LoggedDir struct {
 	http.Dir
 }
 
+// Log requests for non existent content
 func (d LoggedDir) Open(path string) (http.File, error) {
 
 	f, err := d.Dir.Open(path)
 	if err != nil {
-		log.WithField("path", path).Info("No Static HTTP Content")
+		log.WithField("path", path).
+			Info("requested static HTTP content not found")
 	}
 	return f, err
 }
@@ -44,7 +47,20 @@ func main() {
 
 	// Report what are we running on
 	log.WithFields(
-		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).Info("Brightlight")
+		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).
+		Info("brightlight environment")
+
+	// Figure out where the content directory is, GOPATH may contain : separated paths
+	contentPath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight/ui")
+	log.WithField("path", contentPath).
+		Info("HTTP content path")
+
+	// Which interface should we serve on?
+	ii, err := config.GetNetworkInterfaceInfo()
+	if err != nil {
+		log.WithField("error", err).
+			Panic("failed to find suitable network interface")
+	}
 
 	// Start drivers
 	controller.StartTeensyDriver()
@@ -53,28 +69,12 @@ func main() {
 	framebuffer.StartDriver(renderer)
 	animations.StartDriver(renderer)
 	stats.StartDriver()
-
-	// Start Hue bridge emulator components
-	addressAndPort, err := config.GetServerAddressAndPort()
-	if err != nil {
-		log.WithField("error", err).Error("Failed to get server address and port")
-	} else {
-
-		hue.StartUpnpResponder(addressAndPort)
-
-		// Handlers for hue emulator discovery
-		dh, err := hue.GetUpnpDescriptionHandler(addressAndPort)
-		if err != nil {
-			log.WithField("error", err).Fatal("Failed to create hue description.xml handler")
-		} else {
-			http.HandleFunc("/description.xml", dh)
-			http.HandleFunc("/api/", hue.ApiHandler)
-		}
+	brightlightUpdateChan := make(chan interface{})
+	brightlightCommandChan := make(chan interface{})
+	if err := hue.StartHueBridgeEmulator(ii, contentPath, brightlightUpdateChan, brightlightCommandChan); err == nil {
+		servers.UpdateHueBridgeWithBrightlightConfig(brightlightUpdateChan)
+		go servers.HueAnimationHandler(brightlightCommandChan, segments.GetAllNamedSegmentNames())
 	}
-
-	// Figure out where the content directory is, GOPATH may contain : separated paths
-	contentPath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight/ui")
-	log.WithField("contentPath", contentPath).Info("Serving content")
 
 	// Set up web routes (default / is static content)
 	mime.AddExtensionType(".manifest", "text/cache-manifest")
@@ -100,7 +100,9 @@ func main() {
 	http.HandleFunc("/option/", servers.OptionHandler)
 
 	// Start web server
-	if err := http.ListenAndServe(config.GetServerPort(), nil); err != nil {
+	log.WithField("address", ii.Ip+ii.Port).
+		Info("serving UI")
+	if err := http.ListenAndServe(ii.Ip+ii.Port, nil); err != nil {
 		log.Error(err.Error())
 	}
 

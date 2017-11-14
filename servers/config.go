@@ -2,10 +2,11 @@ package servers
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/hue"
+	"github.com/andew42/brightlight/segments"
 	"io/ioutil"
 	"net/http"
 	"path"
-	"strings"
 )
 
 // Handle HTTP requests to read and write config
@@ -13,15 +14,8 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		extIndex := strings.LastIndex(r.URL.Path, `/`)
-		if extIndex == -1 {
-			log.Warn("configHandler no config file specified")
-			http.Error(w, "No config file specified", 400)
-			return
-		}
-
 		// Construct file system path to config
-		fullPath := path.Join(string(contentPath), r.URL.Path)
+		fullPath := path.Join(contentPath, r.URL.Path)
 
 		if r.Method == "GET" {
 
@@ -66,4 +60,17 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 			http.Error(w, "Failed to write file", 405)
 		}
 	}
+}
+
+// Push segment names and animations to hue bridge
+func UpdateHueBridgeWithBrightlightConfig(u chan interface{}) {
+
+	// Send the list of segment names
+	segments := segments.GetAllNamedSegmentNames()
+	for _, s := range segments {
+		u <- hue.SegmentUpdate{NewName: s}
+	}
+
+	// Send the list of button names TODO READ IN JSON CONFIG
+	u <- hue.PresetUpdate{NewName: "Fake Preset"}
 }

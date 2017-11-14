@@ -1,11 +1,12 @@
 package animations
 
 import (
-	"strconv"
-	"time"
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
+	"github.com/andew42/brightlight/segments"
 	"github.com/andew42/brightlight/stats"
+	"strconv"
+	"time"
 )
 
 // Animation action to perform on a segment (from UI)
@@ -43,17 +44,20 @@ func buildAnimatorList(segments []SegmentAction) []segNameAndAnimator {
 func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction) {
 
 	switch seg.Animation {
+	case "Off":
+		// Currently used by hue animations to ignore a segment
+
 	case "Static":
 		if colour, err := strconv.ParseInt(seg.Params, 16, 32); err == nil {
 			*animators = append(*animators, segNameAndAnimator{seg.Segment,
-															   newStaticColour(framebuffer.NewRgbFromInt(int(colour)))})
+				newStaticColour(framebuffer.NewRgbFromInt(int(colour)))})
 		} else {
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animataion parameter")
 		}
 
 	case "Runner":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment,
-														   newRunner(framebuffer.NewRgb(0, 0, 255))})
+			newRunner(framebuffer.NewRgb(0, 0, 255))})
 
 	case "Cylon":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newCylon()})
@@ -121,8 +125,8 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 				// Animate and return updated frame buffer
 				for _, v := range animators {
 					// Resolve the segment to animate, based on string name
-					if seg, err := framebuffer.GetNamedSegment(fb, v.namedSegment); err == nil {
-						v.animator.animateFrame(frameCounter, seg)
+					if seg, err := segments.GetNamedSegment(v.namedSegment); err == nil {
+						v.animator.animateFrame(frameCounter, seg.GetSegment(fb))
 					}
 				}
 
