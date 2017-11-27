@@ -2,10 +2,10 @@ package controller
 
 import "github.com/andew42/brightlight/framebuffer"
 
-var mappingEnabled bool = true
-var outputMappingTable [256]byte = linear128
+var mappingEnabled = true
+var outputMappingTable = linear128
 
-var linear128 [256]byte = [256]byte{
+var linear128 = [256]byte{
 	0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7,
 	8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15,
 	16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23,
@@ -24,7 +24,7 @@ var linear128 [256]byte = [256]byte{
 	120, 120, 121, 121, 122, 122, 123, 123, 124, 124, 125, 125, 126, 126, 127, 127,
 }
 
-var cie128 [256]byte = [256]byte{
+var cie128 = [256]byte{
 	0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -43,7 +43,7 @@ var cie128 [256]byte = [256]byte{
 	108, 110, 111, 112, 113, 114, 115, 117, 118, 119, 120, 122, 123, 124, 125, 127,
 }
 
-var cie256 [256]byte = [256]byte{
+var cie256 = [256]byte{
 	0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4,
 	4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7,

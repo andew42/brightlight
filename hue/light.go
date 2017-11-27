@@ -62,7 +62,7 @@ type lightstate struct {
 func nextLightId(lights map[string]*light) string {
 
 	nextId := 0
-	for k, _ := range lights {
+	for k := range lights {
 		if i, err := strconv.Atoi(k); err == nil {
 			if i > nextId {
 				nextId = i

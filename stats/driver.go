@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	statFrameRenderTime = iota
+	statFrameRenderTime         = iota
 	statFrameSyncJitter
 	statSerialSendTime
 	statSerialDroppedFrame
@@ -93,7 +93,7 @@ func StartDriver() {
 				// New stats so we don't corrupt last one sent by reference
 				stats = NewStats()
 
-			// New stats sample from somewhere
+				// New stats sample from somewhere
 			case s := <-statSampleChannel:
 				{
 					switch s.StatType {
@@ -112,12 +112,12 @@ func StartDriver() {
 					}
 				}
 
-			// Process new listener requests
+				// Process new listener requests
 			case newListener := <-addListener:
 				log.WithField("name", newListener.name).Info("Stats listener added")
 				listeners[newListener.src] = newListener.name
 
-			// Process remove listener request
+				// Process remove listener request
 			case listenerToRemove := <-listenerDone:
 				log.WithField("name", listeners[listenerToRemove]).Info("Stats listener removed")
 				delete(listeners, listenerToRemove)

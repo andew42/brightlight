@@ -36,12 +36,18 @@ type PresetControl struct {
 // Loops processing updates from brightlight
 func BrightlightUpdateHandler(fsl *fullStateLocker, brightlightUpdate chan interface{}) {
 
-	// Delete any saved lights as they are rebuild each time
+	// Delete any saved lights and brightlight scenes as they are rebuild each time
 	fs := fsl.Lock()
 	fs.Lights = make(map[string]*light)
+	// https://stackoverflow.com/questions/23229975
+	for k, v := range fs.Scenes {
+		if v.Owner == "brightlight" {
+			delete(fs.Scenes, k)
+		}
+	}
 	fsl.Unlock()
 
-	// Mark each new luminary with an incremental ID
+	// Mark each new segment (luminary) with an incremental ID
 	hueId := 1
 
 	// Wait for luminary updates used to add lights
@@ -53,15 +59,15 @@ func BrightlightUpdateHandler(fsl *fullStateLocker, brightlightUpdate chan inter
 				processSegmentUpdate(fsl, u.(SegmentUpdate), hueId)
 				hueId++
 			case PresetUpdate:
-				// TODO
+				processPresetUpdate(fsl, u.(PresetUpdate))
 			default:
 				log.WithField("update", u).Fatal("Unexpected update type")
 			}
-			//			processLuminaryUpdate(fsl, lu)
 		}
 	}
 }
 
+// Each segment is treated as a luminary
 func processSegmentUpdate(fsl *fullStateLocker, su SegmentUpdate, hueId int) {
 
 	// Only support add updates at present
@@ -70,7 +76,7 @@ func processSegmentUpdate(fsl *fullStateLocker, su SegmentUpdate, hueId int) {
 	}
 
 	// TODO Just use All and Strip Three for debugging
-	if su.NewName != "All" && su.NewName != "Strip Three" && su.NewName != "Strip Five"{
+	if su.NewName != "All" && su.NewName != "Strip Three" && su.NewName != "Strip Five" {
 		return
 	}
 
@@ -84,4 +90,17 @@ func processSegmentUpdate(fsl *fullStateLocker, su SegmentUpdate, hueId int) {
 		ManufacturerName:  "LED",
 		LuminaireUniqueId: strconv.Itoa(hueId) + ":4e:5b-0b", // TODO
 		SwVersion:         "99999999",})
+}
+
+// Each preset (button) is treated as a scene
+func processPresetUpdate(fsl *fullStateLocker, pu PresetUpdate) {
+
+	// Only support add updates at present
+	if pu.NewName == "" || pu.OldName != "" {
+		log.WithField("preset update", pu).Fatal("Unsupported update")
+	}
+
+	fs := fsl.Lock()
+	defer fsl.Unlock()
+	AddPresetScene(fs, pu.NewName)
 }

@@ -157,7 +157,7 @@ func sendRelayState(f *os.File, state [2]bool) error {
 	data := make([]byte, 1)
 	for i := 0; i < len(state); i++ {
 		if state[i] {
-			data[0] |= (1 << uint(i))
+			data[0] |= 1 << uint(i)
 		}
 	}
 

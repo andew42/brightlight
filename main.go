@@ -72,7 +72,7 @@ func main() {
 	brightlightUpdateChan := make(chan interface{})
 	brightlightCommandChan := make(chan interface{})
 	if err := hue.StartHueBridgeEmulator(ii, contentPath, brightlightUpdateChan, brightlightCommandChan); err == nil {
-		servers.UpdateHueBridgeWithBrightlightConfig(brightlightUpdateChan)
+		servers.UpdateHueBridgeWithBrightlightConfig(contentPath, brightlightUpdateChan)
 		go servers.HueAnimationHandler(brightlightCommandChan, segments.GetAllNamedSegmentNames())
 	}
 

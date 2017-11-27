@@ -144,16 +144,16 @@ func StartDriver(renderer chan *FrameBuffer) {
 					renderer <- nil
 				}
 
-			// Process frame buffer render complete
+				// Process frame buffer render complete
 			case lastRenderedFrameBuffer = <-renderer:
 				renderInProgress = false
 
-			// Process new listener requests
+				// Process new listener requests
 			case newListener := <-addListener:
 				log.WithField("name", newListener.name).Info("Framebuffer listener added")
 				listeners[newListener.src] = listenerInfo{newListener.name, newListener.isSerial}
 
-			// Process remove listener request
+				// Process remove listener request
 			case listenerToRemove := <-listenerDone:
 				log.WithField("name", listeners[listenerToRemove]).Info("Framebuffer listener removed")
 				delete(listeners, listenerToRemove)

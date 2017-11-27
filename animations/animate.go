@@ -135,7 +135,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 				renderer <- fb
 				frameCounter++
 
-			// Request animation update
+				// Request animation update
 			case currentAnimations := <-animationChanged:
 				animators = buildAnimatorList(currentAnimations)
 				frameCounter = 0

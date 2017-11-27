@@ -89,6 +89,31 @@ type newSceneSuccessResponse struct {
 	Id string `json:"id"`
 }
 
+// Adds a brightlight owned scene defined in brightlight button UI
+func AddPresetScene(fs *fullState, name string) {
+
+	// TODO: The idea here was to add the brightlight buttons as
+	// preset scenes (I've just hardcoded All lights ID here) but
+	// the iOS Hue app doesn't recognise the scene, I tried making
+	// the Hue app the owner (rather than using brightlight) but
+	// that didn't work. I think there is some 'secret' app data
+	// required for it to be recognised.
+	lights := make([]string, 1)
+	lights[0] = "1"
+
+	// Assumes scene doesn't exist (brightlight owned scenes are deleted at start up)
+	s := scene{
+		Name:        name,
+		Lights:      lights,
+		Owner:       "brightlight",
+		Locked:      true,
+		LastUpdated: time.Now().Format("2006-01-02T15:04:05"),
+		Version:     2,
+	}
+	nextId := getNextSceneId(&fs.Scenes)
+	fs.Scenes[nextId] = &s
+}
+
 // Body={"name":"Relax","lights":["1"],"recycle":false,"appdata":{"version":1,"data":"fskZZ_r01_d01"}
 // Response=[{"success":{"id": "Abc123Def456Ghi"}}]
 func createScene(c *cmdContext) {

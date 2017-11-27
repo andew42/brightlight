@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"github.com/andew42/brightlight/config"
 )
 
 // Handle HTTP requests to read and write config
@@ -63,14 +64,15 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 }
 
 // Push segment names and animations to hue bridge
-func UpdateHueBridgeWithBrightlightConfig(u chan interface{}) {
+func UpdateHueBridgeWithBrightlightConfig(contentPath string, u chan interface{}) {
 
 	// Send the list of segment names
-	segments := segments.GetAllNamedSegmentNames()
-	for _, s := range segments {
+	for _, s := range segments.GetAllNamedSegmentNames() {
 		u <- hue.SegmentUpdate{NewName: s}
 	}
 
-	// Send the list of button names TODO READ IN JSON CONFIG
-	u <- hue.PresetUpdate{NewName: "Fake Preset"}
+	// Send the list of user button names
+	for _, p := range config.LoadUserPresets(contentPath) {
+		u <- hue.PresetUpdate{NewName: p.Name}
+	}
 }
