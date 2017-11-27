@@ -7,7 +7,6 @@ import (
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/framebuffer"
-	"github.com/andew42/brightlight/hue"
 	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/stats"
 	"golang.org/x/net/websocket"
@@ -16,6 +15,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"github.com/andew42/brightlight/hue"
 	"github.com/andew42/brightlight/segments"
 )
 
@@ -69,11 +69,16 @@ func main() {
 	framebuffer.StartDriver(renderer)
 	animations.StartDriver(renderer)
 	stats.StartDriver()
-	brightlightUpdateChan := make(chan interface{})
-	brightlightCommandChan := make(chan interface{})
-	if err := hue.StartHueBridgeEmulator(ii, contentPath, brightlightUpdateChan, brightlightCommandChan); err == nil {
-		servers.UpdateHueBridgeWithBrightlightConfig(contentPath, brightlightUpdateChan)
-		go servers.HueAnimationHandler(brightlightCommandChan, segments.GetAllNamedSegmentNames())
+
+	// Optional Hue bridge emulation
+	const hueBridgeEmulationEnabled = false
+	if hueBridgeEmulationEnabled {
+		brightlightUpdateChan := make(chan interface{})
+		brightlightCommandChan := make(chan interface{})
+		if err := hue.StartHueBridgeEmulator(ii, contentPath, brightlightUpdateChan, brightlightCommandChan); err == nil {
+			servers.UpdateHueBridgeWithBrightlightConfig(contentPath, brightlightUpdateChan)
+			go servers.HueAnimationHandler(brightlightCommandChan, segments.GetAllNamedSegmentNames())
+		}
 	}
 
 	// Set up web routes (default / is static content)
