@@ -75,6 +75,11 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
 			newRainbow(time.Second*8), 15)})
 
+	case "Christmas":
+		*animators = append(*animators, segNameAndAnimator{seg.Segment, newLinearFade(
+			newStaticColour(framebuffer.Rgb{255,0,0}),
+			newStaticColour(framebuffer.Rgb{0,255,0}), time.Duration(3000 * time.Millisecond))})
+
 	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animataion action")
 	}

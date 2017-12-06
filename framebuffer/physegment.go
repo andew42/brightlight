@@ -32,29 +32,45 @@ func (seg PhySegment) Len() uint {
 	return l
 }
 
+// Get a particular LED colour from the left of the strip
+func (seg PhySegment) Get(pos uint) Rgb {
+
+	stripIndex, stripPos := seg.locate(pos)
+	return seg.Strips[stripIndex].Leds[stripPos]
+}
+
 // Set a particular LED colour from the left of the strip
 func (seg PhySegment) Set(pos uint, colour Rgb) {
 
-	// Locate the strip for this position
-	i := 0
-	for ; i < len(seg.Strips); i++ {
-		stripLen := uint(len(seg.Strips[i].Leds))
+	stripIndex, stripPos := seg.locate(pos)
+	seg.Strips[stripIndex].Leds[stripPos] = colour
+}
+
+// Takes an index (pos) from the left of the physical segment and calculates
+// the index of the LedStrip (stripIndex) and position (stripPos) within the
+// sub strip
+func (seg PhySegment) locate(pos uint) (stripIndex int, stripPos uint) {
+
+	// Locate the LedStrip for this position
+	stripIndex = 0
+	stripPos = pos
+	for ; stripIndex < len(seg.Strips); stripIndex++ {
+		stripLen := uint(len(seg.Strips[stripIndex].Leds))
 		// Is this the required strip?
-		if pos < stripLen {
+		if stripPos < stripLen {
 			break
 		}
-		pos -= stripLen
+		stripPos -= stripLen
 	}
 
 	// Was the position out of range?
-	if i == len(seg.Strips) {
+	if stripIndex == len(seg.Strips) {
 		log.Panic("position out of range")
 	}
 
-	// Set at position within strip
-	if seg.Strips[i].Clockwise {
-		seg.Strips[i].Leds[pos] = colour
-	} else {
-		seg.Strips[i].Leds[uint(len(seg.Strips[i].Leds))-pos-1] = colour
+	// Transpose strip position if LedStrip is anti-clockwise
+	if !seg.Strips[stripIndex].Clockwise {
+		stripPos = uint(len(seg.Strips[stripIndex].Leds))-stripPos-1
 	}
+	return
 }

@@ -104,3 +104,21 @@ func h2rgb(v1 uint, v2 uint, hue uint) uint {
 func (led Rgb) IsLedOn() bool {
 	return led.Red != 0 || led.Green != 0 || led.Blue != 0
 }
+
+// Assumes no overflow of a byte
+func (led Rgb) Add(right Rgb) Rgb {
+	return Rgb{
+		Red:   led.Red + right.Red,
+		Green: led.Green + right.Green,
+		Blue:  led.Blue + right.Blue,
+	}
+}
+
+// Scale an RGB colour by f between 0 -> 1
+func (led Rgb) ScaleRgb(f float32) Rgb {
+
+	return Rgb{
+		Red:   byte(float32(led.Red) * f),
+		Green: byte(float32(led.Green) * f),
+		Blue:  byte(float32(led.Blue) * f)};
+}

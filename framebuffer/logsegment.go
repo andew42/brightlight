@@ -30,6 +30,17 @@ func (seg LogSegment) Len() uint {
 	return seg.len
 }
 
+// Get a particular LED colour from the left of the segment
+func (seg LogSegment) Get(pos uint) Rgb {
+
+	// Is position out of range?
+	if pos >= seg.len {
+		log.Panic("position out of range")
+	}
+	// Get at position within segment
+	return seg.baseSeg.Get(seg.start + pos)
+}
+
 // Set a particular LED colour from the left of the segment
 func (seg LogSegment) Set(pos uint, colour Rgb) {
 
