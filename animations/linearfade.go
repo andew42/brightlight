@@ -5,19 +5,27 @@ import (
 	"time"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/segments"
+	log "github.com/Sirupsen/logrus"
 )
 
 type linearFade struct {
-	from            animator
-	to              animator
+	animators       []animator
 	framesPerPeriod uint
+	reverseOnRepeat bool
+	forward         bool
 }
 
-// TODO Take a slice of animators
-// TODO Reverse animation when it hits end
+// Fade between two or more animations using linear interpolation, if more than
+// two animations are provided then a chain is formed 1 -> 2 -> 3 once the last
+// animation as played the sequence it either starts again or is reversed 3 ->
+// 2 -> 1 (depending on reverseOnRepeat). The animation always repeats forever.
+func newLinearFade(period time.Duration, reverseOnRepeat bool, animators ...animator) *linearFade {
 
-// Fade between two animations using linear interpolation
-func newLinearFade(from animator, to animator, period time.Duration) *linearFade {
+	// Must be at least two animations
+	if len(animators) < 2 {
+		log.WithField("animators", len(animators)).
+			Fatal("LinearFade animation requires at least two animations")
+	}
 
 	// Calculate how many frames require to complete animation from -> to
 	framesPerPeriod := uint(float32(period) / float32(config.FramePeriodMs))
@@ -25,24 +33,45 @@ func newLinearFade(from animator, to animator, period time.Duration) *linearFade
 		// Must be at least two steps
 		framesPerPeriod = 2
 	}
-	return &linearFade{from, to, framesPerPeriod}
+
+	return &linearFade{animators, framesPerPeriod, reverseOnRepeat, !reverseOnRepeat}
 }
 
-// Assume 3 frames per period
+// Assume two animations with 3 frames per period
 // Frame 0 from = 100% to = 0%
 // Frame 1 from = 50% to = 50%
 // Frame 2 from = 0% to = 100%
 func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
-	// How far into this animation are we?
+	// Frames per segment in the chain of animations
+	framesPerSegment := float32(lf.framesPerPeriod) / float32(len(lf.animators)-1)
+
+	// How far into the entire animation chain (all segments) are we?
 	index := frameCount % lf.framesPerPeriod
 
+	// Flip direction when animation hits end stop
+	if index == 0 && lf.reverseOnRepeat {
+		lf.forward = !lf.forward
+	}
+
+	// Flip the index if we are moving backwards
+	if !lf.forward {
+		index = (lf.framesPerPeriod - index) - 1
+	}
+
+	// Determine current from -> to animations
+	animationIndex := float32(index) / framesPerSegment
+	from := lf.animators[uint(animationIndex)]
+	to := lf.animators[uint(animationIndex+1)]
+
 	// Work out what percentage of from and to animations to show
-	toPercent := float32(index) / float32(lf.framesPerPeriod-1)
+	segmentIndex := float32(index) - float32(uint(animationIndex))*framesPerSegment
+	log.Info("Index:", index, " AnimationIndex:", animationIndex, "(", uint(animationIndex), ") SegmentIndex", segmentIndex)
+	toPercent := segmentIndex / framesPerSegment
 	fromPercent := 1 - toPercent
 
 	// Apply the first animation to the frame buffer and scale with fromPercent
-	lf.from.animateFrame(frameCount, frame)
+	from.animateFrame(frameCount, frame)
 	if fromPercent == 100 {
 		return
 	}
@@ -50,7 +79,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
 	// Apply the second animation to a temporary in memory buffer and scale with toPercent
 	tmpSegment := segments.NewMemSegment(frame.Len())
-	lf.to.animateFrame(frameCount, tmpSegment)
+	to.animateFrame(frameCount, tmpSegment)
 	scaleFrameBuffer(tmpSegment, toPercent)
 
 	// Finally add the tmp segment into the frame buffer, we should never
@@ -58,6 +87,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 	for i := uint(0); i < frame.Len(); i++ {
 		frame.Set(i, frame.Get(i).Add(tmpSegment.Get(i)))
 	}
+	log.Info("Colour", frame.Get(0))
 }
 
 // Scale each colour in the segment by f between 0 -> 1
