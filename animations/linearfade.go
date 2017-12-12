@@ -43,9 +43,6 @@ func newLinearFade(period time.Duration, reverseOnRepeat bool, animators ...anim
 // Frame 2 from = 0% to = 100%
 func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
-	// Frames per segment in the chain of animations
-	framesPerSegment := float32(lf.framesPerPeriod) / float32(len(lf.animators)-1)
-
 	// How far into the entire animation chain (all segments) are we?
 	index := frameCount % lf.framesPerPeriod
 
@@ -63,10 +60,22 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 		index = (lf.framesPerPeriod - index) - 1
 	}
 
+	// Segment count per period depends on the reverseOnRepeat value
+	// Consider an animation with 3 segments with reverseOnRepeat:
+	// true  - 0->1->2->1->0 i.e. two segments forward (then two segments reversed)
+	// false - 0->1->2->0    i.e. three segments forward
+	segmentsPerPeriod := len(lf.animators)
+	if lf.reverseOnRepeat {
+		segmentsPerPeriod--
+	}
+
+	// Frames per segment in the chain of animations
+	framesPerSegment := float32(lf.framesPerPeriod) / float32(segmentsPerPeriod)
+
 	// Determine current from -> to animations
 	animationIndex := float32(index) / framesPerSegment
 	from := lf.animators[uint(animationIndex)]
-	to := lf.animators[uint(animationIndex+1)]
+	to := lf.animators[uint(animationIndex+1) % uint(len(lf.animators))]
 
 	// Work out what percentage of from and to animations to show
 	segmentIndex := float32(index) - float32(uint(animationIndex))*framesPerSegment
