@@ -49,9 +49,13 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 	// How far into the entire animation chain (all segments) are we?
 	index := frameCount % lf.framesPerPeriod
 
-	// Flip direction when animation hits end stop
-	if index == 0 && lf.reverseOnRepeat {
-		lf.forward = !lf.forward
+	// Determine direction for this frame, this is done in a pure deterministic
+	// way based only on frame count as the animation may be reused multiple
+	// times with the same frame count if it is embedded in a repeater animation
+	if lf.reverseOnRepeat {
+		lf.forward = (frameCount / lf.framesPerPeriod) % 2 == 0
+	} else {
+		lf.forward = true
 	}
 
 	// Flip the index if we are moving backwards
@@ -66,7 +70,6 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 
 	// Work out what percentage of from and to animations to show
 	segmentIndex := float32(index) - float32(uint(animationIndex))*framesPerSegment
-	log.Info("Index:", index, " AnimationIndex:", animationIndex, "(", uint(animationIndex), ") SegmentIndex", segmentIndex)
 	toPercent := segmentIndex / framesPerSegment
 	fromPercent := 1 - toPercent
 
@@ -87,7 +90,6 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 	for i := uint(0); i < frame.Len(); i++ {
 		frame.Set(i, frame.Get(i).Add(tmpSegment.Get(i)))
 	}
-	log.Info("Colour", frame.Get(0))
 }
 
 // Scale each colour in the segment by f between 0 -> 1
