@@ -78,12 +78,25 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 	case "Christmas":
 		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
 			newLinearFade(
-				time.Duration(3000*time.Millisecond),
-				true,
+				time.Duration(10000*time.Millisecond),
+				false,
 				newBulb(framebuffer.Rgb{255, 0, 0}, 0, 1),
+				newBulb(framebuffer.Rgb{255, 122, 0}, 1, 1),
 				newBulb(framebuffer.Rgb{0, 255, 0}, 2, 1),
+				newBulb(framebuffer.Rgb{178, 0, 255}, 3, 1),
 				newBulb(framebuffer.Rgb{0, 0, 255}, 4, 1)),
-			6)})
+			5)})
+
+	case "Fairground":
+		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
+			newStepFade(
+				time.Duration(640*time.Millisecond),
+				false,
+				newBulb(framebuffer.Rgb{175, 107, 1}, 0, 1),
+				newBulb(framebuffer.Rgb{181, 145, 0}, 1, 1),
+				newBulb(framebuffer.Rgb{175, 107, 1}, 2, 1),
+				newBulb(framebuffer.Rgb{181, 145, 0}, 3, 1)),
+			4)})
 
 	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animataion action")

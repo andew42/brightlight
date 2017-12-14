@@ -13,7 +13,8 @@ define(function () {
             "Sweet Shop",
             "Twinkle",
             "BabyBows",
-            "Christmas"
+            "Christmas",
+            "Fairground"
         ],
         // Logical segments for constructing scenes TODO GENERATE FROM GO NamedSegments
         segments: [
