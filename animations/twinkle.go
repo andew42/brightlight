@@ -10,11 +10,11 @@ import (
 // Twinkle inspired by:
 // https://github.com/daterdots/LEDs/blob/master/TwinkleSparkle2015/TwinkleSparkle2015.ino
 
-// How quickly to cool down a pixel
+// How quickly to cool down a pixel (amount subtracted)
 const cooling = 5
 
 // Percentage of pixies to heat up each frame
-const heatPercentage = 5
+const heatPercentage = 2
 
 type twinkle struct {
 	pixies []byte
