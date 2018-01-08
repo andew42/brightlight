@@ -1,10 +1,10 @@
 package animations
 
 import (
-	"github.com/andew42/brightlight/framebuffer"
 	"time"
 	"github.com/andew42/brightlight/config"
 	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/segment"
 )
 
 type stepFade struct {
@@ -35,7 +35,7 @@ func newStepFade(period time.Duration, reverseOnRepeat bool, animators ...animat
 }
 
 // Animate current frame
-func (sf *stepFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (sf *stepFade) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// How far into the entire animation chain (all segments) are we?
 	index := frameCount % sf.framesPerPeriod

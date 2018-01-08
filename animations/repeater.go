@@ -1,6 +1,8 @@
 package animations
 
-import "github.com/andew42/brightlight/framebuffer"
+import (
+	"github.com/andew42/brightlight/segment"
+)
 
 // Takes an existing animation and repeats it every n LEDs
 type repeater struct {
@@ -16,7 +18,7 @@ func newRepeater(animator animator, repeatLength uint) *repeater {
 	return &r
 }
 
-func (r *repeater) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (r *repeater) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Number of repeats and remaining pixels
 	repeat := frame.Len() / r.repeatLength
@@ -27,7 +29,7 @@ func (r *repeater) animateFrame(frameCount uint, frame framebuffer.Segment) {
 	// Repeat the animation repeat times
 	for i := uint(0); i < repeat; i++ {
 		// Create a logical segment for this animation
-		seg := framebuffer.NewLogSegment(frame, startOffset+i*r.repeatLength, r.repeatLength)
+		seg := segment.NewSubSegment(frame, startOffset+i*r.repeatLength, r.repeatLength)
 		// Animate over the logical segment
 		r.animator.animateFrame(frameCount, seg)
 	}

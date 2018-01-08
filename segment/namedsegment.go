@@ -1,4 +1,4 @@
-package segments
+package segment
 
 import (
 	"errors"
@@ -7,18 +7,16 @@ import (
 	"strings"
 )
 
-// TODO: MOVE OTHER SEGMENTS TO THIS NAME SPACE
-
 // Named segments are used to build scenes in the UI
 // TODO: SHOULD MATCH UI LIST IN UI/CONFIG/STATIC.JS
-// A LogSegment (logical segment) consists of one or more segments (logical or physical)
+// A SubSegment (logical segment) consists of one or more segments (logical or physical)
 // plus a start and end led position
 // A PhySegment (physical segment) consists of one or more led strips
 // LedStrip represents a physical strip of LEDS connected to a particular controller pin
 
 type NamedSegment struct {
 	Name       string
-	GetSegment func(fb *framebuffer.FrameBuffer) framebuffer.Segment
+	GetSegment func(fb *framebuffer.FrameBuffer) Segment
 }
 
 // Return a particular named segment
@@ -32,9 +30,9 @@ func GetNamedSegment(name string) (NamedSegment, error) {
 			if length, err := strconv.Atoi(name[colonIndex+1:]); err == nil {
 				return NamedSegment{
 					Name: name,
-					GetSegment: func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-						return framebuffer.NewLogSegment(
-							framebuffer.NewPhySegment(fb.Strips[stripIndex:stripIndex+1]),
+					GetSegment: func(fb *framebuffer.FrameBuffer) Segment {
+						return NewSubSegment(
+							NewPhySegment(fb.Strips[stripIndex:stripIndex+1]),
 							0, uint(length))
 					},
 				}, nil
@@ -66,42 +64,42 @@ func GetAllNamedSegmentNames() []string {
 var allNamedSegments = func() []NamedSegment {
 
 	// Bedroom Ceiling
-	bedroomCeiling := func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-		t := framebuffer.NewPhySegment([]framebuffer.LedStrip{
+	bedroomCeiling := func(fb *framebuffer.FrameBuffer) Segment {
+		t := NewPhySegment([]framebuffer.LedStrip{
 			fb.Strips[11], fb.Strips[4],
 			fb.Strips[3], fb.Strips[7],
 			fb.Strips[6], fb.Strips[14],
 			fb.Strips[13]})
-		return framebuffer.NewLogSegment(t, 135, t.Len()-135)
+		return NewSubSegment(t, 135, t.Len()-135)
 	}
 
 	// Bedroom Wall
-	bedroomWall := func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-		t := framebuffer.NewPhySegment([]framebuffer.LedStrip{
+	bedroomWall := func(fb *framebuffer.FrameBuffer) Segment {
+		t := NewPhySegment([]framebuffer.LedStrip{
 			fb.Strips[8], fb.Strips[2], fb.Strips[5], fb.Strips[15], fb.Strips[10]})
-		return framebuffer.NewLogSegment(t, 144, t.Len()-(144+241))
+		return NewSubSegment(t, 144, t.Len()-(144+241))
 	}
 
 	// Bathroom Ceiling
-	bathroomCeiling := func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-		t := framebuffer.NewPhySegment([]framebuffer.LedStrip{
+	bathroomCeiling := func(fb *framebuffer.FrameBuffer) Segment {
+		t := NewPhySegment([]framebuffer.LedStrip{
 			fb.Strips[9], fb.Strips[11]})
-		return framebuffer.NewLogSegment(t, 0, t.Len()-27)
+		return NewSubSegment(t, 0, t.Len()-27)
 	}
 
 	// Bathroom Wall
-	bathroomWall := func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-		t := framebuffer.NewPhySegment([]framebuffer.LedStrip{
+	bathroomWall := func(fb *framebuffer.FrameBuffer) Segment {
+		t := NewPhySegment([]framebuffer.LedStrip{
 			fb.Strips[10], fb.Strips[8]})
-		return framebuffer.NewLogSegment(t, 50, t.Len()-(28+50))
+		return NewSubSegment(t, 50, t.Len()-(28+50))
 	}
 
 	// Build the segment list
 	return []NamedSegment{
 		{
 			"All",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewPhySegment([]framebuffer.LedStrip{
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewPhySegment([]framebuffer.LedStrip{
 					fb.Strips[3], fb.Strips[7],
 					fb.Strips[6], fb.Strips[14],
 					fb.Strips[13], fb.Strips[9],
@@ -113,8 +111,8 @@ var allNamedSegments = func() []NamedSegment {
 		},
 		{
 			"All Ceiling",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewPhySegment([]framebuffer.LedStrip{
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewPhySegment([]framebuffer.LedStrip{
 					fb.Strips[3], fb.Strips[7],
 					fb.Strips[6], fb.Strips[14],
 					fb.Strips[13], fb.Strips[9],
@@ -123,8 +121,8 @@ var allNamedSegments = func() []NamedSegment {
 		},
 		{
 			"All Wall",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewPhySegment([]framebuffer.LedStrip{
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewPhySegment([]framebuffer.LedStrip{
 					fb.Strips[5], fb.Strips[15],
 					fb.Strips[10], fb.Strips[8],
 					fb.Strips[2]})
@@ -132,8 +130,8 @@ var allNamedSegments = func() []NamedSegment {
 		},
 		{
 			"Bedroom",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewCombinedSegment(bedroomCeiling(fb), bedroomWall(fb))
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewCombinedSegment(bedroomCeiling(fb), bedroomWall(fb))
 			},
 		},
 		{
@@ -146,8 +144,8 @@ var allNamedSegments = func() []NamedSegment {
 		},
 		{
 			"Bathroom",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewCombinedSegment(bathroomCeiling(fb), bathroomWall(fb))
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewCombinedSegment(bathroomCeiling(fb), bathroomWall(fb))
 			},
 		},
 		{
@@ -160,22 +158,22 @@ var allNamedSegments = func() []NamedSegment {
 		},
 		{
 			"Curtains",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewPhySegment([]framebuffer.LedStrip{
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewPhySegment([]framebuffer.LedStrip{
 					fb.Strips[3], fb.Strips[7]})
 			},
 		},
 		{
 			"Strip Three",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewLogSegment(framebuffer.NewPhySegment(
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewSubSegment(NewPhySegment(
 					[]framebuffer.LedStrip{fb.Strips[3]}), 0, 20)
 			},
 		},
 		{
 			"Strip Five",
-			func(fb *framebuffer.FrameBuffer) framebuffer.Segment {
-				return framebuffer.NewLogSegment(framebuffer.NewPhySegment(
+			func(fb *framebuffer.FrameBuffer) Segment {
+				return NewSubSegment(NewPhySegment(
 					[]framebuffer.LedStrip{fb.Strips[5]}), 0, 19)
 			},
 		},

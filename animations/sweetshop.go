@@ -3,6 +3,7 @@ package animations
 import (
 	"github.com/andew42/brightlight/framebuffer"
 	"time"
+	"github.com/andew42/brightlight/segment"
 )
 
 type sweetshop struct {
@@ -16,7 +17,7 @@ func newSweetshop(period time.Duration) *sweetshop {
 	return &sweetshop{period: period}
 }
 
-func (s *sweetshop) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (s *sweetshop) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Create the pixies?
 	if uint(len(s.pixies)) != frame.Len() {

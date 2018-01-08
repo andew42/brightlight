@@ -1,16 +1,16 @@
-package framebuffer
+package segment
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/framebuffer"
 )
 
-// Two segments connected together
 type CombinedSegment struct {
 	Seg1 Segment
 	Seg2 Segment
 }
 
-// Constructor
+// Two segments connected together
 func NewCombinedSegment(seg1 Segment, seg2 Segment) CombinedSegment {
 
 	return CombinedSegment{seg1, seg2}
@@ -23,14 +23,14 @@ func (s CombinedSegment) Len() uint {
 }
 
 // Get a particular LED colour 0 is 0 in seg1
-func (s CombinedSegment) Get(pos uint) Rgb {
+func (s CombinedSegment) Get(pos uint) framebuffer.Rgb {
 
 	seg, segPos := s.locate(pos)
 	return seg.Get(segPos)
 }
 
 // Set a particular LED colour 0 is 0 in seg1
-func (s CombinedSegment) Set(pos uint, colour Rgb) {
+func (s CombinedSegment) Set(pos uint, colour framebuffer.Rgb) {
 
 	seg, segPos := s.locate(pos)
 	seg.Set(segPos, colour)

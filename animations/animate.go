@@ -3,7 +3,7 @@ package animations
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
-	"github.com/andew42/brightlight/segments"
+	"github.com/andew42/brightlight/segment"
 	"github.com/andew42/brightlight/stats"
 	"strconv"
 	"time"
@@ -52,7 +52,7 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 			*animators = append(*animators, segNameAndAnimator{seg.Segment,
 				newStaticColour(framebuffer.NewRgbFromInt(int(colour)))})
 		} else {
-			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animataion parameter")
+			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
 		}
 
 	case "Runner":
@@ -148,7 +148,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 				// Animate and return updated frame buffer
 				for _, v := range animators {
 					// Resolve the segment to animate, based on string name
-					if seg, err := segments.GetNamedSegment(v.namedSegment); err == nil {
+					if seg, err := segment.GetNamedSegment(v.namedSegment); err == nil {
 						v.animator.animateFrame(frameCounter, seg.GetSegment(fb))
 					}
 				}

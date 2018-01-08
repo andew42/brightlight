@@ -1,6 +1,9 @@
 package animations
 
-import "github.com/andew42/brightlight/framebuffer"
+import (
+	"github.com/andew42/brightlight/framebuffer"
+	"github.com/andew42/brightlight/segment"
+)
 
 type cylon struct {
 }
@@ -10,7 +13,7 @@ func newCylon() *cylon {
 	return &cylon{}
 }
 
-func (c *cylon) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (c *cylon) animateFrame(frameCount uint, frame segment.Segment) {
 
 	if frame.Len() == 0 {
 		return

@@ -4,6 +4,7 @@ import (
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"time"
+	"github.com/andew42/brightlight/segment"
 )
 
 type rainbow struct {
@@ -20,7 +21,7 @@ func newRainbow(period time.Duration) *rainbow {
 	return &r
 }
 
-func (r *rainbow) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (r *rainbow) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Work out the phase (starting angle) for this frame
 	phase := float32(frameCount%r.framesPerCycle) * r.degreesPerFrame

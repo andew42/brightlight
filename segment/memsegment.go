@@ -1,4 +1,4 @@
-package segments
+package segment
 
 import "github.com/andew42/brightlight/framebuffer"
 

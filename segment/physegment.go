@@ -1,16 +1,16 @@
-package framebuffer
+package segment
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/framebuffer"
 )
 
-// A physical segment aggregates a number of LedStrips
 type PhySegment struct {
-	Strips []LedStrip
+	Strips []framebuffer.LedStrip
 }
 
-// Constructor
-func NewPhySegment(strips []LedStrip) PhySegment {
+// A physical segment aggregates a number of LedStrips
+func NewPhySegment(strips []framebuffer.LedStrip) PhySegment {
 
 	// Strip out zero length segments
 	ps := PhySegment{}
@@ -33,14 +33,14 @@ func (seg PhySegment) Len() uint {
 }
 
 // Get a particular LED colour from the left of the strip
-func (seg PhySegment) Get(pos uint) Rgb {
+func (seg PhySegment) Get(pos uint) framebuffer.Rgb {
 
 	stripIndex, stripPos := seg.locate(pos)
 	return seg.Strips[stripIndex].Leds[stripPos]
 }
 
 // Set a particular LED colour from the left of the strip
-func (seg PhySegment) Set(pos uint, colour Rgb) {
+func (seg PhySegment) Set(pos uint, colour framebuffer.Rgb) {
 
 	stripIndex, stripPos := seg.locate(pos)
 	seg.Strips[stripIndex].Leds[stripPos] = colour
@@ -70,7 +70,7 @@ func (seg PhySegment) locate(pos uint) (stripIndex int, stripPos uint) {
 
 	// Transpose strip position if LedStrip is anti-clockwise
 	if !seg.Strips[stripIndex].Clockwise {
-		stripPos = uint(len(seg.Strips[stripIndex].Leds))-stripPos-1
+		stripPos = uint(len(seg.Strips[stripIndex].Leds)) - stripPos - 1
 	}
 	return
 }

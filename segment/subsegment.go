@@ -1,18 +1,18 @@
-package framebuffer
+package segment
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/andew42/brightlight/framebuffer"
 )
 
-// A logical segment is a slice of another segment
-type LogSegment struct {
+type SubSegment struct {
 	baseSeg Segment
 	start   uint
 	len     uint
 }
 
-// Constructor
-func NewLogSegment(baseSeg Segment, start uint, len uint) LogSegment {
+// A sub segment is a slice of another segment
+func NewSubSegment(baseSeg Segment, start uint, len uint) SubSegment {
 
 	baseLen := baseSeg.Len()
 	if start >= baseLen {
@@ -21,17 +21,17 @@ func NewLogSegment(baseSeg Segment, start uint, len uint) LogSegment {
 	if start+len > baseLen {
 		log.Panic("invalid segment length")
 	}
-	return LogSegment{baseSeg, start, len}
+	return SubSegment{baseSeg, start, len}
 }
 
 // Number of LEDs in the segment
-func (seg LogSegment) Len() uint {
+func (seg SubSegment) Len() uint {
 
 	return seg.len
 }
 
 // Get a particular LED colour from the left of the segment
-func (seg LogSegment) Get(pos uint) Rgb {
+func (seg SubSegment) Get(pos uint) framebuffer.Rgb {
 
 	// Is position out of range?
 	if pos >= seg.len {
@@ -42,7 +42,7 @@ func (seg LogSegment) Get(pos uint) Rgb {
 }
 
 // Set a particular LED colour from the left of the segment
-func (seg LogSegment) Set(pos uint, colour Rgb) {
+func (seg SubSegment) Set(pos uint, colour framebuffer.Rgb) {
 
 	// Is position out of range?
 	if pos >= seg.len {

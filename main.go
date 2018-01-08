@@ -16,7 +16,7 @@ import (
 	"path"
 	"runtime"
 	"github.com/andew42/brightlight/hue"
-	"github.com/andew42/brightlight/segments"
+	"github.com/andew42/brightlight/segment"
 )
 
 // Wrap a Dir file system server object to log failures
@@ -77,7 +77,7 @@ func main() {
 		brightlightCommandChan := make(chan interface{})
 		if err := hue.StartHueBridgeEmulator(ii, contentPath, brightlightUpdateChan, brightlightCommandChan); err == nil {
 			servers.UpdateHueBridgeWithBrightlightConfig(contentPath, brightlightUpdateChan)
-			go servers.HueAnimationHandler(brightlightCommandChan, segments.GetAllNamedSegmentNames())
+			go servers.HueAnimationHandler(brightlightCommandChan, segment.GetAllNamedSegmentNames())
 		}
 	}
 

@@ -3,9 +3,8 @@ package animations
 import (
 	"github.com/andew42/brightlight/framebuffer"
 	"math/rand"
+	"github.com/andew42/brightlight/segment"
 )
-
-// import "github.com/pborges/huejack"
 
 // Twinkle inspired by:
 // https://github.com/daterdots/LEDs/blob/master/TwinkleSparkle2015/TwinkleSparkle2015.ino
@@ -41,7 +40,7 @@ func qsub8(left uint8, right uint8) uint8 {
 }
 
 // animation interface
-func (t *twinkle) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (t *twinkle) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Create the pixies if not already created
 	if t.pixies == nil {

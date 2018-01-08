@@ -3,7 +3,7 @@ package servers
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/hue"
-	"github.com/andew42/brightlight/segments"
+	"github.com/andew42/brightlight/segment"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -67,7 +67,7 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 func UpdateHueBridgeWithBrightlightConfig(contentPath string, u chan interface{}) {
 
 	// Send the list of segment names
-	for _, s := range segments.GetAllNamedSegmentNames() {
+	for _, s := range segment.GetAllNamedSegmentNames() {
 		u <- hue.SegmentUpdate{NewName: s}
 	}
 

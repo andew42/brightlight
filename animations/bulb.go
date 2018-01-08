@@ -1,6 +1,9 @@
 package animations
 
-import "github.com/andew42/brightlight/framebuffer"
+import (
+	"github.com/andew42/brightlight/framebuffer"
+	"github.com/andew42/brightlight/segment"
+)
 
 type bulb struct {
 	colour framebuffer.Rgb
@@ -15,7 +18,7 @@ func newBulb(colour framebuffer.Rgb, offset uint, width uint) *bulb {
 	return &bulb{colour, offset, width}
 }
 
-func (b *bulb) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (b *bulb) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Return if bulb won't fit
 	if b.offset+b.width > frame.Len() {

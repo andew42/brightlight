@@ -1,10 +1,9 @@
 package animations
 
 import (
-	"github.com/andew42/brightlight/framebuffer"
 	"time"
 	"github.com/andew42/brightlight/config"
-	"github.com/andew42/brightlight/segments"
+	"github.com/andew42/brightlight/segment"
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -41,7 +40,7 @@ func newLinearFade(period time.Duration, reverseOnRepeat bool, animators ...anim
 // Frame 0 from = 100% to = 0%
 // Frame 1 from = 50% to = 50%
 // Frame 2 from = 0% to = 100%
-func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
+func (lf *linearFade) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// How far into the entire animation chain (all segments) are we?
 	index := frameCount % lf.framesPerPeriod
@@ -50,7 +49,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 	// way based only on frame count as the animation may be reused multiple
 	// times with the same frame count if it is embedded in a repeater animation
 	if lf.reverseOnRepeat {
-		lf.forward = (frameCount / lf.framesPerPeriod) % 2 == 0
+		lf.forward = (frameCount/lf.framesPerPeriod)%2 == 0
 	} else {
 		lf.forward = true
 	}
@@ -75,7 +74,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 	// Determine current from -> to animations
 	animationIndex := float32(index) / framesPerSegment
 	from := lf.animators[uint(animationIndex)]
-	to := lf.animators[uint(animationIndex+1) % uint(len(lf.animators))]
+	to := lf.animators[uint(animationIndex+1)%uint(len(lf.animators))]
 
 	// Work out what percentage of from and to animations to show
 	segmentIndex := float32(index) - float32(uint(animationIndex))*framesPerSegment
@@ -90,7 +89,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 	scaleFrameBuffer(frame, fromPercent)
 
 	// Apply the second animation to a temporary in memory buffer and scale with toPercent
-	tmpSegment := segments.NewMemSegment(frame.Len())
+	tmpSegment := segment.NewMemSegment(frame.Len())
 	to.animateFrame(frameCount, tmpSegment)
 	scaleFrameBuffer(tmpSegment, toPercent)
 
@@ -102,7 +101,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame framebuffer.Segment) {
 }
 
 // Scale each colour in the segment by f between 0 -> 1
-func scaleFrameBuffer(segment framebuffer.Segment, f float32) {
+func scaleFrameBuffer(segment segment.Segment, f float32) {
 
 	for i := uint(0); i < segment.Len(); i++ {
 		segment.Set(i, segment.Get(i).ScaleRgb(f))
