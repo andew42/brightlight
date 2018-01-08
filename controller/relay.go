@@ -140,7 +140,7 @@ func initRelayBoard(f *os.File) error {
 	// If we got a response check its the expected one
 	if response[0] != 0xAD {
 		log.WithField("response", response[0]).Warn("initRelayBoard unexpect initialisation response")
-		return errors.New("Unknown relay board")
+		return errors.New("unknown relay board")
 	}
 
 	// Start 'command mode' (0x51) and turn all relays off (0x00)

@@ -76,8 +76,10 @@ https://github.com/go-lang-plugin-org
 With ANSI terminal emulator enabled for logrus
 
 #### To Do
+#####UI
 * Doesn't support landscape well (as home screen app)
 * Doesn't support on call bar well (as home screen app)
+#####Engine
 * Candle
 * Fair ground light chasers
 * Static string (Gazebo lights)

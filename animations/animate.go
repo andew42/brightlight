@@ -99,7 +99,7 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 			4)})
 
 	default:
-		log.WithField("action", seg.Animation).Warn("Unknown animataion action")
+		log.WithField("action", seg.Animation).Warn("Unknown animation action")
 	}
 }
 

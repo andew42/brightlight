@@ -33,7 +33,7 @@ func OptionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.WithFields(map[string]interface{}{"cmd": cmd.Cmd, "parma": cmd.Param}).Info("OptionHandler called")
+	log.WithFields(map[string]interface{}{"cmd": cmd.Cmd, "param": cmd.Param}).Info("OptionHandler called")
 
 	// Perform the command
 	switch cmd.Cmd {

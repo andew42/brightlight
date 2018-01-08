@@ -120,5 +120,5 @@ func (led Rgb) ScaleRgb(f float32) Rgb {
 	return Rgb{
 		Red:   byte(float32(led.Red) * f),
 		Green: byte(float32(led.Green) * f),
-		Blue:  byte(float32(led.Blue) * f)};
+		Blue:  byte(float32(led.Blue) * f)}
 }

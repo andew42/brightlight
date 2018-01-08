@@ -25,6 +25,7 @@
       <w>hacky</w>
       <w>huestate</w>
       <w>ipaddress</w>
+      <w>itoa</w>
       <w>lastscan</w>
       <w>lastupdate</w>
       <w>lastupdated</w>
@@ -45,12 +46,17 @@
       <w>proxyport</w>
       <w>replacesbridgeid</w>
       <w>resourcelinks</w>
+      <w>revalidate</w>
       <w>rootdevice</w>
       <w>starterkit</w>
+      <w>starterkitid</w>
+      <w>strconv</w>
+      <w>stty</w>
       <w>swupdate</w>
       <w>swversion</w>
       <w>transitiontime</w>
       <w>uniqueid</w>
+      <w>usbserial</w>
       <w>xmlns</w>
       <w>zigbee</w>
       <w>zigbeechannel</w>
