@@ -2,12 +2,9 @@ package servers
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/andew42/brightlight/hue"
-	"github.com/andew42/brightlight/segment"
 	"io/ioutil"
 	"net/http"
 	"path"
-	"github.com/andew42/brightlight/config"
 )
 
 // Handle HTTP requests to read and write config
@@ -60,19 +57,5 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 			log.WithField("Method", r.Method).Warn("Unknown config server method")
 			http.Error(w, "Failed to write file", 405)
 		}
-	}
-}
-
-// Push segment names and animations to hue bridge
-func UpdateHueBridgeWithBrightlightConfig(contentPath string, u chan interface{}) {
-
-	// Send the list of segment names
-	for _, s := range segment.GetAllNamedSegmentNames() {
-		u <- hue.SegmentUpdate{NewName: s}
-	}
-
-	// Send the list of user button names
-	for _, p := range config.LoadUserPresets(contentPath) {
-		u <- hue.PresetUpdate{NewName: p.Name}
 	}
 }

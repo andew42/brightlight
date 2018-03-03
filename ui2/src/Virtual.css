@@ -1,0 +1,9 @@
+td.disabled-text {
+    column-span: all;
+    column-width: 10px;
+}
+
+tbody {
+    font-size: xx-small;
+}
+

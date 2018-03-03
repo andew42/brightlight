@@ -4,7 +4,6 @@ import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
-	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/servers"
@@ -15,8 +14,7 @@ import (
 	"os"
 	"path"
 	"runtime"
-	"github.com/andew42/brightlight/hue"
-	"github.com/andew42/brightlight/segment"
+	"github.com/andew42/brightlight/config"
 )
 
 // Wrap a Dir file system server object to log failures
@@ -51,16 +49,11 @@ func main() {
 		Info("brightlight environment")
 
 	// Figure out where the content directory is, GOPATH may contain : separated paths
-	contentPath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight/ui")
-	log.WithField("path", contentPath).
-		Info("HTTP content path")
-
-	// Which interface should we serve on?
-	ii, err := config.GetNetworkInterfaceInfo()
-	if err != nil {
-		log.WithField("error", err).
-			Panic("failed to find suitable network interface")
-	}
+	// contentPath1 supports the original ractive ui
+	contentBasePath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight")
+	log.WithFields(
+		log.Fields{"contentBasePath": contentBasePath}).
+		Info("HTTP content base path")
 
 	// Start drivers
 	controller.StartTeensyDriver()
@@ -70,24 +63,18 @@ func main() {
 	animations.StartDriver(renderer)
 	stats.StartDriver()
 
-	// Optional Hue bridge emulation
-	const hueBridgeEmulationEnabled = false
-	if hueBridgeEmulationEnabled {
-		brightlightUpdateChan := make(chan interface{})
-		brightlightCommandChan := make(chan interface{})
-		if err := hue.StartHueBridgeEmulator(ii, contentPath, brightlightUpdateChan, brightlightCommandChan); err == nil {
-			servers.UpdateHueBridgeWithBrightlightConfig(contentPath, brightlightUpdateChan)
-			go servers.HueAnimationHandler(brightlightCommandChan, segment.GetAllNamedSegmentNames())
-		}
-	}
-
-	// Set up web routes (default / is static content)
+	// Set up static content serving
 	mime.AddExtensionType(".manifest", "text/cache-manifest")
-	fs := http.FileServer(LoggedDir{http.Dir(contentPath)})
-	http.Handle("/", fs)
+	// Serve original ui on /ui
+	fs1 := http.FileServer(LoggedDir{http.Dir(contentBasePath)})
+	http.Handle("/ui/", fs1)
+	// Serve new react ui on /
+	fs2 := http.FileServer(LoggedDir{http.Dir(contentBasePath + "/ui2/build")})
+	http.Handle("/", fs2)
 
 	// Config requires PUT (write) support
-	http.HandleFunc("/config/", servers.GetConfigHandler(contentPath))
+	http.HandleFunc("/config/", servers.GetConfigHandler(contentBasePath+"/ui"))
+	http.HandleFunc("/ui-config/", servers.GetConfigHandler(contentBasePath+"/ui2/build"))
 
 	// Requests to run zero or more animation (json payload)
 	http.HandleFunc("/RunAnimations/", servers.RunAnimationsHandler)
@@ -95,7 +82,7 @@ func main() {
 	// Requests to show a strip length on the room lights
 	http.HandleFunc("/StripLength/", servers.StripLenHandler)
 
-	// Push frame buffer changes over a web socket
+	// Push frame buffer changes over a web socket for virtual framebuffer debugging
 	http.Handle("/FrameBuffer", websocket.Handler(servers.FrameBufferHandler))
 
 	// Push stats info over a web socket
@@ -105,9 +92,15 @@ func main() {
 	http.HandleFunc("/option/", servers.OptionHandler)
 
 	// Start web server
-	log.WithField("address", ii.Ip+ii.Port).
-		Info("serving UI")
-	if err := http.ListenAndServe(ii.Ip+ii.Port, nil); err != nil {
+	ipAndPort, err := config.GetLocalIP()
+	if err != nil {
+		log.WithField("err", err).
+			Fatal("Failed to find an IP address on which to serve content")
+	}
+	ipAndPort += ":8080"
+	log.WithField("address", ipAndPort).
+		Info("serving old UI at /ui/html and new UI at /")
+	if err := http.ListenAndServe(ipAndPort, nil); err != nil {
 		log.Error(err.Error())
 	}
 

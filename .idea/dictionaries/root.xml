@@ -9,8 +9,10 @@
       <w>appdata</w>
       <w>autodelete</w>
       <w>beddy</w>
+      <w>bouncefix</w>
       <w>bridgeid</w>
       <w>brightlight</w>
+      <w>buttonedit</w>
       <w>ceffbe</w>
       <w>colormode</w>
       <w>datastore</w>
@@ -54,6 +56,7 @@
       <w>stty</w>
       <w>swupdate</w>
       <w>swversion</w>
+      <w>touchmove</w>
       <w>transitiontime</w>
       <w>uniqueid</w>
       <w>usbserial</w>

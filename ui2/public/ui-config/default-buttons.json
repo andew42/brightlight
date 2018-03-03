@@ -1,0 +1,156 @@
+[
+  {
+    "name": "OFF",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Static",
+        "params": "000000"
+      }
+    ]
+  },
+  {
+    "name": "Full",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Static",
+        "params": "ffffff"
+      }
+    ]
+  },
+  {
+    "name": "Sweet Shop",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Sweet Shop"
+      }
+    ]
+  },
+  {
+    "name": "Two Tone",
+    "segments": [
+      {
+        "segment": "Bedroom",
+        "animation": "Static",
+        "params": "0004e5"
+      },
+      {
+        "segment": "Bathroom",
+        "animation": "Static",
+        "params": "e400e3"
+      }
+    ]
+  },
+  {
+    "name": "High",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Static",
+        "params": "e0e0e0"
+      }
+    ]
+  },
+  {
+    "name": "Runner",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Runner"
+      }
+    ]
+  },
+  {
+    "name": "Twinkle",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Twinkle"
+      }
+    ]
+  },
+  {
+    "name": "Mid",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Static",
+        "params": "808080"
+      }
+    ]
+  },
+  {
+    "name": "Rainbow",
+    "segments": [
+      {
+        "segment": "Curtains",
+        "animation": "Rainbow"
+      }
+    ]
+  },
+  {
+    "name": "Baby Bows",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "BabyBows"
+      }
+    ]
+  },
+  {
+    "name": "Low",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Static",
+        "params": "3f3f3f"
+      }
+    ]
+  },
+  {
+    "name": "Cylon",
+    "segments": [
+      {
+        "segment": "Curtains",
+        "animation": "Cylon"
+      }
+    ]
+  },
+  {
+    "name": "Sweet Rainbow",
+    "segments": [
+      {
+        "segment": "Bedroom",
+        "animation": "Sweet Shop",
+        "params": "6f16d4"
+      },
+      {
+        "segment": "Bathroom",
+        "animation": "Rainbow",
+        "params": "0016d4"
+      }
+    ]
+  },
+  {
+    "name": "Very Low",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Static",
+        "params": "101010"
+      }
+    ]
+  },
+  {
+    "name": "Nearly Off",
+    "segments": [
+      {
+        "segment": "All",
+        "animation": "Static",
+        "params": "020202"
+      }
+    ]
+  }
+]

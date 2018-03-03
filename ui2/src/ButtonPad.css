@@ -1,0 +1,23 @@
+.Bouncefix {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.button-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 8px;
+    grid-row-gap: 8px;
+    padding: 8px;
+    height: 100%;
+    background-color: purple;
+}
+
+.button-pad > button {
+    border: 2px gainsboro;
+    border-radius: 3px;
+    background-color: gainsboro;
+    padding: 1em;
+    color: purple;
+}

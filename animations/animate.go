@@ -98,6 +98,10 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 				newBulb(framebuffer.Rgb{181, 145, 0}, 3, 1)),
 			4)})
 
+	case "Discrete":
+		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
+			newBulb(framebuffer.NewRgb(255, 255, 255), 0, 1), 15)})
+
 	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animation action")
 	}
