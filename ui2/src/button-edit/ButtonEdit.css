@@ -1,0 +1,12 @@
+.button-edit-editor-list {
+    padding: 8px;
+}
+
+.ok-cancel-container {
+    text-align: right;
+    margin: 16px;
+}
+
+.hidden-dropdown-arrow {
+    appearance: none;
+}

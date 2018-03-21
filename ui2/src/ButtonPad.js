@@ -27,7 +27,7 @@ export default class ButtonPad extends React.Component {
                     <Button key={button.name}
                             onTap={() => runAnimations(button.segments)}
                             onPress={() => {
-                                this.history.push('/button-edit', {'button': button})
+                                this.history.push('/button-edit', {'button': button, 'buttons': this.state.buttons})
                             }}
                             label={button.name}/>)}
                 </div>

@@ -1,4 +1,4 @@
-import {getJson} from "./jsonHttpRequest";
+import {getJson, putJson} from "./jsonHttpRequest";
 
 // Get the list of user defined buttons (or the default set)
 export function getButtons(success, error) {
@@ -11,9 +11,15 @@ export function getButtons(success, error) {
     )
 }
 
+// Save the supplied user defined buttons
+export function saveButtons(buttons, success, error) {
+    putJson('/ui-config/user-buttons.json', buttons, success, error);
+}
+
 // Run an animation
 let busy;
 let nextRunAnimations;
+
 export function runAnimations(segments) {
 
     console.log(segments);

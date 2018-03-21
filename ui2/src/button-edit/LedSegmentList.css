@@ -1,0 +1,9 @@
+.led-segment-list {
+    width: 25%;
+}
+
+.check-mark {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}

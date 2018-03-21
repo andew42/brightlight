@@ -8,7 +8,9 @@
     "react-dom": "^16.2.0",
     "react-helmet": "^5.2.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.0"
+    "react-scripts": "1.1.0",
+    "semantic-ui-css": "^2.2.14",
+    "semantic-ui-react": "^0.78.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -18,7 +20,9 @@
   },
   "proxy": {
     "/": {
-      "target": "ws://localhost:8080/",
+      "target-elms": "ws://192.168.0.77:8080/",
+      "target-phone": "ws://172.20.10.2:8080/",
+      "target": "ws://172.20.10.2:8080/",
       "ws": true
     }
   }

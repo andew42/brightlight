@@ -14,3 +14,11 @@ body {
   -webkit-user-select: none;
   font-family: San-Francisco, HelveticaNeue-Light, sans-serif;
 }
+
+button:focus {
+  outline: 0;
+}
+
+input:focus {
+  outline: 0;
+}
