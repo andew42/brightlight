@@ -12,17 +12,24 @@ export default class LedSegmentList extends React.Component {
 
     renderSegment(seg) {
         return <div className='ui image led-segment-list'>
-            <Image label={seg} src={"/segment-icons/" + encodeURIComponent(seg) + ".svg"}/>
+            <Image label={seg.label} src={"/segment-icons/" + encodeURIComponent(seg.segment) + ".svg"}/>
             <div className='check-mark'>
-                <Icon name='checkmark'/>
+                <Icon name={this.props.selectedItems.includes(seg.segment) ? 'checkmark box' : 'square outline'}/>
             </div>
         </div>;
     }
 
     render() {
-        let segments = ['All', 'All Ceiling', 'All Wall', 'Bathroom', 'Bathroom Ceiling', 'Bathroom Wall',
-            'Bedroom', 'Bedroom Ceiling', 'Bedroom Wall', 'Chest', 'Chest Ceiling', 'Chest Wall',
-            'Curtains', 'Door', 'Dressing', 'Dressing Ceiling', 'Dressing Wall', 'Light Switch'];
+        let segments = [
+            {segment:'All', label:'All'}, {segment:'All Ceiling', label:'Ceiling'}, {segment:'All Wall', label:'Wall'},
+            {segment:'Bedroom', label: 'Bedroom'}, {segment:'Bedroom Ceiling', label:'Ceiling'}, {segment:'Bedroom Wall', label:'Wall'},
+            {segment:'Bathroom', label:'Bathroom'}, {segment:'Bathroom Ceiling', label:'Ceiling'}, {segment:'Bathroom Wall', label:'Wall'},
+            {segment:'Chest', label:'Chest'}, {segment:'Chest Ceiling', label:'Ceiling'}, {segment:'Chest Wall', label:'Wall'},
+            {segment:'Dressing', label:'Dressing'}, {segment:'Dressing Ceiling', label:'Ceiling'}, {segment:'Dressing Wall', label:'Wall'},
+            {segment:'Curtains', label:'Curtains'}, {segment:'Door', label:'Door'}, {segment:'Light Switch', label:'Light Switch'}
+
+        ];
+
         return <Modal trigger={this.props.trigger}
                       open={this.state.isOpen}
         >

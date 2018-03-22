@@ -19,8 +19,8 @@ export default class ButtonEdit extends React.Component {
         this.buttons = props.history.location.state.buttons;
         this.button = props.history.location.state.button;
 
-        // Derive our update state from initial button state
         this.state = {
+            // Initial state of button we are editing
             name: this.button.name,
             segments: JSON.parse(JSON.stringify(this.button.segments))
         };
@@ -46,6 +46,7 @@ export default class ButtonEdit extends React.Component {
     }
 
     render() {
+        let selectedSegments = this.state.segments.map(s => s.segment);
         let key = 1;
         return <div className="button-edit-editor-list">
             <Fragment>
@@ -55,7 +56,8 @@ export default class ButtonEdit extends React.Component {
                     <LedSegment key={key++} segment={segment} onRemove={seg => this.onRemoveSegment(seg)}/>))}
 
                 <div className='ok-cancel-container'>
-                    <LedSegmentList trigger={<Button icon='plus' circular floated='left'></Button>}/>
+                    <LedSegmentList selectedItems={selectedSegments}
+                                    trigger={<Button icon='plus' circular floated='left'></Button>}/>
                     <Button primary onClick={this.onOK}>OK</Button>
                     <Button secondary onClick={() => this.props.history.goBack()}>Cancel</Button>
                 </div>

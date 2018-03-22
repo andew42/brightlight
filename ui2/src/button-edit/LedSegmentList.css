@@ -1,9 +1,15 @@
 .led-segment-list {
-    width: 25%;
+    width: 33%;
+    margin-top: 2px;
+    margin-bottom: 8px;
 }
 
 .check-mark {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 8px;
+    right: 8px;
+}
+
+div.ui.label {
+    /*font-size: x-small;*/
 }
