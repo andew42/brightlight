@@ -6,8 +6,8 @@
 
 .check-mark {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
+    bottom: 2px;
+    right: 14px;
 }
 
 div.ui.label {

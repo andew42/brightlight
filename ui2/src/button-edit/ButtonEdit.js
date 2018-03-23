@@ -22,7 +22,8 @@ export default class ButtonEdit extends React.Component {
         this.state = {
             // Initial state of button we are editing
             name: this.button.name,
-            segments: JSON.parse(JSON.stringify(this.button.segments))
+            segments: JSON.parse(JSON.stringify(this.button.segments)),
+// TODO            selectedSegments: this.state.segments.map(s => s.segment)
         };
         this.onOK = this.onOK.bind(this);
         this.onAddSegment = this.onAddSegment.bind(this);
@@ -45,6 +46,14 @@ export default class ButtonEdit extends React.Component {
         // TODO
     }
 
+    toggleSelectedSegment(segName) {
+        // TODO
+        // if (state.selectedSegments.includes(segName))
+        //     this.setState({selectedSegments: state.selectedSegments.filter(n => n != segName)});
+        // else
+        //     this.setState({selectedSegments: state.s})
+    }
+
     render() {
         let selectedSegments = this.state.segments.map(s => s.segment);
         let key = 1;
@@ -57,6 +66,7 @@ export default class ButtonEdit extends React.Component {
 
                 <div className='ok-cancel-container'>
                     <LedSegmentList selectedItems={selectedSegments}
+                                    toggleSelectedSegment={seg => console.info(seg)}
                                     trigger={<Button icon='plus' circular floated='left'></Button>}/>
                     <Button primary onClick={this.onOK}>OK</Button>
                     <Button secondary onClick={() => this.props.history.goBack()}>Cancel</Button>
