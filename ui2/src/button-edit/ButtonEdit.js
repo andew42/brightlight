@@ -21,12 +21,15 @@ export default class ButtonEdit extends React.Component {
         this.state = {
             name: this.button.name,
             segments: buttonSegmentsCopy,
-            selectedSegments: buttonSegmentsCopy.map(s => s.segment)
+            selectedSegments: buttonSegmentsCopy.map(s => s.segment),
+            isOpen: false
         };
 
         // Callback bindings for this
         this.onOK = this.onOK.bind(this);
         this.toggleSelectedSegment = this.toggleSelectedSegment.bind(this);
+        this.editSegmentListCancel = this.editSegmentListCancel.bind(this);
+        this.editSegmentListOk = this.editSegmentListOk.bind(this);
     }
 
     onOK() {
@@ -52,6 +55,18 @@ export default class ButtonEdit extends React.Component {
         }
     }
 
+    editSegmentListCancel() {
+        this.setState({
+            selectedSegments: this.state.segments.map(s => s.segment),
+            isOpen: false
+        });
+    }
+
+    editSegmentListOk() {
+        // TODO
+        this.setState({isOpen: false});
+    }
+
     render() {
         //let selectedSegments = this.state.segments.map(s => s.segment);
         let key = 1;
@@ -63,9 +78,13 @@ export default class ButtonEdit extends React.Component {
                     <LedSegment key={key++} segment={segment} onRemove={seg => this.onRemoveSegment(seg)}/>))}
 
                 <div className='ok-cancel-container'>
-                    <LedSegmentList selectedItems={this.state.selectedSegments}
+                    <LedSegmentList isOpen={this.state.isOpen}
+                                    onCancel={this.editSegmentListCancel}
+                                    onOk={this.editSegmentListOk}
+                                    selectedItems={this.state.selectedSegments}
                                     toggleSelectedSegment={seg => this.toggleSelectedSegment(seg)}
-                                    trigger={<Button icon='plus' circular floated='left'/>}/>
+                                    trigger={<Button icon='plus' circular floated='left'
+                                                     onClick={() => this.setState({isOpen: true})}/>}/>
                     <Button primary onClick={this.onOK}>OK</Button>
                     <Button secondary onClick={() => this.props.history.goBack()}>Cancel</Button>
                 </div>

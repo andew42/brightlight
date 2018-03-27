@@ -22,36 +22,27 @@ export default class LedSegmentList extends React.Component {
 
     render() {
         let segments = [
-            {segment: 'All', label: 'All'}, {segment: 'All Ceiling', label: 'Ceiling'}, {
-                segment: 'All Wall',
-                label: 'Wall'
-            },
-            {segment: 'Bedroom', label: 'Bedroom'}, {
-                segment: 'Bedroom Ceiling',
-                label: 'Ceiling'
-            }, {segment: 'Bedroom Wall', label: 'Wall'},
-            {segment: 'Bathroom', label: 'Bathroom'}, {
-                segment: 'Bathroom Ceiling',
-                label: 'Ceiling'
-            }, {segment: 'Bathroom Wall', label: 'Wall'},
-            {segment: 'Chest', label: 'Chest'}, {segment: 'Chest Ceiling', label: 'Ceiling'}, {
-                segment: 'Chest Wall',
-                label: 'Wall'
-            },
-            {segment: 'Dressing', label: 'Dressing'}, {
-                segment: 'Dressing Ceiling',
-                label: 'Ceiling'
-            }, {segment: 'Dressing Wall', label: 'Wall'},
-            {segment: 'Curtains', label: 'Curtains'}, {segment: 'Door', label: 'Door'}, {
-                segment: 'Light Switch',
-                label: 'Light Switch'
-            }
-
+            {segment: 'All', label: 'All'},
+            {segment: 'All Ceiling', label: 'Ceiling'},
+            {segment: 'All Wall', label: 'Wall'},
+            {segment: 'Bedroom', label: 'Bedroom'},
+            {segment: 'Bedroom Ceiling', label: 'Ceiling'},
+            {segment: 'Bedroom Wall', label: 'Wall'},
+            {segment: 'Bathroom', label: 'Bathroom'},
+            {segment: 'Bathroom Ceiling', label: 'Ceiling'},
+            {segment: 'Bathroom Wall', label: 'Wall'},
+            {segment: 'Chest', label: 'Chest'},
+            {segment: 'Chest Ceiling', label: 'Ceiling'},
+            {segment: 'Chest Wall', label: 'Wall'},
+            {segment: 'Dressing', label: 'Dressing'},
+            {segment: 'Dressing Ceiling', label: 'Ceiling'},
+            {segment: 'Dressing Wall', label: 'Wall'},
+            {segment: 'Curtains', label: 'Curtains'},
+            {segment: 'Door', label: 'Door'},
+            {segment: 'Light Switch', label: 'Light Switch'}
         ];
 
-        return <Modal trigger={this.props.trigger}
-                      open={this.state.isOpen}
-        >
+        return <Modal trigger={this.props.trigger} open={this.props.isOpen}>
             <Modal.Header>Select Light Segment</Modal.Header>
             <Modal.Content scrolling>
                 <Modal.Description>
@@ -59,8 +50,8 @@ export default class LedSegmentList extends React.Component {
                 </Modal.Description>
             </Modal.Content>
             <Modal.Actions>
-                <Button primary content='OK'/>
-                <Button content='Cancel' onClick={() => this.setState({isOpen: false})}/>
+                <Button primary content='OK' onClick={this.props.onOk}/>
+                <Button content='Cancel' onClick={this.props.onCancel}/>
             </Modal.Actions>
         </Modal>
     }

@@ -15,12 +15,12 @@ const Home = () => (
     </nav>
 );
 
-// The main application navigates between components TODO trap button long press and move to button edit...
+// The main application navigates between components
 class App extends Component {
 
     render() {
         return (
-            <div className="App">
+            <div className="App" onContextMenu={e => e.preventDefault()}>
                 <Helmet>
                     <meta name="apple-mobile-web-app-capable" content="yes"/>
                     <title>Bright Light</title>
