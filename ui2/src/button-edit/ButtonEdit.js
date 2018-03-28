@@ -35,13 +35,16 @@ export default class ButtonEdit extends React.Component {
     onOK() {
         // Update button object and save to server
         this.button.name = this.state.name;
-        // TODO: Better error handling
+        // TODO: Full update and better error handling
         saveButtons(this.buttons, () => this.props.history.goBack(), e => console.error(e));
     }
 
     onRemoveSegment(segment) {
         console.info('removing segment ' + segment.segment);
-        this.setState({segments: this.state.segments.filter(seg => seg !== segment)})
+        this.setState({
+            segments: this.state.segments.filter(seg => seg !== segment),
+            selectedSegments: this.state.selectedSegments.filter(seg => seg !== segment.segment)
+        })
     }
 
     toggleSelectedSegment(segName) {
@@ -57,18 +60,32 @@ export default class ButtonEdit extends React.Component {
 
     editSegmentListCancel() {
         this.setState({
+            // Restore selected segment list as user canceled
             selectedSegments: this.state.segments.map(s => s.segment),
             isOpen: false
         });
     }
 
     editSegmentListOk() {
-        // TODO
-        this.setState({isOpen: false});
+        let segments = this.state.segments;
+        let selectedSegments = this.state.selectedSegments;
+        // Build new segments from selectedSegments
+        let updatedSegments = selectedSegments.map(seg => {
+            // Use existing segment if its still selected
+            let foundSegment = segments.find(s => s.segment === seg);
+            if (foundSegment !== undefined)
+                return foundSegment;
+            // Here if we have a new segment to add (default static animation)
+            return {
+                "segment": seg,
+                "animation": "Static",
+                "params": "3f3f3f"
+            }
+        });
+        this.setState({isOpen: false, segments: updatedSegments});
     }
 
     render() {
-        //let selectedSegments = this.state.segments.map(s => s.segment);
         let key = 1;
         return <div className="button-edit-editor-list">
             <Fragment>
