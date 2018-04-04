@@ -1,6 +1,7 @@
 import * as React from "react";
 import './ButtonPad.css';
-import {getButtons, runAnimations} from "./server-proxy/buttons";
+import {getButtons} from "../server-proxy/buttons";
+import {runAnimation} from "../server-proxy/animation";
 import {Bouncefix} from "./Bouncefix";
 import Button from "./Button";
 
@@ -25,7 +26,7 @@ export default class ButtonPad extends React.Component {
             <div>
                 <div className="button-pad">{this.state.buttons.map((button) =>
                     <Button key={button.name}
-                            onTap={() => runAnimations(button.segments)}
+                            onTap={() => runAnimation(button.segments)}
                             onPress={() => {
                                 this.history.push('/button-edit', {'button': button, 'buttons': this.state.buttons})
                             }}

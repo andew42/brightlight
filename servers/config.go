@@ -30,7 +30,7 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 
 			log.WithField("FullPath", fullPath).Info("configHandler PUT called")
 
-			// Only support user.json and user-buttons.json
+			// Only support writing user.json (ui) and user-buttons.json (ui2)
 			if r.URL.Path != "/config/user.json" && r.URL.Path != "/ui-config/user-buttons.json" {
 				log.WithField("FileName", r.URL.Path).Warn("Unsupported config file name")
 				http.Error(w, "File name not allowed", 401)

@@ -1,6 +1,6 @@
 import * as React from "react";
 import './Virtual.css';
-import {Open} from "./server-proxy/frameBuffer";
+import {Open} from "../server-proxy/frameBuffer";
 
 // Displays the frame buffer as a two dimensional array of pixels
 export default class Virtual extends React.Component {

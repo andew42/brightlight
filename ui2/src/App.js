@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {Helmet} from "react-helmet";
 import './App.css';
-import ButtonPad from "./ButtonPad";
+import ButtonPad from "./buttons/ButtonPad";
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
-import Virtual from "./Virtual";
+import Virtual from "./virtual/Virtual";
 import ButtonEdit from "./button-edit/ButtonEdit";
 
 // Home page is just a bunch of links for now

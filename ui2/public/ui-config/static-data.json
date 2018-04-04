@@ -1,0 +1,37 @@
+{
+  "animations": [
+    "Off",
+    "Static",
+    "Cylon",
+    "Rainbow",
+    "Runner",
+    "Sweet Shop",
+    "Twinkle",
+    "BabyBows",
+    "Christmas",
+    "Fairground",
+    "Discrete"
+  ],
+  "segments": [
+    {"segment": "All", "label": "All"},
+    {"segment": "All Ceiling", "label": "Ceiling"},
+    {"segment": "All Wall", "label": "Wall"},
+    {"segment": "Bedroom", "label": "Bedroom"},
+    {"segment": "Bedroom Ceiling", "label": "Ceiling"},
+    {"segment": "Bedroom Wall", "label": "Wall"},
+    {"segment": "Bathroom", "label": "Bathroom"},
+    {"segment": "Bathroom Ceiling", "label": "Ceiling"},
+    {"segment": "Bathroom Wall", "label": "Wall"},
+    {"segment": "Chest", "label": "Chest"},
+    {"segment": "Chest Ceiling", "label": "Ceiling"},
+    {"segment": "Chest Wall", "label": "Wall"},
+    {"segment": "Dressing", "label": "Dressing"},
+    {"segment": "Dressing Ceiling", "label": "Ceiling"},
+    {"segment": "Dressing Wall", "label": "Wall"},
+    {"segment": "Curtains", "label": "Curtains"},
+    {"segment": "Door", "label": "Door"},
+    {"segment": "Light Switch", "label": "Light Switch"},
+    {"segment": "Strip Three", "label": "Strip Three"},
+    {"segment": "Strip Five", "label": "Strip Five"}
+  ]
+}

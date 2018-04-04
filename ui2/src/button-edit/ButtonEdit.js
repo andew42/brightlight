@@ -6,6 +6,7 @@ import {saveButtons} from "../server-proxy/buttons";
 import {Button} from "semantic-ui-react";
 import LedSegment from "./LedSegment";
 import LedSegmentList from "./LedSegmentList";
+import {getStaticData} from "../server-proxy/staticData";
 
 // Shows a list of editors that change to suit the animation
 export default class ButtonEdit extends React.Component {
@@ -22,7 +23,9 @@ export default class ButtonEdit extends React.Component {
             name: this.button.name,
             segments: buttonSegmentsCopy,
             selectedSegments: buttonSegmentsCopy.map(s => s.segment),
-            isOpen: false
+            isOpen: false,
+            segmentNames: [],
+            animationNames: []
         };
 
         // Callback bindings for this
@@ -32,11 +35,18 @@ export default class ButtonEdit extends React.Component {
         this.editSegmentListOk = this.editSegmentListOk.bind(this);
     }
 
+    // Get static data from server when mounting
+    componentDidMount() {
+        getStaticData(sd => this.setState({segmentNames: sd.segments, animationNames: sd.animations}),
+            (xhr) => console.error(xhr)); // TODO: Report errors to user
+    }
+
     onOK() {
         // Update button object and save to server
         this.button.name = this.state.name;
         // TODO: Full update and better error handling
-        saveButtons(this.buttons, () => this.props.history.goBack(), e => console.error(e));
+        saveButtons(this.buttons, () => this.props.history.goBack(),
+            e => console.error(e));
     }
 
     onRemoveSegment(segment) {
@@ -96,6 +106,7 @@ export default class ButtonEdit extends React.Component {
 
                 <div className='ok-cancel-container'>
                     <LedSegmentList isOpen={this.state.isOpen}
+                                    segmentNames={this.state.segmentNames}
                                     onCancel={this.editSegmentListCancel}
                                     onOk={this.editSegmentListOk}
                                     selectedItems={this.state.selectedSegments}

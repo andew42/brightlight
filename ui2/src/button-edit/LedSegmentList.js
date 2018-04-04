@@ -21,32 +21,11 @@ export default class LedSegmentList extends React.Component {
     }
 
     render() {
-        let segments = [
-            {segment: 'All', label: 'All'},
-            {segment: 'All Ceiling', label: 'Ceiling'},
-            {segment: 'All Wall', label: 'Wall'},
-            {segment: 'Bedroom', label: 'Bedroom'},
-            {segment: 'Bedroom Ceiling', label: 'Ceiling'},
-            {segment: 'Bedroom Wall', label: 'Wall'},
-            {segment: 'Bathroom', label: 'Bathroom'},
-            {segment: 'Bathroom Ceiling', label: 'Ceiling'},
-            {segment: 'Bathroom Wall', label: 'Wall'},
-            {segment: 'Chest', label: 'Chest'},
-            {segment: 'Chest Ceiling', label: 'Ceiling'},
-            {segment: 'Chest Wall', label: 'Wall'},
-            {segment: 'Dressing', label: 'Dressing'},
-            {segment: 'Dressing Ceiling', label: 'Ceiling'},
-            {segment: 'Dressing Wall', label: 'Wall'},
-            {segment: 'Curtains', label: 'Curtains'},
-            {segment: 'Door', label: 'Door'},
-            {segment: 'Light Switch', label: 'Light Switch'}
-        ];
-
         return <Modal trigger={this.props.trigger} open={this.props.isOpen}>
             <Modal.Header>Select Light Segment</Modal.Header>
             <Modal.Content scrolling>
                 <Modal.Description>
-                    {segments.map(seg => this.renderSegment(seg))}
+                    {this.props.segmentNames.map(seg => this.renderSegment(seg))}
                 </Modal.Description>
             </Modal.Content>
             <Modal.Actions>
