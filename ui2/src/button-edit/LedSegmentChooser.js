@@ -1,8 +1,8 @@
 import * as React from "react";
-import './LedSegmentList.css';
+import './LedSegmentChooser.css';
 import {Button, Checkbox, Image, Modal} from "semantic-ui-react";
 
-export default class LedSegmentList extends React.Component {
+export default class LedSegmentChooser extends React.Component {
 
     constructor(props) {
         super(props);

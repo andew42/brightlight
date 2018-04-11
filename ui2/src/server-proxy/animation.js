@@ -1,4 +1,3 @@
-// Run an animation
 let busy;
 let nextRunAnimation;
 

@@ -1,5 +1,5 @@
-// Returns a web socket to for a frame buffer connection
-// The caller should close the returned socket when done
+// Returns a web socket for a frame buffer connection
+// The caller should close returned socket when done
 // Calls cb with each frame buffer frame every 40ms
 export function Open(cb) {
 

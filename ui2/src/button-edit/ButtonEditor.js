@@ -1,15 +1,15 @@
 import * as React from "react";
 import {Fragment} from "react";
-import NameEditor from "./NameEditor";
-import './ButtonEdit.css';
+import './ButtonEditor.css';
 import {saveButtons} from "../server-proxy/buttons";
 import {Button} from "semantic-ui-react";
-import LedSegment from "./LedSegment";
-import LedSegmentList from "./LedSegmentList";
+import LedSegmentChooser from "./LedSegmentChooser";
 import {getStaticData} from "../server-proxy/staticData";
+import {LedSegmentEditor} from "./LedSegmentEditor";
+import {NameEditor} from "./NameEditor";
 
 // Shows a list of editors that change to suit the animation
-export default class ButtonEdit extends React.Component {
+export default class ButtonEditor extends React.Component {
     constructor(props) {
         super(props);
 
@@ -95,24 +95,36 @@ export default class ButtonEdit extends React.Component {
         this.setState({isOpen: false, segments: updatedSegments});
     }
 
+    // The animation on a particular segment has changed
+    onAnimationNameChange(seg, val) {
+
+        let newSegments = this.state.segments.map(s => s !== seg ? s : Object.assign({}, s, {animation: val}));
+        this.setState({segments: newSegments});
+    }
+
     render() {
         let key = 1;
+        let animationNames = this.state.animationNames.map(n => ({'text': n, 'value': n}));
         return <div className="button-edit-editor-list">
             <Fragment>
                 <NameEditor name={this.state.name} onNameChanged={name => this.setState({name: name})}/>
 
                 {this.state.segments.map(segment => (
-                    <LedSegment key={key++} segment={segment} onRemove={seg => this.onRemoveSegment(seg)}/>))}
+                    <LedSegmentEditor key={key++}
+                                      segment={segment}
+                                      onRemove={seg => this.onRemoveSegment(seg)}
+                                      onAnimationNameChange={(e, d) => this.onAnimationNameChange(segment, d.value)}
+                                      animationNames={animationNames}/>))}
 
                 <div className='ok-cancel-container'>
-                    <LedSegmentList isOpen={this.state.isOpen}
-                                    segmentNames={this.state.segmentNames}
-                                    onCancel={this.editSegmentListCancel}
-                                    onOk={this.editSegmentListOk}
-                                    selectedItems={this.state.selectedSegments}
-                                    toggleSelectedSegment={seg => this.toggleSelectedSegment(seg)}
-                                    trigger={<Button icon='plus' circular floated='left'
-                                                     onClick={() => this.setState({isOpen: true})}/>}/>
+                    <LedSegmentChooser isOpen={this.state.isOpen}
+                                       segmentNames={this.state.segmentNames}
+                                       onCancel={this.editSegmentListCancel}
+                                       onOk={this.editSegmentListOk}
+                                       selectedItems={this.state.selectedSegments}
+                                       toggleSelectedSegment={seg => this.toggleSelectedSegment(seg)}
+                                       trigger={<Button icon='plus' circular floated='left'
+                                                        onClick={() => this.setState({isOpen: true})}/>}/>
                     <Button primary onClick={this.onOK}>OK</Button>
                     <Button secondary onClick={() => this.props.history.goBack()}>Cancel</Button>
                 </div>

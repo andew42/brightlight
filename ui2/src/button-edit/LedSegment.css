@@ -1,8 +1,0 @@
-.led-segment-container {
-    display: grid;
-    grid-template-columns: auto 1fr;
-}
-
-.led-segment-image {
-    align-content: left;
-}

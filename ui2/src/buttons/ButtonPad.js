@@ -13,14 +13,12 @@ export default class ButtonPad extends React.Component {
         this.history = props.history
     }
 
-    // Get buttons from server when mounting
     componentDidMount() {
         // Retrieve button state from server to update our state
         getButtons((buttons) => this.setState({buttons: buttons}),
             (xhr) => console.error(xhr))
     }
 
-    // Draw
     render() {
         return <Bouncefix className="Bouncefix">
             <div>

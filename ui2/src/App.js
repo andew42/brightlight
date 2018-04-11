@@ -4,7 +4,7 @@ import './App.css';
 import ButtonPad from "./buttons/ButtonPad";
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
 import Virtual from "./virtual/Virtual";
-import ButtonEdit from "./button-edit/ButtonEdit";
+import ButtonEditor from "./button-edit/ButtonEditor";
 
 // Home page is just a bunch of links for now
 const Home = () => (
@@ -28,7 +28,7 @@ class App extends Component {
                 <BrowserRouter>
                     <Switch>
                         <Route path="/buttons" component={ButtonPad}/>
-                        <Route path="/button-edit" component={ButtonEdit}/>
+                        <Route path="/button-edit" component={ButtonEditor}/>
                         <Route path="/virtual" component={Virtual}/>
                         <Route path="/" component={Home}/>
                     </Switch>
