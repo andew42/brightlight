@@ -1,0 +1,11 @@
+.colour-editor-container {
+    display: flex;
+    align-items: center;
+    margin: .5rem;
+}
+
+.colour-patch {
+    width: 2.2rem;
+    height: 2rem;
+    border-radius: .25rem;
+}
