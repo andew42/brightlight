@@ -1,6 +1,7 @@
 import * as React from "react";
 import {Dropdown, Image, Label, Segment} from "semantic-ui-react";
 import './LedSegmentEditor.css';
+import {ColourEditor} from "./ColourEditor";
 
 export function LedSegmentEditor(props) {
     return <Segment attached color='blue' className='led-segment-container'>
@@ -18,7 +19,9 @@ export function LedSegmentEditor(props) {
                       options={props.animationNames}
                       onChange={props.onAnimationNameChange}
                       className='led-segment-animation-name'/>
-            <div className='led-segment-param'>{props.segment.params}</div>
+            <div className='led-segment-parameters'>
+                <ColourEditor colour={'#' + props.segment.params}/>
+            </div>
         </div>
     </Segment>;
 }
