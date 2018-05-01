@@ -4,10 +4,16 @@ import {Button, Checkbox, Image, Modal} from "semantic-ui-react";
 
 export default class LedSegmentChooser extends React.Component {
 
+    // props
+    //   selectedItems
+    //   trigger - button used to open chooser
+    //   isOpen - is the editor visible
+    //   allSegmentNames - the list of segments to choose from
+    //   toggleSelectedSegment - function to call when a segment is toggled
+    //   onOK - function to call when user hits OK
+    //   onCancel - function to call when user hits cancel
     constructor(props) {
         super(props);
-
-        this.state = {isOpen: true};
     }
 
     renderSegment(seg) {
@@ -25,7 +31,7 @@ export default class LedSegmentChooser extends React.Component {
             <Modal.Header>Select Light Segment</Modal.Header>
             <Modal.Content scrolling>
                 <Modal.Description>
-                    {this.props.segmentNames.map(seg => this.renderSegment(seg))}
+                    {this.props.allSegmentNames.map(seg => this.renderSegment(seg))}
                 </Modal.Description>
             </Modal.Content>
             <Modal.Actions>

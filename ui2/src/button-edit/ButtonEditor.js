@@ -17,15 +17,28 @@ export default class ButtonEditor extends React.Component {
         this.buttons = props.history.location.state.buttons;
         this.button = props.history.location.state.button;
 
-        // Copy the initial state of the button we are editing
+        // Copy the initial state of the button we are editing e.g.
+        // {
+        //     "name": "Cylon",
+        //     "segments": [
+        //     {
+        //         "segment": "Curtains",
+        //         "animation": "Cylon"
+        //     }]
+        // }
         let buttonSegmentsCopy = JSON.parse(JSON.stringify(this.button.segments));
         this.state = {
+            // Is the editor shown
+            isOpen: false,
+
+            // Static data
+            allSegmentNames: [],
+            allAnimationNames: [],
+
+            // The button we are editing
             name: this.button.name,
             segments: buttonSegmentsCopy,
             selectedSegments: buttonSegmentsCopy.map(s => s.segment),
-            isOpen: false,
-            segmentNames: [],
-            animationNames: []
         };
 
         // Callback bindings for this
@@ -37,7 +50,7 @@ export default class ButtonEditor extends React.Component {
 
     // Get static data from server when mounting
     componentDidMount() {
-        getStaticData(sd => this.setState({segmentNames: sd.segments, animationNames: sd.animations}),
+        getStaticData(sd => this.setState({allSegmentNames: sd.segments, allAnimationNames: sd.animations}),
             (xhr) => console.error(xhr)); // TODO: Report errors to user
     }
 
@@ -81,7 +94,7 @@ export default class ButtonEditor extends React.Component {
         let selectedSegments = this.state.selectedSegments;
         // Build new segments from selectedSegments
         let updatedSegments = selectedSegments.map(seg => {
-            // Use existing segment if its still selected
+            // Use existing segment if it's still selected
             let foundSegment = segments.find(s => s.segment === seg);
             if (foundSegment !== undefined)
                 return foundSegment;
@@ -104,7 +117,7 @@ export default class ButtonEditor extends React.Component {
 
     render() {
         let key = 1;
-        let animationNames = this.state.animationNames.map(n => ({'text': n, 'value': n}));
+        let animationNames = this.state.allAnimationNames.map(n => ({'text': n, 'value': n}));
         return <div className="button-edit-editor-list">
             <Fragment>
                 <NameEditor name={this.state.name} onNameChanged={name => this.setState({name: name})}/>
@@ -118,7 +131,7 @@ export default class ButtonEditor extends React.Component {
 
                 <div className='ok-cancel-container'>
                     <LedSegmentChooser isOpen={this.state.isOpen}
-                                       segmentNames={this.state.segmentNames}
+                                       allSegmentNames={this.state.allSegmentNames}
                                        onCancel={this.editSegmentListCancel}
                                        onOk={this.editSegmentListOk}
                                        selectedItems={this.state.selectedSegments}

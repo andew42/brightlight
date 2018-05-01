@@ -1,0 +1,25 @@
+.vs-slider-track {
+    height: 100%;
+}
+
+.vs-slider-thumb-container {
+    position: relative;
+    left: 100%;
+}
+
+.vs-slider-thumb {
+    position: absolute;
+    margin-top: -7px;
+    margin-left: 3px;
+    border-style: solid;
+    border-width: 7px 13px 7px 0;
+    border-color: transparent #808080 transparent transparent;
+}
+
+.vs-slider-thumb-anno {
+    position: absolute;
+    margin-top: 7px;
+    margin-left: 3px;
+    font-size: xx-small;
+    color: grey;
+}

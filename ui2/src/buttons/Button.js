@@ -38,9 +38,10 @@ export default class Button extends React.Component {
     }
 
     render() {
-        return <button ref={(domElement) => {
-            this.domButton = domElement;
-        }}>
+        return <button style={this.props.style}
+                       ref={(domElement) => {
+                           this.domButton = domElement;
+                       }}>
             {this.props.label}
         </button>
     }

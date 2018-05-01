@@ -1,0 +1,52 @@
+.cp-content-height {
+    height: 20rem;
+}
+
+.cp-sliders {
+    position: absolute;
+    top: 60px;
+    bottom: 80px;
+    width: 100%;
+}
+
+.cp-slider {
+    float: left;
+    width: 30%;
+    height: 100%;
+    padding: 15px;
+}
+
+/* 0 - 360 in 60 degree stops http://en.wikipedia.org/wiki/HSL_and_HSV */
+.cp-slider-hue > div {
+    background-image: linear-gradient(
+            to top,
+            #ff0000,
+            #ffff00,
+            #00ff00,
+            #00ffff,
+            #0000ff,
+            #ff00ff,
+            #ff0000
+    );
+}
+
+.cp-slider-saturation > div {
+    background-image: linear-gradient(to top, #fff, rgba(204, 154, 129, 0));
+}
+
+.cp-slider-value > div {
+    background-image: linear-gradient(to top, #000, rgba(204, 154, 129, 0));
+}
+
+@media only screen
+and (min-device-width: 375px)
+and (max-device-width: 667px)
+and (orientation: portrait) {
+    /* Make fat sliders a bit fatter on iPhone6 */
+    .cp-slider {
+        float: left;
+        width: 105px;
+        height: 100%;
+        padding: 20px;
+    }
+}

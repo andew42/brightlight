@@ -1,6 +1,7 @@
 <component name="ProjectDictionaryState">
   <dictionary name="andrew">
     <words>
+      <w>anno</w>
       <w>ctor</w>
       <w>cylon</w>
       <w>dropdown</w>
@@ -9,14 +10,19 @@
       <w>gopath</w>
       <w>leds</w>
       <w>logrus</w>
+      <w>mousedown</w>
+      <w>mousemove</w>
+      <w>mouseup</w>
       <w>onclose</w>
       <w>onerror</w>
       <w>onmessage</w>
       <w>onopen</w>
       <w>onreadystatechange</w>
+      <w>ontouchstart</w>
       <w>qsub</w>
       <w>ractive</w>
       <w>teensy</w>
+      <w>touchstart</w>
       <w>unescape</w>
       <w>unmount</w>
       <w>upnp</w>
