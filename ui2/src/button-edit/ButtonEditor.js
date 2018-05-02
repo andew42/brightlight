@@ -28,9 +28,6 @@ export default class ButtonEditor extends React.Component {
         // }
         let buttonSegmentsCopy = JSON.parse(JSON.stringify(this.button.segments));
         this.state = {
-            // Is the editor shown
-            isOpen: false,
-
             // Static data
             allSegmentNames: [],
             allAnimationNames: [],
@@ -84,8 +81,7 @@ export default class ButtonEditor extends React.Component {
     editSegmentListCancel() {
         this.setState({
             // Restore selected segment list as user canceled
-            selectedSegments: this.state.segments.map(s => s.segment),
-            isOpen: false
+            selectedSegments: this.state.segments.map(s => s.segment)
         });
     }
 
@@ -105,7 +101,7 @@ export default class ButtonEditor extends React.Component {
                 "params": "3f3f3f"
             }
         });
-        this.setState({isOpen: false, segments: updatedSegments});
+        this.setState({segments: updatedSegments});
     }
 
     // The animation on a particular segment has changed
@@ -130,14 +126,14 @@ export default class ButtonEditor extends React.Component {
                                       animationNames={animationNames}/>))}
 
                 <div className='ok-cancel-container'>
-                    <LedSegmentChooser isOpen={this.state.isOpen}
-                                       allSegmentNames={this.state.allSegmentNames}
+                    <LedSegmentChooser allSegmentNames={this.state.allSegmentNames}
                                        onCancel={this.editSegmentListCancel}
                                        onOk={this.editSegmentListOk}
-                                       selectedItems={this.state.selectedSegments}
-                                       toggleSelectedSegment={seg => this.toggleSelectedSegment(seg)}
-                                       trigger={<Button icon='plus' circular floated='left'
-                                                        onClick={() => this.setState({isOpen: true})}/>}/>
+                                       checkedSegmentNames={this.state.selectedSegments}
+                                       toggleCheckedSegment={seg => this.toggleSelectedSegment(seg)}
+                                       trigger={<Button icon='plus'
+                                                        circular
+                                                        floated='left'/>}/>
                     <Button primary onClick={this.onOK}>OK</Button>
                     <Button secondary onClick={() => this.props.history.goBack()}>Cancel</Button>
                 </div>
