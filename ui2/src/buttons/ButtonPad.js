@@ -34,4 +34,3 @@ export default class ButtonPad extends React.Component {
         </Bouncefix>
     }
 }
-

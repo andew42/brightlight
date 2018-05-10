@@ -1,17 +1,17 @@
-.led-segment-container {
+.lse-container {
     display: grid;
     grid-template-columns: auto 1fr;
     padding: 0px!important;
 }
 
-.led-segment-image {
+.lse-image {
     margin: 6px 4px 4px;
 }
 
-.led-segment-animation-name {
+.lse-animation-name {
     margin: 4px;
 }
 
-.led-segment-parameters {
+.lse-parameters {
     margin: 1rem;
 }

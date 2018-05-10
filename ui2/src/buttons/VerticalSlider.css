@@ -1,5 +1,6 @@
 .vs-slider-track {
     height: 100%;
+    border-radius: 10px;
 }
 
 .vs-slider-thumb-container {

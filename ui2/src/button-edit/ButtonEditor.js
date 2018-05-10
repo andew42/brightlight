@@ -114,7 +114,7 @@ export default class ButtonEditor extends React.Component {
     render() {
         let key = 1;
         let animationNames = this.state.allAnimationNames.map(n => ({'text': n, 'value': n}));
-        return <div className="button-edit-editor-list">
+        return <div className="button-editor-editor-list">
             <Fragment>
                 <NameEditor name={this.state.name} onNameChanged={name => this.setState({name: name})}/>
 
@@ -123,9 +123,9 @@ export default class ButtonEditor extends React.Component {
                                       segment={segment}
                                       onRemove={seg => this.onRemoveSegment(seg)}
                                       onAnimationNameChange={(e, d) => this.onAnimationNameChange(segment, d.value)}
-                                      animationNames={animationNames}/>))}
+                                      allAnimationNames={animationNames}/>))}
 
-                <div className='ok-cancel-container'>
+                <div className='button-editor-ok-cancel-container'>
                     <LedSegmentChooser allSegmentNames={this.state.allSegmentNames}
                                        onCancel={this.editSegmentListCancel}
                                        onOk={this.editSegmentListOk}

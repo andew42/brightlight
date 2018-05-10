@@ -26,11 +26,11 @@ export default class LedSegmentChooser extends React.Component {
     };
 
     renderSegment(seg) {
-        return <div className='ui image led-segment-list'
+        return <div className='ui image lsc-led-segment-list'
                     key={seg.segment}>
             <Image label={seg.label}
                    src={"/segment-icons/" + encodeURIComponent(seg.segment) + ".svg"}/>
-            <div className='check-mark'>
+            <div className='lsc-check-mark'>
                 <Checkbox checked={this.props.checkedSegmentNames.includes(seg.segment)}
                           onChange={() => this.props.toggleCheckedSegment(seg.segment)}/>
             </div>

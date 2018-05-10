@@ -20,12 +20,12 @@ export default class VerticalSlider extends React.Component {
         }
 
         // Control range (typically 360 or 100)
-        var range = max - min;
+        let range = max - min;
 
         // Helper converts pixel positions into range position and calls onValueChange
-        var updatePosition = function (mouseX, mouseY) {
+        let updatePosition = function (mouseX, mouseY) {
 
-            var r = el.getBoundingClientRect();
+            let r = el.getBoundingClientRect();
 
             // Ensure mouse / finger is within control
             if (mouseX < r.left || mouseX > r.right || mouseY > r.bottom || mouseY < r.top) {
@@ -33,7 +33,7 @@ export default class VerticalSlider extends React.Component {
             }
 
             // Where is the mouse positioned within track
-            var pos;
+            let pos;
             if ((r.bottom - mouseY) < padding) {
                 // Position is in the lower dead zone
                 pos = 0;
@@ -69,25 +69,25 @@ export default class VerticalSlider extends React.Component {
         if ('ontouchstart' in window)
             return;
 
-        var mousedown = false;
+        let mousedown = false;
 
         // Track mouse downs over document
         el.addEventListener('mousedown', function (evt) {
-            console.info('Mouse Down')
+            console.info('Mouse Down');
             mousedown = true;
             updatePosition(evt.clientX, evt.clientY);
         });
 
         // Track mouse up over document
         el.addEventListener('mouseup', function () {
-            console.info('Mouse Up')
+            console.info('Mouse Up');
             mousedown = false;
         }, true);
 
         // Track mouse move over slider track
         el.addEventListener('mousemove', function (evt) {
             if (mousedown) {
-                console.info('Update')
+                console.info('Update');
                 updatePosition(evt.clientX, evt.clientY);
             }
         }, true);

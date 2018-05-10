@@ -1,11 +1,18 @@
 .cp-content-height {
-    height: 20rem;
+    height: 25rem;
+}
+
+.cp-colour-swatch {
+    width: 80%;
+    margin-left: 10%;
+    height: 40px;
+    border-radius: 10px;
 }
 
 .cp-sliders {
     position: absolute;
-    top: 60px;
-    bottom: 80px;
+    top: 104px;
+    bottom: 69px;
     width: 100%;
 }
 
@@ -36,17 +43,4 @@
 
 .cp-slider-value > div {
     background-image: linear-gradient(to top, #000, rgba(204, 154, 129, 0));
-}
-
-@media only screen
-and (min-device-width: 375px)
-and (max-device-width: 667px)
-and (orientation: portrait) {
-    /* Make fat sliders a bit fatter on iPhone6 */
-    .cp-slider {
-        float: left;
-        width: 105px;
-        height: 100%;
-        padding: 20px;
-    }
 }
