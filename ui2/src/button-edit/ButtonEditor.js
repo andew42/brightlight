@@ -1,141 +1,102 @@
 import * as React from "react";
 import {Fragment} from "react";
 import './ButtonEditor.css';
-import {saveButtons} from "../server-proxy/buttons";
 import {Button} from "semantic-ui-react";
-import LedSegmentChooser from "./LedSegmentChooser";
-import {getStaticData} from "../server-proxy/staticData";
 import {LedSegmentEditor} from "./LedSegmentEditor";
 import {NameEditor} from "./NameEditor";
+import LedSegmentChooser from "./LedSegmentChooser";
 
 // Shows a list of editors that change to suit the animation
 export default class ButtonEditor extends React.Component {
-    constructor(props) {
-        super(props);
 
-        // We expect to be passed all buttons and button to edit in location state
-        this.buttons = props.history.location.state.buttons;
-        this.button = props.history.location.state.button;
-
-        // Copy the initial state of the button we are editing e.g.
-        // {
-        //     "name": "Cylon",
-        //     "segments": [
-        //     {
-        //         "segment": "Curtains",
-        //         "animation": "Cylon"
-        //     }]
-        // }
-        let buttonSegmentsCopy = JSON.parse(JSON.stringify(this.button.segments));
-        this.state = {
-            // Static data
-            allSegmentNames: [],
-            allAnimationNames: [],
-
-            // The button we are editing
-            name: this.button.name,
-            segments: buttonSegmentsCopy,
-            selectedSegments: buttonSegmentsCopy.map(s => s.segment),
-        };
-
-        // Callback bindings for this
-        this.onOK = this.onOK.bind(this);
-        this.toggleSelectedSegment = this.toggleSelectedSegment.bind(this);
-        this.editSegmentListCancel = this.editSegmentListCancel.bind(this);
-        this.editSegmentListOk = this.editSegmentListOk.bind(this);
-    }
-
-    // Get static data from server when mounting
     componentDidMount() {
-        getStaticData(sd => this.setState({allSegmentNames: sd.segments, allAnimationNames: sd.animations}),
-            (xhr) => console.error(xhr)); // TODO: Report errors to user
+        // Make a copy of the initial button state in case we cancel
+        let allButtons = this.props.allButtons;
+        let buttonKey = this.props.history.location.state.buttonKey;
+        let button = allButtons.find(x => x.key === buttonKey);
+        if (button !== undefined)
+            this.initialButton = JSON.parse(JSON.stringify(button));
     }
 
-    onOK() {
-        // Update button object and save to server
-        this.button.name = this.state.name;
-        // TODO: Full update and better error handling
-        saveButtons(this.buttons, () => this.props.history.goBack(),
-            e => console.error(e));
-    }
-
-    onRemoveSegment(segment) {
-        console.info('removing segment ' + segment.segment);
-        this.setState({
-            segments: this.state.segments.filter(seg => seg !== segment),
-            selectedSegments: this.state.selectedSegments.filter(seg => seg !== segment.segment)
-        })
-    }
-
-    toggleSelectedSegment(segName) {
-        console.info('Toggle:' + segName);
-        if (this.state.selectedSegments.includes(segName))
-            this.setState({selectedSegments: this.state.selectedSegments.filter(n => n !== segName)});
+    toggleSelectedSegment(seg) {
+        let allButtons = this.props.allButtons;
+        let buttonKey = this.props.history.location.state.buttonKey;
+        let button = allButtons.find(x => x.key === buttonKey);
+        // Make a note of initial button in case we cancel
+        if (this.initialButton === undefined)
+            this.initialButton = {...button};
+        if (button.segments.find(s => s.name === seg.name) === undefined) {
+            // Add new segment to the button
+            let newSegments = button.segments.map(x => x);
+            newSegments.push({...seg, animation: "Static", params: "#3f3f3f"});
+            newSegments.sort((a, b) => a.z - b.z);
+            this.props.onButtonChanged({
+                ...button,
+                segments: newSegments
+            });
+        }
         else {
-            let selectedSegmentCopy = JSON.parse(JSON.stringify(this.state.selectedSegments));
-            selectedSegmentCopy.push(segName);
-            this.setState({selectedSegments: selectedSegmentCopy});
+            // Remove segment from button
+            this.props.onButtonChanged({
+                ...button,
+                segments: button.segments.filter(s => s.name !== seg.name)
+            });
         }
     }
 
-    editSegmentListCancel() {
-        this.setState({
-            // Restore selected segment list as user canceled
-            selectedSegments: this.state.segments.map(s => s.segment)
-        });
-    }
-
-    editSegmentListOk() {
-        let segments = this.state.segments;
-        let selectedSegments = this.state.selectedSegments;
-        // Build new segments from selectedSegments
-        let updatedSegments = selectedSegments.map(seg => {
-            // Use existing segment if it's still selected
-            let foundSegment = segments.find(s => s.segment === seg);
-            if (foundSegment !== undefined)
-                return foundSegment;
-            // Here if we have a new segment to add (default static animation)
-            return {
-                "segment": seg,
-                "animation": "Static",
-                "params": "3f3f3f"
-            }
-        });
-        this.setState({segments: updatedSegments});
-    }
-
-    // The animation on a particular segment has changed
-    onAnimationNameChange(seg, val) {
-
-        let newSegments = this.state.segments.map(s => s !== seg ? s : Object.assign({}, s, {animation: val}));
-        this.setState({segments: newSegments});
-    }
-
     render() {
+        let allButtons = this.props.allButtons;
+        let allAnimations = this.props.allAnimations;
+        let allSegments = this.props.allSegments;
+        let buttonKey = this.props.history.location.state.buttonKey;
+        let button = allButtons.find(x => x.key === buttonKey);
+        let animationNames = allAnimations.map(n => ({'text': n.name, 'value': n.name}));
+        let otherButtonNames = allButtons.filter(b => b.key !== buttonKey).map(b => b.name);
         let key = 1;
-        let animationNames = this.state.allAnimationNames.map(n => ({'text': n, 'value': n}));
         return <div className="button-editor-editor-list">
             <Fragment>
-                <NameEditor name={this.state.name} onNameChanged={name => this.setState({name: name})}/>
+                <NameEditor name={button.name}
+                            onNameChanged={newName => this.props.onButtonChanged({
+                                ...button,
+                                name: newName
+                            })}
+                            error={otherButtonNames.find(x => x.toUpperCase() === button.name.toUpperCase()) ?
+                                'Name already exists' :
+                                undefined}/>
 
-                {this.state.segments.map(segment => (
+                {button.segments.map(segment => (
                     <LedSegmentEditor key={key++}
                                       segment={segment}
-                                      onRemove={seg => this.onRemoveSegment(seg)}
-                                      onAnimationNameChange={(e, d) => this.onAnimationNameChange(segment, d.value)}
-                                      allAnimationNames={animationNames}/>))}
+                                      allAnimationNames={animationNames}
+                                      onRemove={seg => this.props.onButtonChanged({
+                                          ...button,
+                                          segments: button.segments.filter(s => s.name !== seg.name)
+                                      })}
+                                      onSegmentChanged={seg => this.props.onButtonChanged({
+                                          ...button,
+                                          segments: button.segments.map(s => s.name === seg.name ? seg : s)
+                                      })}/>))}
 
                 <div className='button-editor-ok-cancel-container'>
-                    <LedSegmentChooser allSegmentNames={this.state.allSegmentNames}
-                                       onCancel={this.editSegmentListCancel}
-                                       onOk={this.editSegmentListOk}
-                                       checkedSegmentNames={this.state.selectedSegments}
+                    <LedSegmentChooser allSegments={allSegments}
+                                       checkedSegmentNames={button.segments.map(s => s.name)}
+                                       onOk={() => this.initialButton = undefined}
+                                       onCancel={() => {
+                                           this.props.onButtonChanged(this.initialButton);
+                                           this.initialButton = undefined;
+                                       }}
                                        toggleCheckedSegment={seg => this.toggleSelectedSegment(seg)}
                                        trigger={<Button icon='plus'
                                                         circular
                                                         floated='left'/>}/>
-                    <Button primary onClick={this.onOK}>OK</Button>
-                    <Button secondary onClick={() => this.props.history.goBack()}>Cancel</Button>
+                    <Button primary onClick={() => {
+                        this.props.onOk();
+                        this.props.history.goBack();
+                    }} content='OK'/>
+                    <Button secondary onClick={() => {
+                        this.props.onButtonChanged(this.initialButton);
+                        this.props.history.goBack();
+                    }} content='Cancel'/>
                 </div>
             </Fragment>
         </div>
