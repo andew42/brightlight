@@ -13,8 +13,10 @@ import (
 func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// JSON body of form
-	// [{"segmentId": "s1", "action": "static", "params": "6f16d4"},
-	//  {"segmentId": "s2", "action": "static", "params": "6f16d4"}]
+	// [
+	//	 {"name":"Bedroom", "animation":"Sweet Shop", "params":[{"key":60, "type":"speed", "value":50}]},
+	//	 {"name":"Bathroom", "animation":"Rainbow", "params":[{"key":40, "type":"speed", "value":50}]}
+	// ]
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.WithField("err", err.Error()).Error("RunAnimationsHandler bad body")

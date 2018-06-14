@@ -14,17 +14,18 @@ import (
 type SegmentAction struct {
 	Name      string
 	Animation string
-	Params    SegmentParams
+	Params    segmentParams
 }
 
-type SegmentParam struct {
+type segmentParam struct {
 	Type  string
 	Value interface{}
 }
 
-type SegmentParams []SegmentParam
+type segmentParams []segmentParam
+type propertyMap map[string]interface{}
 
-func (params SegmentParams) asColour(index int) (framebuffer.Rgb, error) {
+func (params segmentParams) asColour(index int) (framebuffer.Rgb, error) {
 
 	if params == nil || len(params) <= index {
 		return framebuffer.Rgb{}, errors.New("no parameter at index: " + strconv.Itoa(index))
@@ -33,15 +34,34 @@ func (params SegmentParams) asColour(index int) (framebuffer.Rgb, error) {
 	if p.Type != "colour" {
 		return framebuffer.Rgb{}, errors.New("parameter type 'colour' expected but '" + p.Type + "' provided")
 	}
-	var valueMap map[string]interface{}
+	var valueMap propertyMap
 	var ok bool
 	if valueMap, ok = p.Value.(map[string]interface{}); !ok {
 		return framebuffer.Rgb{}, errors.New("unexpected parameter type")
+	}
+	if !valueMap.IsValidNumber("r") {
+		return framebuffer.Rgb{}, errors.New("missing or incorrectly typed red colour value")
+	}
+	if !valueMap.IsValidNumber("g") {
+		return framebuffer.Rgb{}, errors.New("missing or incorrectly typed green colour value")
+	}
+	if !valueMap.IsValidNumber("b") {
+		return framebuffer.Rgb{}, errors.New("missing or incorrectly typed blue colour value")
 	}
 	return framebuffer.NewRgb(
 		byte(valueMap["r"].(float64)),
 		byte(valueMap["g"].(float64)),
 		byte(valueMap["b"].(float64))), nil
+}
+
+func (m *propertyMap) IsValidNumber(i string) bool {
+	var v interface{}
+	var ok bool
+	if v, ok = (*m)[i]; !ok {
+		return false;
+	}
+	_, ok = v.(float64);
+	return ok
 }
 
 var animationChanged = make(chan []SegmentAction)
