@@ -1,187 +1,227 @@
 [
   {
-    "key": 1,
-    "name": "OFF",
-    "segments": [
+    "key":1,
+    "name":"OFF",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Static",
-        "params": "#000000"
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params": [
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+        ]
       }
     ]
   },
   {
-    "key": 2,
-    "name": "Full",
-    "segments": [
+    "key":2,
+    "name":"Full",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Static",
-        "params": "#ffffff"
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":255, "g":255, "b":255}}
+        ]
       }
     ]
   },
   {
-    "key": 3,
-    "name": "Sweet Shop",
-    "segments": [
+    "key":3,
+    "name":"Sweet Shop",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Sweet Shop"
+        "name":"All",
+        "z":1,
+        "animation":"Sweet Shop",
+        "params":[
+          {"key":60, "type":"speed", "value":50}
+        ]
       }
     ]
   },
   {
-    "key": 4,
-    "name": "Two Tone",
-    "segments": [
+    "key":4,
+    "name":"Two Tone",
+    "segments":[
       {
-        "name": "Bedroom",
-        "z": 4,
-        "animation": "Static",
-        "params": "#0004e5"
+        "name":"Bedroom",
+        "z":4,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":4, "b":229}}
+        ]
       },
       {
-        "name": "Bathroom",
-        "z": 7,
-        "animation": "Static",
-        "params": "#e400e3"
+        "name":"Bathroom",
+        "z":7,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":228, "g":0, "b":227}}
+        ]
       }
     ]
   },
   {
-    "key": 5,
-    "name": "High",
-    "segments": [
+    "key":5,
+    "name":"High",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Static",
-        "params": "#e0e0e0"
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":224, "g":224, "b":224}}
+        ]
       }
     ]
   },
   {
-    "key": 6,
-    "name": "Runner",
-    "segments": [
+    "key":6,
+    "name":"Runner",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Runner"
+        "name":"All",
+        "z":1,
+        "animation":"Runner",
+        "params":[
+          {"key":50, "type":"speed", "value":50}
+        ]
       }
     ]
   },
   {
-    "key": 7,
-    "name": "Twinkle",
-    "segments": [
+    "key":7,
+    "name":"Twinkle",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Twinkle"
+        "name":"All",
+        "z":1,
+        "animation":"Twinkle",
+        "params":[
+          {"key":70, "type":"speed", "value":50}
+        ]
       }
     ]
   },
   {
-    "key": 8,
-    "name": "Mid",
-    "segments": [
+    "key":8,
+    "name":"Mid",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Static",
-        "params": "#808080"
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":128, "g":128, "b":128}}
+        ]
       }
     ]
   },
   {
-    "key": 9,
-    "name": "Rainbow",
-    "segments": [
+    "key":9,
+    "name":"Rainbow",
+    "segments":[
       {
-        "name": "Curtains",
-        "z": 16,
-        "animation": "Rainbow"
+        "name":"Curtains",
+        "z":16,
+        "animation":"Rainbow",
+        "params":[
+          {"key":40, "type":"speed", "value":50}
+        ]
       }
     ]
   },
   {
-    "key": 10,
-    "name": "Baby Bows",
-    "segments": [
+    "key":10,
+    "name":"Baby Bows",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "BabyBows"
+        "name":"All",
+        "z":1,
+        "animation":"BabyBows",
+        "params":[
+          {"key":80, "type":"speed", "value":50}
+        ]
       }
     ]
   },
   {
-    "key": 11,
-    "name": "Low",
-    "segments": [
+    "key":11,
+    "name":"Low",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Static",
-        "params": "#3f3f3f"
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":63, "g":63, "b":63}}
+        ]
       }
     ]
   },
   {
-    "key": 12,
-    "name": "Cylon",
-    "segments": [
+    "key":12,
+    "name":"Cylon",
+    "segments":[
       {
-        "name": "Curtains",
-        "z": 16,
-        "animation": "Cylon"
+        "name":"Curtains",
+        "z":16,
+        "animation":"Cylon",
+        "params":[
+          {"key":30, "type":"speed", "value":50}
+        ]
       }
     ]
   },
   {
-    "key": 13,
-    "name": "Sweet Rainbow",
-    "segments": [
+    "key":13,
+    "name":"Sweet Rainbow",
+    "segments":[
       {
-        "name": "Bedroom",
-        "z": 4,
-        "animation": "Sweet Shop",
-        "params": "#6f16d4"
+        "name":"Bedroom",
+        "z":4,
+        "animation":"Sweet Shop",
+        "params":[
+          {"key":60, "type":"speed", "value":50}
+        ]
       },
       {
-        "name": "Bathroom",
-        "z": 7,
-        "animation": "Rainbow",
-        "params": "#0016d4"
+        "name":"Bathroom",
+        "z":7,
+        "animation":"Rainbow",
+        "params":[
+          {"key":40, "type":"speed", "value":50}
+        ]
       }
     ]
   },
   {
-    "key": 14,
-    "name": "Very Low",
-    "segments": [
+    "key":14,
+    "name":"Very Low",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Static",
-        "params": "#101010"
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":15, "g":15, "b":15}}
+        ]
       }
     ]
   },
   {
-    "key": 15,
-    "name": "Nearly Off",
-    "segments": [
+    "key":15,
+    "name":"Nearly Off",
+    "segments":[
       {
-        "name": "All",
-        "z": 1,
-        "animation": "Static",
-        "params": "#020202"
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":2, "g":2, "b":2}}
+        ]
       }
     ]
   }

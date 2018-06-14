@@ -7,13 +7,41 @@ import (
 	"github.com/andew42/brightlight/stats"
 	"strconv"
 	"time"
+	"errors"
 )
 
 // Animation action to perform on a segment (from UI)
 type SegmentAction struct {
-	Segment   string
+	Name      string
 	Animation string
-	Params    string
+	Params    SegmentParams
+}
+
+type SegmentParam struct {
+	Type  string
+	Value interface{}
+}
+
+type SegmentParams []SegmentParam
+
+func (params SegmentParams) asColour(index int) (framebuffer.Rgb, error) {
+
+	if params == nil || len(params) <= index {
+		return framebuffer.Rgb{}, errors.New("no parameter at index: " + strconv.Itoa(index))
+	}
+	p := params[index];
+	if p.Type != "colour" {
+		return framebuffer.Rgb{}, errors.New("parameter type 'colour' expected but '" + p.Type + "' provided")
+	}
+	var valueMap map[string]interface{}
+	var ok bool
+	if valueMap, ok = p.Value.(map[string]interface{}); !ok {
+		return framebuffer.Rgb{}, errors.New("unexpected parameter type")
+	}
+	return framebuffer.NewRgb(
+		byte(valueMap["r"].(float64)),
+		byte(valueMap["g"].(float64)),
+		byte(valueMap["b"].(float64))), nil
 }
 
 var animationChanged = make(chan []SegmentAction)
@@ -48,35 +76,35 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		// Currently used by hue animations to ignore a segment
 
 	case "Static":
-		if colour, err := strconv.ParseInt(seg.Params, 16, 32); err == nil {
-			*animators = append(*animators, segNameAndAnimator{seg.Segment,
-				newStaticColour(framebuffer.NewRgbFromInt(int(colour)))})
+		if colour, err := seg.Params.asColour(0); err == nil {
+			*animators = append(*animators,
+				segNameAndAnimator{seg.Name, newStaticColour(colour)})
 		} else {
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
 		}
 
 	case "Runner":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment,
+		*animators = append(*animators, segNameAndAnimator{seg.Name,
 			newRunner(framebuffer.NewRgb(0, 0, 255))})
 
 	case "Cylon":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newCylon()})
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newCylon()})
 
 	case "Rainbow": // TODO MAKE TIME A PARAMETER
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRainbow(time.Second * 15)})
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newRainbow(time.Second * 15)})
 
 	case "Sweet Shop": // TODO MAKE TIME A PARAMETER
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newSweetshop(time.Second * 1)})
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newSweetshop(time.Second * 1)})
 
 	case "Twinkle":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newTwinkle()})
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newTwinkle()})
 
 	case "BabyBows":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
 			newRainbow(time.Second*8), 15)})
 
 	case "Christmas":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
 			newLinearFade(
 				time.Duration(10000*time.Millisecond),
 				false,
@@ -88,7 +116,7 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 			5)})
 
 	case "Fairground":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
 			newStepFade(
 				time.Duration(640*time.Millisecond),
 				false,
@@ -99,7 +127,7 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 			4)})
 
 	case "Discrete":
-		*animators = append(*animators, segNameAndAnimator{seg.Segment, newRepeater(
+		*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
 			newBulb(framebuffer.NewRgb(255, 255, 255), 0, 1), 15)})
 
 	default:
@@ -116,17 +144,17 @@ func AnimateStripLength(stripIndex uint, stripLength uint) {
 	segments := make([]SegmentAction, 0)
 	if stripIndex < uint(len(fb.Strips)) && stripLength <= uint(len(fb.Strips[stripIndex].Leds)) {
 		// Clear all lights
-		segments = append(segments, SegmentAction{"All", "Static", "0"})
+		segments = append(segments, SegmentAction{"All", "Static", nil}) // TODO
 
 		// Special pXX:YY segment id to address physical strip XX of length YY
 		// NOTE: if a strip is reverse direction then this may not show up on
 		// the virtual display which shows only the FIRST 20 LEDs
 
 		segId := "p" + strconv.Itoa(int(stripIndex)) + ":" + strconv.Itoa(int(stripLength))
-		segments = append(segments, SegmentAction{segId, "Static", "808080"})
+		segments = append(segments, SegmentAction{segId, "Static", nil}) // TODO 808080
 	} else {
 		// Invalid request, light all LEDs red
-		segments = append(segments, SegmentAction{"All", "Static", "800000"})
+		segments = append(segments, SegmentAction{"All", "Static", nil}) // TODO
 	}
 
 	// Perform the animation

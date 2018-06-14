@@ -1,10 +1,10 @@
 import * as React from "react";
 import {Fragment} from "react";
 import './ButtonEditor.css';
-import {Button} from "semantic-ui-react";
 import {LedSegmentEditor} from "./LedSegmentEditor";
 import {NameEditor} from "./NameEditor";
 import LedSegmentChooser from "./LedSegmentChooser";
+import {Button} from "semantic-ui-react";
 
 // Shows a list of editors that change to suit the animation
 export default class ButtonEditor extends React.Component {
@@ -15,7 +15,7 @@ export default class ButtonEditor extends React.Component {
         let buttonKey = this.props.history.location.state.buttonKey;
         let button = allButtons.find(x => x.key === buttonKey);
         if (button !== undefined)
-            this.initialButton = JSON.parse(JSON.stringify(button));
+            this.preEditButton = {...button};
     }
 
     toggleSelectedSegment(seg) {
@@ -23,12 +23,15 @@ export default class ButtonEditor extends React.Component {
         let buttonKey = this.props.history.location.state.buttonKey;
         let button = allButtons.find(x => x.key === buttonKey);
         // Make a note of initial button in case we cancel
-        if (this.initialButton === undefined)
-            this.initialButton = {...button};
+        if (this.preSegChooserButton === undefined)
+            this.preSegChooserButton = {...button};
         if (button.segments.find(s => s.name === seg.name) === undefined) {
             // Add new segment to the button
             let newSegments = button.segments.map(x => x);
-            newSegments.push({...seg, animation: "Static", params: "#3f3f3f"});
+            newSegments.push({
+                ...seg, animation: "Static", params: [
+                    {"key": 20, "type": "colour", "label": "Colour", "value": {"r": 31, "g": 31, "b": 31}}]
+            });
             newSegments.sort((a, b) => a.z - b.z);
             this.props.onButtonChanged({
                 ...button,
@@ -50,7 +53,7 @@ export default class ButtonEditor extends React.Component {
         let allSegments = this.props.allSegments;
         let buttonKey = this.props.history.location.state.buttonKey;
         let button = allButtons.find(x => x.key === buttonKey);
-        let animationNames = allAnimations.map(n => ({'text': n.name, 'value': n.name}));
+        let animationNames = allAnimations.map(n => ({'text': n.name, 'value': n.name, 'params': n.params}));
         let otherButtonNames = allButtons.filter(b => b.key !== buttonKey).map(b => b.name);
         let key = 1;
         return <div className="button-editor-editor-list">
@@ -80,10 +83,12 @@ export default class ButtonEditor extends React.Component {
                 <div className='button-editor-ok-cancel-container'>
                     <LedSegmentChooser allSegments={allSegments}
                                        checkedSegmentNames={button.segments.map(s => s.name)}
-                                       onOk={() => this.initialButton = undefined}
+                                       onOk={() => this.preSegChooserButton = undefined}
                                        onCancel={() => {
-                                           this.props.onButtonChanged(this.initialButton);
-                                           this.initialButton = undefined;
+                                           if (this.preSegChooserButton !== undefined) {
+                                               this.props.onButtonChanged(this.preSegChooserButton);
+                                               this.preSegChooserButton = undefined;
+                                           }
                                        }}
                                        toggleCheckedSegment={seg => this.toggleSelectedSegment(seg)}
                                        trigger={<Button icon='plus'
@@ -94,7 +99,7 @@ export default class ButtonEditor extends React.Component {
                         this.props.history.goBack();
                     }} content='OK'/>
                     <Button secondary onClick={() => {
-                        this.props.onButtonChanged(this.initialButton);
+                        this.props.onButtonChanged(this.preEditButton);
                         this.props.history.goBack();
                     }} content='Cancel'/>
                 </div>

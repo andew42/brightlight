@@ -11,7 +11,7 @@ export default class ColourEditor extends React.Component {
                                             style={{backgroundColor: this.props.colour.asColourString()}}/>}
                            colour={this.props.colour}
                            onColourChanged={c => this.props.onColourChanged(c)}/>
-            <Label pointing='left' content='Colour'/>
+            <Label pointing='left' content={this.props.label}/>
         </div>
     }
 }

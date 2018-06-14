@@ -23,7 +23,7 @@ export default class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {allButtons: [], allSegments: [], allAnimations: []}
+        this.state = {allButtons: undefined, allSegments: undefined, allAnimations: undefined}
     }
 
     // Get static data from server when mounting
@@ -42,6 +42,7 @@ export default class App extends Component {
         this.setState((props, state) => {
             return {...state, allButtons: allButtons}
         });
+        runAnimation(button.segments);
     }
 
     onSaveButtonEdit() {

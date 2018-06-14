@@ -7,17 +7,23 @@
 .button-pad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-column-gap: 8px;
-    grid-row-gap: 8px;
-    padding: 8px;
-    height: 100%;
+    grid-column-gap: 6px;
+    grid-row-gap: 6px;
+    padding: 6px;
     background-color: purple;
 }
 
 .button-pad > button {
     border: 2px gainsboro;
-    border-radius: 3px;
+    border-radius: 2px;
     background-color: gainsboro;
     padding: 1em;
-    color: purple;
+    color: #303040;
+    font-weight: bold;
+    height: 5em;
+}
+
+.button-pad-bottom-padding {
+    background-color: purple;
+    height: 10000px;
 }

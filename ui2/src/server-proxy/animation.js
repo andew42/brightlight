@@ -3,7 +3,7 @@ let nextRunAnimation;
 
 export function runAnimation(segments) {
 
-    console.log(segments);
+    console.log('runAnimation: ' + segments);
 
     // Return immediately if nothing to do
     if (segments === undefined || segments.length === 0) {
@@ -13,14 +13,7 @@ export function runAnimation(segments) {
     // Throttle calls to server when user is swiping around
     if (busy) {
         // Make a copy of the segment list to run when last call completes
-        nextRunAnimation = [];
-        for (let s = 0; s < segments.length; s++) {
-            nextRunAnimation.push({
-                "segment": segments[s].segment,
-                "animation": segments[s].animation,
-                "params": segments[s].params
-            });
-        }
+        nextRunAnimation = segments.map(x => ({...x}));
     } else {
         busy = true;
         let req = new XMLHttpRequest();

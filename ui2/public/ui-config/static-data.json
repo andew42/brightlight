@@ -1,16 +1,38 @@
 {
-  "animations": [
-    {"name": "Off"},
-    {"name": "Static"},
-    {"name": "Cylon"},
-    {"name": "Rainbow"},
-    {"name": "Runner"},
-    {"name": "Sweet Shop"},
-    {"name": "Twinkle"},
-    {"name": "BabyBows"},
-    {"name": "Christmas"},
-    {"name": "Fairground"},
-    {"name": "Discrete"}
+  "animations":[
+    {"name":"Off", "params":[
+      {"key":10, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+    ]},
+    {"name":"Static", "params":[
+      {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+    ]},
+    {"name":"Cylon", "params":[
+      {"key":30, "type":"speed", "value":50}
+    ]},
+    {"name":"Rainbow", "params":[
+      {"key":40, "type":"speed", "value":50}
+    ]},
+    {"name":"Runner", "params":[
+      {"key":50, "type":"speed", "value":50}
+    ]},
+    {"name":"Sweet Shop", "params":[
+      {"key":60, "type":"speed", "value":50}
+    ]},
+    {"name":"Twinkle", "params":[
+      {"key":70, "type":"speed", "value":50}
+    ]},
+    {"name":"BabyBows", "params":[
+      {"key":80, "type":"speed", "value":50}
+    ]},
+    {"name":"Christmas", "params":[
+      {"key":90, "type":"speed", "value":50}
+    ]},
+    {"name":"Fairground", "params":[
+      {"key":100, "type":"speed", "value":50}
+    ]},
+    {"name":"Discrete", "params":[
+      {"key":110, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+    ]}
   ],
   "segments": [
     {"name": "All", "z": 1, "label": "All"},
