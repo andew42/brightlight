@@ -54,6 +54,21 @@ func (params segmentParams) asColour(index int) (framebuffer.Rgb, error) {
 		byte(valueMap["b"].(float64))), nil
 }
 
+func (params segmentParams) asRange(index int) (int, error) {
+
+	if params == nil || len(params) <= index {
+		return 0, errors.New("no parameter at index: " + strconv.Itoa(index))
+	}
+	p := params[index];
+	if p.Type != "range" {
+		return 0, errors.New("parameter type 'range' expected but '" + p.Type + "' provided")
+	}
+	if val, ok := p.Value.(float64); ok {
+		return int(val), nil
+	}
+	return 0, errors.New("unexpected parameter type")
+}
+
 func (m *propertyMap) IsValidNumber(i string) bool {
 	var v interface{}
 	var ok bool
@@ -110,8 +125,13 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 	case "Cylon":
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newCylon()})
 
-	case "Rainbow": // TODO MAKE TIME A PARAMETER
-		*animators = append(*animators, segNameAndAnimator{seg.Name, newRainbow(time.Second * 15)})
+	case "Rainbow":
+		if val, err := seg.Params.asRange(0); err == nil {
+			*animators = append(*animators,
+				segNameAndAnimator{seg.Name, newRainbow(time.Second * time.Duration(val))})
+		} else {
+			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+		}
 
 	case "Sweet Shop": // TODO MAKE TIME A PARAMETER
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newSweetshop(time.Second * 1)})

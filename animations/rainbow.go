@@ -15,6 +15,10 @@ type rainbow struct {
 // period is the duration for a complete cycle of the rainbow
 func newRainbow(period time.Duration) *rainbow {
 
+	if period < config.FramePeriodMs {
+		period = config.FramePeriodMs
+	}
+
 	var r rainbow
 	r.framesPerCycle = uint(float32(period) / float32(config.FramePeriodMs))
 	r.degreesPerFrame = 360.0 / float32(r.framesPerCycle)

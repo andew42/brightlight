@@ -1,8 +1,8 @@
 import * as React from "react";
-import './VerticalSlider.css';
+import './HorizontalSlider.css';
 
 // props - min, max, pos, onPosChange(pos), sliderColour, className
-export default class VerticalSlider extends React.Component {
+export default class HorizontalSlider extends React.Component {
 
     constructor(props) {
         super(props);
@@ -20,7 +20,7 @@ export default class VerticalSlider extends React.Component {
             padding = 0;
         }
 
-        // Control range (typically 360 or 100)
+        // Control range (typically 100)
         let range = this.props.max - this.props.min;
 
         let r = el.getBoundingClientRect();
@@ -32,17 +32,17 @@ export default class VerticalSlider extends React.Component {
 
         // Where is the mouse positioned within track
         let pos;
-        if ((r.bottom - mouseY) < padding) {
-            // Position is in the lower dead zone
+        if (mouseX < (r.left + padding)) {
+            // Position is in the left dead zone
             pos = this.props.min;
-        } else if (mouseY < (r.bottom - r.height + padding)) {
-            // Position is in the upper dead zone
+        } else if (mouseX > (r.right - padding)) {
+            // Position is in the right dead zone
             pos = this.props.max;
         } else {
             // Calculate position in pixels
-            pos = (r.bottom - padding) - mouseY;
+            pos = mouseX - (r.left + padding);
             // Convert to value between min and max
-            pos = (pos / (r.height - 2 * padding)) * range + this.props.min;
+            pos = (pos / (r.width - 2 * padding)) * range + this.props.min;
         }
         // Inform the caller
         this.props.onPosChange(pos);
@@ -74,14 +74,15 @@ export default class VerticalSlider extends React.Component {
                     onMouseDown={e => this.doMouseDown(e)}
                     onMouseMove={e => this.doMouseMove(e)}
                     onMouseUp={() => this.mousedown = false}>
-            <div className='vs-slider-track'
+            <div className='hs-slider-track'
                  style={{backgroundColor: this.props.sliderColour}}>
-                <div className='vs-slider-thumb-container'
-                     style={{top: ((range - this.props.pos) / (range / 100)) + '%'}}>
-                    <div className='vs-slider-thumb'/>
-                    <div className='vs-slider-thumb-anno'>{this.props.pos.toFixed(0)}</div>
+                <div className='hs-slider-thumb-container'
+                     style={{left: ((range - (range - this.props.pos)) / (range / 100)) + '%'}}>
+                    <div className='hs-slider-thumb'/>
+                    <div className='hs-slider-thumb-anno'>{this.props.pos.toFixed(0)}</div>
                 </div>
             </div>
+            <div className='hs-label'>{this.props.label}</div>
         </div>
     }
 }

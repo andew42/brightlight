@@ -8,7 +8,7 @@
         "z":1,
         "animation":"Static",
         "params": [
-          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+          {"key":10, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
         ]
       }
     ]
@@ -36,7 +36,7 @@
         "z":1,
         "animation":"Sweet Shop",
         "params":[
-          {"key":60, "type":"speed", "value":50}
+          {"key":60, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
         ]
       }
     ]
@@ -86,7 +86,7 @@
         "z":1,
         "animation":"Runner",
         "params":[
-          {"key":50, "type":"speed", "value":50}
+          {"key":50, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
         ]
       }
     ]
@@ -100,7 +100,7 @@
         "z":1,
         "animation":"Twinkle",
         "params":[
-          {"key":70, "type":"speed", "value":50}
+          {"key":70, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
         ]
       }
     ]
@@ -128,7 +128,7 @@
         "z":16,
         "animation":"Rainbow",
         "params":[
-          {"key":40, "type":"speed", "value":50}
+          {"key":40, "type":"range", "label":"Duration(s)", "min":1, "max":30, "value":15}
         ]
       }
     ]
@@ -142,7 +142,7 @@
         "z":1,
         "animation":"BabyBows",
         "params":[
-          {"key":80, "type":"speed", "value":50}
+          {"key":80, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
         ]
       }
     ]
@@ -170,7 +170,7 @@
         "z":16,
         "animation":"Cylon",
         "params":[
-          {"key":30, "type":"speed", "value":50}
+          {"key":30, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
         ]
       }
     ]
@@ -184,7 +184,7 @@
         "z":4,
         "animation":"Sweet Shop",
         "params":[
-          {"key":60, "type":"speed", "value":50}
+          {"key":60, "type":"range", "label":"Duration(s)", "min":1, "max":20, "value":10}
         ]
       },
       {
@@ -192,7 +192,7 @@
         "z":7,
         "animation":"Rainbow",
         "params":[
-          {"key":40, "type":"speed", "value":50}
+          {"key":40, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
         ]
       }
     ]
