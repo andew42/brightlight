@@ -7,28 +7,28 @@
       {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
     ]},
     {"name":"Cylon", "params":[
-      {"key":30, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
+      {"key":30, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"Rainbow", "params":[
-      {"key":40, "type":"range", "label":"Duration(s)", "min":1, "max":30, "value":15}
+      {"key":40, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15}
     ]},
     {"name":"Runner", "params":[
-      {"key":50, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
+      {"key":50, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"Sweet Shop", "params":[
-      {"key":60, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
+      {"key":60, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"Twinkle", "params":[
-      {"key":70, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
+      {"key":70, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"BabyBows", "params":[
-      {"key":80, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
+      {"key":80, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"Christmas", "params":[
-      {"key":90, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
+      {"key":90, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"Fairground", "params":[
-      {"key":100, "type":"range", "label":"Speed", "min":0, "max":100, "value":50}
+      {"key":100, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"Discrete", "params":[
       {"key":110, "type":"colour", "label":"Colour", "value":{"r":128, "g":128, "b":0}},

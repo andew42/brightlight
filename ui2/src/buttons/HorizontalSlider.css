@@ -1,8 +1,7 @@
 .hs-slider-track {
     height: 100%;
     border-radius: 10px;
-    background-image: linear-gradient(to right, #fff, rgba(204, 154, 129, 0));
-
+    background-image: linear-gradient(to right, #ffffffd0, #ffffff00);
 }
 
 .hs-slider-thumb-container {

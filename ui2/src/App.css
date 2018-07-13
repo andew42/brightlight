@@ -6,6 +6,7 @@
     bottom: 0;
     left: 0;
     right: 0;
+    touch-action: none; /* https://developers.google.com/web/updates/2017/01/scrolling-intervention */
 }
 
 /* Remove body margin and selection semantics */

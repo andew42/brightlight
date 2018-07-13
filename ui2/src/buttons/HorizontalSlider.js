@@ -15,9 +15,14 @@ export default class HorizontalSlider extends React.Component {
         // We expect the element to have some padding which will be
         // treated as a dead zone to allow easy selection of min max
         // values. Padding is expected to be in pixels
-        let padding = parseInt(window.getComputedStyle(el, null).padding, 10);
-        if (padding === undefined) {
-            padding = 0;
+        let cs = window.getComputedStyle(el, null);
+        let paddingLeft = parseInt(cs.paddingLeft, 10);
+        if (paddingLeft === undefined) {
+            paddingLeft = 0;
+        }
+        let paddingRight = parseInt(cs.paddingRight, 10);
+        if (paddingRight === undefined) {
+            paddingRight = 0;
         }
 
         // Control range (typically 100)
@@ -32,24 +37,32 @@ export default class HorizontalSlider extends React.Component {
 
         // Where is the mouse positioned within track
         let pos;
-        if (mouseX < (r.left + padding)) {
-            // Position is in the left dead zone
-            pos = this.props.min;
-        } else if (mouseX > (r.right - padding)) {
-            // Position is in the right dead zone
-            pos = this.props.max;
+        if (mouseX <= (r.left + paddingLeft)) {
+            // Position is in the left dead zone (-1 click)
+            if (this.props.pos > this.props.min)
+                pos = this.props.pos - 1;
+            else
+                pos = this.props.min;
+        } else if (mouseX >= (r.right - paddingRight)) {
+            // Position is in the right dead zone (+1 click)
+            if (this.props.pos < this.props.max)
+                pos = this.props.pos + 1;
+            else
+                pos = this.props.max;
         } else {
             // Calculate position in pixels
-            pos = mouseX - (r.left + padding);
+            pos = mouseX - (r.left + paddingLeft);
             // Convert to value between min and max
-            pos = (pos / (r.width - 2 * padding)) * range + this.props.min;
+            pos = (pos / (r.width - (paddingLeft + paddingRight))) * range + this.props.min;
         }
+
         // Inform the caller
         this.props.onPosChange(pos);
-    };
+    }
 
     doTouchUpdate(e) {
         this.updatePosition(this.domElement.current, e.targetTouches[0].clientX, e.targetTouches[0].clientY);
+        e.preventDefault();
     }
 
     doMouseDown(e) {
@@ -67,6 +80,13 @@ export default class HorizontalSlider extends React.Component {
 
     render() {
         let range = this.props.max - this.props.min;
+
+        let pos = this.props.pos;
+        if (pos < this.props.min)
+            pos = this.props.min;
+        else if (pos > this.props.max)
+            pos = this.props.max;
+
         return <div ref={this.domElement}
                     className={this.props.className}
                     onTouchStart={e => this.doTouchUpdate(e)}
@@ -77,9 +97,9 @@ export default class HorizontalSlider extends React.Component {
             <div className='hs-slider-track'
                  style={{backgroundColor: this.props.sliderColour}}>
                 <div className='hs-slider-thumb-container'
-                     style={{left: ((range - (range - this.props.pos)) / (range / 100)) + '%'}}>
+                     style={{left: ((range - (range - pos)) / (range / 100)) + '%'}}>
                     <div className='hs-slider-thumb'/>
-                    <div className='hs-slider-thumb-anno'>{this.props.pos.toFixed(0)}</div>
+                    <div className='hs-slider-thumb-anno'>{pos.toFixed(0)}</div>
                 </div>
             </div>
             <div className='hs-label'>{this.props.label}</div>

@@ -60,9 +60,9 @@ function LedSegmentParam(props) {
                 min={props.param.min}
                 max={props.param.max}
                 value={props.param.value}
-                onSpeedChanged={speed => props.onParamChanged({
+                onPosChanged={pos => props.onParamChanged({
                     ...props.param,
-                    value: speed
+                    value: pos
                 })}/>;
         default:
             return "Unknown Param: " + props.param.type;
