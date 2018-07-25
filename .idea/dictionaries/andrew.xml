@@ -19,6 +19,7 @@
       <w>onopen</w>
       <w>onreadystatechange</w>
       <w>ontouchstart</w>
+      <w>pressup</w>
       <w>qsub</w>
       <w>ractive</w>
       <w>teensy</w>

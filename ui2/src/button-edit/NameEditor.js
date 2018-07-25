@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Input, Label, Segment} from "semantic-ui-react";
+import './NameEditor.css';
 
 export function NameEditor(props) {
     return <Segment color='blue' attached style={{textAlign: 'left'}}>

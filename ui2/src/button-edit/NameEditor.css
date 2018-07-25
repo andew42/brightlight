@@ -1,0 +1,4 @@
+input {
+    /* Smallest size that doesn't auto scale when editing */
+    font-size: 16px !important;
+}

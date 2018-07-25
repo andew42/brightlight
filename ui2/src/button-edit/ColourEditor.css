@@ -9,3 +9,7 @@
     height: 2rem;
     border: solid 1px lightgray !important;
 }
+
+.colour-editor-label {
+    -webkit-tap-highlight-color: #00000000;
+}

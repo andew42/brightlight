@@ -15,7 +15,7 @@ export default class ButtonPad extends React.Component {
             <div className="button-pad">{this.props.allButtons.map(button =>
                 <Button key={button.key}
                         onTap={() => this.props.onButtonTap(button.key)}
-                        onPress={() => this.props.onButtonPress(this.props.history, button.key)}
+                        onPressUp={() => this.props.onButtonPress(this.props.history, button.key)}
                         label={button.name}/>)}
             </div>
             <div className="button-pad-bottom-padding"/>

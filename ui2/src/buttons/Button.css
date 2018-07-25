@@ -1,0 +1,9 @@
+.button-pressed:active {
+    background: azure;
+    -webkit-tap-highlight-color: #00000000;
+}
+
+.button-long-pressed:active {
+    background: darkorange;
+    -webkit-tap-highlight-color: #00000000;
+}

@@ -1,48 +1,38 @@
 import * as React from "react";
-import * as Hammer from "hammerjs"
+import './Button.css';
 
 export default class Button extends React.Component {
     constructor(props) {
         super(props);
 
-        let emptyFunction = function () {
-        };
-
-        // Wire up onTap handler if provided
-        if (props.onTap !== undefined) {
-            this.onTap = props.onTap;
-        } else {
-            this.onTap = emptyFunction;
-        }
-        this.onTap = this.onTap.bind(this);
-
-        // Wire up onPress handler if provided
-        if (props.onPress !== undefined) {
-            this.onPress = props.onPress;
-        } else {
-            this.onPress = emptyFunction;
-        }
-        this.onPress = this.onPress.bind(this);
+        this.state = {pressed: false};
     }
 
-    componentDidMount() {
-        this.hammer = Hammer(this.domButton);
-        this.hammer.get('press').set({time: 1000});
-        this.hammer.on('tap', this.onTap);
-        this.hammer.on('press', this.onPress);
+    onTouchStart() {
+        this.timerId = setTimeout(() => this.setState({pressed: true}), 1000);
     }
 
-    componentWillUnmount() {
-        this.hammer.off('tap', this.onTap);
-        this.hammer.off('press', this.onPress);
+    onTouchEnd(e) {
+        clearTimeout(this.timerId);
+        if (this.state.pressed) {
+            e.preventDefault();
+            this.setState({pressed: false});
+            this.props.onPressUp();
+        }
+        else {
+            this.props.onTap();
+        }
     }
 
     render() {
         return <button style={this.props.style}
-                       ref={(domElement) => {
-                           this.domButton = domElement;
-                       }}>
-            {this.props.label}
+                       onTouchStart={() => this.onTouchStart()}
+                       onTouchEnd={e => this.onTouchEnd(e)}
+                       onMouseDown={() => this.onTouchStart()}
+                       onMouseUp={e => this.onTouchEnd(e)}
+                       className={this.state.pressed ? 'button-long-pressed' : 'button-pressed'}
+        >
+            <div>{this.props.label}</div>
         </button>
     }
 }
