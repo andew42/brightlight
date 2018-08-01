@@ -22,7 +22,7 @@
       {"key":70, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"BabyBows", "params":[
-      {"key":80, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
+      {"key":80, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15}
     ]},
     {"name":"Christmas", "params":[
       {"key":90, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}

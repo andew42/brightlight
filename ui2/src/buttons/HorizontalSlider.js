@@ -39,13 +39,13 @@ export default class HorizontalSlider extends React.Component {
         let pos;
         if (mouseX <= (r.left + paddingLeft)) {
             // Position is in the left dead zone (-1 click)
-            if (this.props.pos > this.props.min)
+            if (this.props.pos > (this.props.min + 1))
                 pos = this.props.pos - 1;
             else
                 pos = this.props.min;
         } else if (mouseX >= (r.right - paddingRight)) {
             // Position is in the right dead zone (+1 click)
-            if (this.props.pos < this.props.max)
+            if (this.props.pos < (this.props.max - 1))
                 pos = this.props.pos + 1;
             else
                 pos = this.props.max;
@@ -54,7 +54,15 @@ export default class HorizontalSlider extends React.Component {
             pos = mouseX - (r.left + paddingLeft);
             // Convert to value between min and max
             pos = (pos / (r.width - (paddingLeft + paddingRight))) * range + this.props.min;
+            // Clip to min max
+            if (pos < this.props.min)
+                pos = this.props.min;
+            else if (pos > this.props.max)
+                pos = this.props.max;
         }
+
+        // Make it an integer
+        pos = Math.round(pos);
 
         // Inform the caller
         this.props.onPosChange(pos);

@@ -140,8 +140,13 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newTwinkle()})
 
 	case "BabyBows":
-		*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
-			newRainbow(time.Second*8), 15)})
+		if val, err := seg.Params.asRange(0); err == nil {
+			*animators = append(*animators,
+				segNameAndAnimator{seg.Name, newRepeater(
+					newRainbow(time.Second*time.Duration(val)), 15)})
+		} else {
+			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+		}
 
 	case "Christmas":
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(

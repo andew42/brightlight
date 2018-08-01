@@ -55,11 +55,11 @@ export default class App extends Component {
     }
 
     onButtonTap(key) {
-        console.info('onButtonTap ' + key);
         runAnimation(this.findButton(key).segments);
     }
 
     onButtonPress(history, key) {
+        runAnimation(this.findButton(key).segments);
         history.push('/button-edit', {'buttonKey': key});
     }
 
