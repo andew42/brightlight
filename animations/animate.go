@@ -126,9 +126,16 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newCylon()})
 
 	case "Rainbow":
-		if val, err := seg.Params.asRange(0); err == nil {
+		var err error
+		duration, err := seg.Params.asRange(0)
+		var brightness int
+		if err == nil {
+			brightness, err = seg.Params.asRange(1)
+		}
+		if err == nil {
 			*animators = append(*animators,
-				segNameAndAnimator{seg.Name, newRainbow(time.Second * time.Duration(val))})
+				segNameAndAnimator{seg.Name,
+					newRainbow(time.Second*time.Duration(duration), brightness)})
 		} else {
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
 		}
@@ -140,10 +147,20 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newTwinkle()})
 
 	case "BabyBows":
-		if val, err := seg.Params.asRange(0); err == nil {
+		var err error
+		length, err := seg.Params.asRange(0)
+		var duration int
+		if err == nil {
+			duration, err = seg.Params.asRange(1)
+		}
+		var brightness int
+		if err == nil {
+			brightness, err = seg.Params.asRange(2)
+		}
+		if err == nil {
 			*animators = append(*animators,
 				segNameAndAnimator{seg.Name, newRepeater(
-					newRainbow(time.Second*time.Duration(val)), 15)})
+					newRainbow(time.Second*time.Duration(duration), brightness), uint(length))})
 		} else {
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
 		}

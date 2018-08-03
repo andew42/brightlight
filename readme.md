@@ -77,8 +77,9 @@ With ANSI terminal emulator enabled for logrus
 
 #### To Do
 #####UI
-* Doesn't support landscape well (as home screen app)
-* Doesn't support on call bar well (as home screen app)
+* Does not support landscape well (as home screen app)
+* Does not support on call bar well (as home screen app)
+* Indicate selected button
 #####Engine
 * Candle
 * Fair ground light chasers
@@ -89,8 +90,7 @@ With ANSI terminal emulator enabled for logrus
 * Fade between animations
 * Cylon stacking
 * Twinkle colours
-* UI to change speed / length on animations
-* Hue controller support for alexa
+* Support for alexa
 
 #### Building for pi
 env GOOS=linux GOARCH=arm go build -o ./pi

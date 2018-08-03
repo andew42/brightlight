@@ -105,7 +105,7 @@ export default class HorizontalSlider extends React.Component {
             <div className='hs-slider-track'
                  style={{backgroundColor: this.props.sliderColour}}>
                 <div className='hs-slider-thumb-container'
-                     style={{left: ((range - (range - pos)) / (range / 100)) + '%'}}>
+                     style={{left: ((range - (range - (pos - this.props.min))) / (range / 100)) + '%'}}>
                     <div className='hs-slider-thumb'/>
                     <div className='hs-slider-thumb-anno'>{pos.toFixed(0)}</div>
                 </div>

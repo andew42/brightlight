@@ -128,7 +128,8 @@
         "z":16,
         "animation":"Rainbow",
         "params":[
-          {"key":40, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15}
+          {"key":40, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15},
+          {"key":41, "type":"range", "label":"Brightness", "min":10, "max":50, "value":50}
         ]
       }
     ]
@@ -142,7 +143,9 @@
         "z":1,
         "animation":"BabyBows",
         "params":[
-          {"key":80, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15}
+          {"key":80, "type":"range", "label":"Bow Length", "min":1, "max":50, "value":15},
+          {"key":81, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15},
+          {"key":82, "type":"range", "label":"Brightness", "min":10, "max":50, "value":50}
         ]
       }
     ]
