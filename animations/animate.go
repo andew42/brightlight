@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 	"errors"
+	"github.com/andew42/brightlight/config"
 )
 
 // Animation action to perform on a segment (from UI)
@@ -140,9 +141,21 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
 		}
 
-	case "Sweet Shop": // TODO MAKE TIME A PARAMETER
-		*animators = append(*animators, segNameAndAnimator{seg.Name, newSweetshop(time.Second * 1)})
-
+	case "Sweet Shop":
+		var err error
+		duration, err := seg.Params.asRange(0)
+		var brightness int
+		if err == nil {
+			brightness, err = seg.Params.asRange(1)
+		}
+		var minSaturation int
+		if err == nil {
+			minSaturation, err = seg.Params.asRange(2)
+		}
+		if err == nil {
+			*animators = append(*animators, segNameAndAnimator{seg.Name,
+				newSweetshop(config.FramePeriodMs*time.Duration(duration), brightness, minSaturation)})
+		}
 	case "Twinkle":
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newTwinkle()})
 

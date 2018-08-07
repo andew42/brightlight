@@ -81,6 +81,7 @@ With ANSI terminal emulator enabled for logrus
 * Does not support on call bar well (as home screen app)
 * Indicate selected button
 #####Engine
+* Allow same segment to appear multiple times
 * Candle
 * Fair ground light chasers
 * Static string (Gazebo lights)
@@ -90,6 +91,9 @@ With ANSI terminal emulator enabled for logrus
 * Fade between animations
 * Cylon stacking
 * Twinkle colours
+* Plasma charging bulls
+* Meteors
+* Fireworks
 * Support for alexa
 
 #### Building for pi

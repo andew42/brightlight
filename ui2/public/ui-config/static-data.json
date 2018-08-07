@@ -17,7 +17,9 @@
       {"key":50, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
     ]},
     {"name":"Sweet Shop", "params":[
-      {"key":60, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}
+      {"key":60, "type":"range", "label":"Duration(frames)", "min":1, "max":100, "value":25},
+      {"key":61, "type":"range", "label":"Brightness", "min":20, "max":60, "value":50},
+      {"key":62, "type":"range", "label":"Min Saturation", "min":0, "max":99, "value":50}
     ]},
     {"name":"Twinkle", "params":[
       {"key":70, "type":"range", "label":"Speed", "min":1, "max":60, "value":30}

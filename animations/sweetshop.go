@@ -7,14 +7,16 @@ import (
 )
 
 type sweetshop struct {
-	period     time.Duration
-	changeTime time.Time
-	pixies     []framebuffer.Rgb
+	period        time.Duration
+	brightness    int
+	minSaturation int
+	changeTime    time.Time
+	pixies        []framebuffer.Rgb
 }
 
-func newSweetshop(period time.Duration) *sweetshop {
+func newSweetshop(period time.Duration, brightness int, minSaturation int) *sweetshop {
 
-	return &sweetshop{period: period}
+	return &sweetshop{period: period, brightness: brightness, minSaturation: minSaturation}
 }
 
 func (s *sweetshop) animateFrame(frameCount uint, frame segment.Segment) {
@@ -32,7 +34,7 @@ func (s *sweetshop) animateFrame(frameCount uint, frame segment.Segment) {
 
 		// Refresh the random colours
 		for i := uint(0); i < frame.Len(); i++ {
-			s.pixies[i] = framebuffer.NewRgbFromHsl(randBetween(0, 359), randBetween(50, 100), 50)
+			s.pixies[i] = framebuffer.NewRgbFromHsl(randBetween(0, 359), randBetween(s.minSaturation, 100), uint(s.brightness))
 		}
 	}
 
