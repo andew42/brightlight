@@ -202,8 +202,25 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 			4)})
 
 	case "Discrete":
-		*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
-			newBulb(framebuffer.NewRgb(255, 255, 255), 0, 1), 15)})
+		var err error
+		colour, err := seg.Params.asColour(0)
+		var width int
+		if err == nil {
+			width, err = seg.Params.asRange(1)
+		}
+		var repeat int
+		if err == nil {
+			repeat, err = seg.Params.asRange(2)
+		}
+		if err == nil && (width < 1 || repeat < 1) {
+			err = errors.New("bad width or repeat parameters")
+		}
+		if err == nil {
+			*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
+				newBulb(colour, 0, uint(width)), uint(repeat))})
+		} else {
+			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+		}
 
 	default:
 		log.WithField("action", seg.Animation).Warn("Unknown animation action")
