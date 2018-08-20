@@ -5,7 +5,7 @@ import ButtonPad from "./buttons/ButtonPad";
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
 import ButtonEditor from "./button-edit/ButtonEditor";
 import {getStaticData} from "./server-proxy/staticData";
-import {getButtons} from "./server-proxy/buttons";
+import {getButtons, saveButtons} from "./server-proxy/buttons";
 import {runAnimation} from "./server-proxy/animation";
 import Virtual from "./virtual/Virtual";
 
@@ -47,7 +47,10 @@ export default class App extends Component {
 
     onSaveButtonEdit() {
         console.info('onSaveButtonEdit');
-        // TODO SAVE!
+        saveButtons(
+            this.state.allButtons,
+            () => console.info('button state saved'),
+            (xhr) => console.error(xhr)); // TODO: Report errors to user
     }
 
     findButton(key) {

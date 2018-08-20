@@ -159,7 +159,7 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 	case "Twinkle":
 		*animators = append(*animators, segNameAndAnimator{seg.Name, newTwinkle()})
 
-	case "BabyBows":
+	case "Baby Bows":
 		var err error
 		length, err := seg.Params.asRange(0)
 		var duration int
@@ -218,6 +218,24 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		if err == nil {
 			*animators = append(*animators, segNameAndAnimator{seg.Name, newRepeater(
 				newBulb(colour, 0, uint(width)), uint(repeat))})
+		} else {
+			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+		}
+
+	case "Life":
+		var err error
+		colour, err := seg.Params.asColour(0)
+		var duration int
+		if err == nil {
+			duration, err = seg.Params.asRange(1)
+		}
+		var rule int
+		if err == nil {
+			rule, err = seg.Params.asRange(2)
+		}
+		if err == nil {
+			*animators = append(*animators, segNameAndAnimator{seg.Name,
+				newLife(colour, uint(duration), rule)})
 		} else {
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
 		}

@@ -141,7 +141,7 @@
       {
         "name":"All",
         "z":1,
-        "animation":"BabyBows",
+        "animation":"Baby Bows",
         "params":[
           {"key":80, "type":"range", "label":"Bow Length", "min":1, "max":50, "value":15},
           {"key":81, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15},

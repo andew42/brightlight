@@ -81,6 +81,7 @@ With ANSI terminal emulator enabled for logrus
 * Does not support on call bar well (as home screen app)
 * Indicate selected button
 #####Engine
+* Indicate which button is pressed
 * Allow same segment to appear multiple times
 * Candle
 * Fair ground light chasers

@@ -18,7 +18,7 @@
     ]},
     {"name":"Twinkle", "params":[
     ]},
-    {"name":"BabyBows", "params":[
+    {"name":"Baby Bows", "params":[
       {"key":80, "type":"range", "label":"Bow Length", "min":1, "max":50, "value":15},
       {"key":81, "type":"range", "label":"Duration(s)", "min":1, "max":60, "value":15},
       {"key":82, "type":"range", "label":"Brightness", "min":10, "max":50, "value":50}
@@ -31,6 +31,11 @@
       {"key":110, "type":"colour", "label":"Colour", "value":{"r":128, "g":128, "b":128}},
       {"key":111, "type":"range", "label":"Width", "min":1, "max":10, "value":1},
       {"key":112, "type":"range", "label":"Repeat", "min":1, "max":200, "value":20}
+    ]},
+    {"name":"Life", "params":[
+      {"key":120, "type":"colour", "label":"Colour", "value":{"r":128, "g":128, "b":128}},
+      {"key":121, "type":"range", "label":"Duration(frames)", "min":1, "max":100, "value":25},
+      {"key":122, "type":"range", "label":"Rule", "min":0, "max":255, "value":30}
     ]}
   ],
   "segments": [
