@@ -70,6 +70,21 @@ func (params segmentParams) asRange(index int) (int, error) {
 	return 0, errors.New("unexpected parameter type")
 }
 
+func (params segmentParams) asCheckbox(index int) (bool, error) {
+
+	if params == nil || len(params) <= index {
+		return false, errors.New("no parameter at index: " + strconv.Itoa(index))
+	}
+	p := params[index];
+	if p.Type != "checkbox" {
+		return false, errors.New("parameter type 'checkbox' expected but '" + p.Type + "' provided")
+	}
+	if val, ok := p.Value.(bool); ok {
+		return bool(val), nil
+	}
+	return false, errors.New("unexpected parameter type")
+}
+
 func (m *propertyMap) IsValidNumber(i string) bool {
 	var v interface{}
 	var ok bool
@@ -233,9 +248,13 @@ func appendAnimatorsForAction(animators *[]segNameAndAnimator, seg SegmentAction
 		if err == nil {
 			rule, err = seg.Params.asRange(2)
 		}
+		var autoRepeat bool
+		if err == nil {
+			autoRepeat, err = seg.Params.asCheckbox(3)
+		}
 		if err == nil {
 			*animators = append(*animators, segNameAndAnimator{seg.Name,
-				newLife(colour, uint(duration), rule)})
+				newLife(colour, uint(duration), rule, autoRepeat)})
 		} else {
 			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
 		}

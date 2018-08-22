@@ -4,6 +4,7 @@ import './LedSegmentEditor.css';
 import ColourEditor from "./ColourEditor";
 import Colour from "../colour/Colour";
 import {RangeEditor} from "./RangeEditor";
+import {CheckboxEditor} from "./CheckboxEditor";
 
 export function LedSegmentEditor(props) {
     return <Segment attached color='blue' className='lse-container'>
@@ -64,6 +65,14 @@ function LedSegmentParam(props) {
                     ...props.param,
                     value: pos
                 })}/>;
+        case "checkbox":
+            return <CheckboxEditor
+                label={props.param.label}
+                checked={props.param.value}
+                onChange={newCheckState => props.onParamChanged({
+                    ...props.param,
+                    value: newCheckState
+                })}/>
         default:
             return "Unknown Param: " + props.param.type;
     }

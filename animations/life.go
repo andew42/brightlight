@@ -10,14 +10,16 @@ type life struct {
 	colour              framebuffer.Rgb
 	framesPerGeneration uint
 	rule                int
+	autoRepeat          bool
+	repeatGeneration	uint
 	cachedGeneration    uint
 	cachedState         []bool
 	tempState           []bool
 }
 
-func newLife(colour framebuffer.Rgb, framesPerGeneration uint, rule int) *life {
+func newLife(colour framebuffer.Rgb, framesPerGeneration uint, rule int, autoRepeat bool) *life {
 
-	return &life{colour: colour, framesPerGeneration: framesPerGeneration, rule: rule}
+	return &life{colour: colour, framesPerGeneration: framesPerGeneration, rule: rule, autoRepeat: autoRepeat}
 }
 
 func (l *life) animateFrame(frameCount uint, frame segment.Segment) {
@@ -40,6 +42,9 @@ func (l *life) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Work out the required generation
 	generation := frameCount / l.framesPerGeneration
+	if l.repeatGeneration != 0 {
+		generation = generation % l.repeatGeneration
+	}
 
 	// Get the state for that generation
 	newState := l.getGenerationState(generation)
@@ -53,6 +58,12 @@ func (l *life) getGenerationState(generation uint) []bool {
 		return l.cachedState
 	}
 
+	if generation == 0 {
+		l.cachedGeneration = 0;
+		l.cachedState = getGenerationZeroState(uint(len(l.cachedState)))
+		return l.cachedState
+	}
+
 	if l.cachedGeneration > generation {
 		log.Fatal("attempt to regress generation in life animation")
 	}
@@ -63,7 +74,28 @@ func (l *life) getGenerationState(generation uint) []bool {
 		l.cachedState, l.tempState = l.tempState, l.cachedState
 		l.cachedGeneration++
 	}
+
+	// If the state hasn't changed we may need to auto repeat
+	if l.autoRepeat && areStatesEqual(l.cachedState, l.tempState) {
+		l.cachedGeneration = 0;
+		l.cachedState = getGenerationZeroState(uint(len(l.cachedState)))
+		l.repeatGeneration = generation
+	}
+
 	return l.cachedState
+}
+
+func areStatesEqual(s1 []bool, s2 []bool) bool {
+
+	if len(s1) != len(s2) {
+		return false
+	}
+	for i := range s1 {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func getNextGenerationState(rule int, currentState []bool, nextState []bool) {
