@@ -11,6 +11,13 @@ import (
 	"github.com/andew42/brightlight/config"
 )
 
+// Button request to animate
+type Button struct {
+	Key      int
+	Name     string
+	Segments segments
+}
+
 // Animation action to perform on a segment (from UI)
 type SegmentAction struct {
 	Name      string
@@ -23,6 +30,7 @@ type segmentParam struct {
 	Value interface{}
 }
 
+type segments []SegmentAction
 type segmentParams []segmentParam
 type propertyMap map[string]interface{}
 

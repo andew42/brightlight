@@ -1,5 +1,4 @@
 import * as React from "react";
-import './Button.css';
 
 export default class Button extends React.Component {
     constructor(props) {
@@ -25,13 +24,13 @@ export default class Button extends React.Component {
     }
 
     render() {
-        return <button style={this.props.style}
-                       onTouchStart={() => this.onTouchStart()}
+        let classNames = this.props.active ? 'button-active ' : '';
+        classNames = classNames + (this.state.pressed ? 'button-long-pressed' : 'button-pressed');
+        return <button onTouchStart={() => this.onTouchStart()}
                        onTouchEnd={e => this.onTouchEnd(e)}
                        onMouseDown={() => this.onTouchStart()}
                        onMouseUp={e => this.onTouchEnd(e)}
-                       className={this.state.pressed ? 'button-long-pressed' : 'button-pressed'}
-        >
+                       className={classNames}>
             <div>{this.props.label}</div>
         </button>
     }

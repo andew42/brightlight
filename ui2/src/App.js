@@ -42,7 +42,7 @@ export default class App extends Component {
         this.setState((props, state) => {
             return {...state, allButtons: allButtons}
         });
-        runAnimation(button.segments);
+        runAnimation(button);
     }
 
     onSaveButtonEdit() {
@@ -58,11 +58,11 @@ export default class App extends Component {
     }
 
     onButtonTap(key) {
-        runAnimation(this.findButton(key).segments);
+        runAnimation(this.findButton(key));
     }
 
     onButtonPress(history, key) {
-        runAnimation(this.findButton(key).segments);
+        runAnimation(this.findButton(key));
         history.push('/button-edit', {'buttonKey': key});
     }
 

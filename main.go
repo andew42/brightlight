@@ -82,6 +82,9 @@ func main() {
 	// Requests to show a strip length on the room lights
 	http.HandleFunc("/StripLength/", servers.StripLenHandler)
 
+	// Push button state changes over a web socket to keep UIs in sync
+	http.Handle("/ButtonState", websocket.Handler(servers.ButtonStateHandler))
+
 	// Push frame buffer changes over a web socket for virtual framebuffer debugging
 	http.Handle("/FrameBuffer", websocket.Handler(servers.FrameBufferHandler))
 

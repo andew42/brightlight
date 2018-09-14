@@ -1,36 +1,40 @@
-let busy;
-let nextRunAnimation;
+let currentAnimationRequest;
+let nextAnimationRequest;
 
-export function runAnimation(segments) {
-
-    console.log('runAnimation: ' + segments);
+export function runAnimation(button) {
 
     // Return immediately if nothing to do
-    if (segments === undefined || segments.length === 0) {
+    if (button === undefined || button.segments === undefined || button.segments.length === 0)
         return;
-    }
+
+    // Already requesting current animation? This can happen on a desktop
+    // browser where we see tap for the touch and the tap for the mouse
+    if (currentAnimationRequest !== undefined && button.key === currentAnimationRequest.key)
+        return;
+
+    console.log('runAnimation: ' + button.key + ' ' + button.name);
 
     // Throttle calls to server when user is swiping around
-    if (busy) {
-        // Make a copy of the segment list to run when last call completes
-        nextRunAnimation = segments.map(x => ({...x}));
+    if (currentAnimationRequest !== undefined) {
+        // Remember button to run when last call completes
+        nextAnimationRequest = button;
     } else {
-        busy = true;
+        currentAnimationRequest = button;
         let req = new XMLHttpRequest();
         req.open("POST", "/RunAnimations/");
         req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        req.send(JSON.stringify(segments));
+        req.send(JSON.stringify(button));
         req.onreadystatechange = function () {
             if (req.readyState === 4) {
-// TODO                setConnectionStatus(req.responseText);
+                console.info('runAnimation returned teensy connection state: ' + req.responseText);
                 req = null;
             }
 
             // Run any pending animations so we always have the last one
-            busy = false;
-            if (nextRunAnimation !== undefined) {
-                runAnimation(nextRunAnimation);
-                nextRunAnimation = undefined;
+            currentAnimationRequest = undefined;
+            if (nextAnimationRequest !== undefined) {
+                runAnimation(nextAnimationRequest);
+                nextAnimationRequest = undefined;
             }
         };
     }

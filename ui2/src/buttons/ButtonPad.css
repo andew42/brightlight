@@ -21,6 +21,25 @@
     color: #303040;
     font-weight: bold;
     height: 5em;
+    -webkit-tap-highlight-color: #00000000;
+}
+
+.button-pad > button:active {
+    background-color: gainsboro;
+    color: #303040;
+    border-top-color: orange;
+    border-top-width: 7px;
+    border-top-style: solid;
+}
+
+.button-pad > button.button-active {
+    border-top-color: darkorange;
+    border-top-width: 7px;
+    border-top-style: solid;
+}
+
+.button-pad > button.button-long-pressed {
+    background-color: darkorange;
 }
 
 .button-pad-bottom-padding {
