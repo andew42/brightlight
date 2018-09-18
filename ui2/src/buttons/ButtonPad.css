@@ -13,7 +13,15 @@
     background-color: purple;
 }
 
-.button-pad > button {
+.button-pad > div {
+    position: relative;
+    height: 5em;
+}
+
+.button-pad > div > button {
+    position: absolute;
+    left: 0;
+    width: 100%;
     border: 2px gainsboro;
     border-radius: 2px;
     background-color: gainsboro;
@@ -24,21 +32,17 @@
     -webkit-tap-highlight-color: #00000000;
 }
 
-.button-pad > button:active {
-    background-color: gainsboro;
-    color: #303040;
-    border-top-color: orange;
-    border-top-width: 7px;
-    border-top-style: solid;
+.button-pad > div > div.active{
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 7px;
+    background: darkorange;
+    border: 2px darkorange;
+    border-radius: 2px;
 }
 
-.button-pad > button.button-active {
-    border-top-color: darkorange;
-    border-top-width: 7px;
-    border-top-style: solid;
-}
-
-.button-pad > button.button-long-pressed {
+.button-pad > div > button.button-pressed {
     background-color: darkorange;
 }
 

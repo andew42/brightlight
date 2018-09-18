@@ -33,11 +33,14 @@ export default class ButtonPad extends React.Component {
 
         return <Bouncefix className="Bouncefix">
             <div className="button-pad">{this.props.allButtons.map(button =>
-                <Button key={button.key}
-                        active={button.key === this.state.activeButtonKey}
-                        onTap={() => this.props.onButtonTap(button.key)}
-                        onPressUp={() => this.props.onButtonPress(this.props.history, button.key)}
-                        label={button.name}/>)}
+                <div>
+                    <Button key={button.key}
+                            active={button.key === this.state.activeButtonKey}
+                            onTap={() => this.props.onButtonTap(button.key)}
+                            onPressUp={() => this.props.onButtonPress(this.props.history, button.key)}
+                            label={button.name}/>
+                    <div className={button.key === this.state.activeButtonKey ? 'active' : ''}/>
+                </div>)}
             </div>
             <div className="button-pad-bottom-padding"/>
         </Bouncefix>
