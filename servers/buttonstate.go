@@ -7,32 +7,43 @@ import (
 	"sync"
 )
 
-var listenersMux sync.Mutex
-var listeners []chan int
-
-// Called by run animations server to indicate current button pressed
-func updateButtonState(key int) {
-
-	listenersMux.Lock()
-	defer listenersMux.Unlock()
-	for _, l := range listeners {
-		l <- key
-	}
-	currentButtonKey = key
+// Track the currently active button and version of the button pad save
+// Allows multiple UIs to refresh active button and button pad contents
+// when it changes
+type buttonState struct {
+	ActiveButtonKey  int
+	ButtonPadVersion int
 }
 
-// Called by each web socket go routine to append a listener
-func addButtonListener() chan int {
+var listenersMux sync.Mutex
+var listeners []chan buttonState
+var currentButtonState buttonState
 
+// Called by run animations server to indicate current button pressed
+func updateActiveButtonKey(key int) {
+	updateCurrentButtonState(func() {
+		currentButtonState.ActiveButtonKey = key
+	})
+}
+
+// Called by config server to update button pad save version
+func updateButtonPadVersion(ver int) {
+	updateCurrentButtonState(func() {
+		currentButtonState.ButtonPadVersion = ver
+	})
+}
+
+func updateCurrentButtonState(f func()) {
 	listenersMux.Lock()
 	defer listenersMux.Unlock()
-	c := make(chan int)
-	listeners = append(listeners, c)
-	return c
+	f()
+	for _, l := range listeners {
+		l <- currentButtonState
+	}
 }
 
 // Called when a web socket closes to remove its listener
-func removeButtonListener(c chan int) {
+func removeButtonListener(c chan buttonState) {
 
 	listenersMux.Lock()
 	defer listenersMux.Unlock()
@@ -49,51 +60,56 @@ func removeButtonListener(c chan int) {
 // Give each button state listener its own unique ID (for logging)
 var buttonStateListenerId = 0
 
-// Current button state so we can immediately tell new listeners
-var currentButtonKey = 0
-
 // Handle button state web socket requests (web socket is closed when
 // we return) We have one of these go routines per web socket request
 func ButtonStateHandler(ws *websocket.Conn) {
 
-	// Not thread safe but good enough for debug output
+	listenersMux.Lock()
+
+	// Create an id for this listener go routine
 	buttonStateListenerId++
 	listenerId := buttonStateListenerId
 	log.WithField("id", listenerId).Info("adding button state listener")
 
-	// Add our listener
-	src := addButtonListener()
+	// Add our listener channel
+	update := make(chan buttonState)
+	listeners = append(listeners, update)
+
+	// Copy the current button state
+	buttonState := currentButtonState
+
+	listenersMux.Unlock()
 
 	// Send the current state immediately
-	if err := sendButtonStateToWebSocket(listenerId, currentButtonKey, ws, src); err != nil {
+	if err := sendButtonStateToWebSocket(listenerId, buttonState, ws, update); err != nil {
 		return
 	}
 
-	// Watch for client close operations by setting up a read go routine, we
-	// never expect anything from the client but the read fails on close
+	// Watch for client closeSocket operations by setting up a read go routine, we
+	// never expect anything from the client but the read fails on closeSocket
 	// https://groups.google.com/forum/#!topic/golang-nuts/pXNSBx4wgAw
-	close := make(chan int)
+	closeSocket := make(chan int)
 	go func() {
 		websocket.Message.Receive(ws, nil)
-		close <- 0
+		closeSocket <- 0
 	}()
 
 	for {
 		select {
-		case bs := <-src: // src sends us button state updates
-			if err := sendButtonStateToWebSocket(listenerId, bs, ws, src); err != nil {
+		case bs := <-update: // update sends us button state updates
+			if err := sendButtonStateToWebSocket(listenerId, bs, ws, update); err != nil {
 				return
 			}
-		case <-close: // close sends us read errors (i.e. socket closed by client)
+		case <-closeSocket: // closeSocket sends us read errors (i.e. socket closed by client)
 			log.WithField("id", listenerId).Info("closing button state listener")
-			removeButtonListener(src)
-			return;
+			removeButtonListener(update)
+			return
 		}
 	}
 }
 
 // Render button state key as JSON
-func sendButtonStateToWebSocket(listenerId int, bs int, ws *websocket.Conn, c chan int) error {
+func sendButtonStateToWebSocket(listenerId int, bs buttonState, ws *websocket.Conn, c chan buttonState) error {
 
 	log.WithFields(log.Fields{"id": listenerId, "state": bs}).Info("sending button state")
 

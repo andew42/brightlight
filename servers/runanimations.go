@@ -50,7 +50,7 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 	animations.RunAnimations(button.Segments)
 
 	// Update button state (i.e. the button key for the animation we are running)
-	updateButtonState(button.Key)
+	updateActiveButtonKey(button.Key)
 
 	// Return controller status
 	allConnected := true

@@ -77,9 +77,9 @@ With ANSI terminal emulator enabled for logrus
 
 #### To Do
 #####UI
+* Changing button name / config not reflected in second ui
 * Does not support landscape well (as home screen app)
 * Does not support on call bar well (as home screen app)
-* Indicate selected button
 #####Engine
 * Candle
 * Fair ground light chasers

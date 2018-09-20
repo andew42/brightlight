@@ -16,9 +16,9 @@ export default class ButtonPad extends React.Component {
 
     // Open web socket to stream active button state transitions
     componentDidMount() {
-        this.ws = OpenWebSocket('ButtonState', b => {
-            console.info('Active button changed to ' + b);
-            this.setState({activeButtonKey: b});
+        this.ws = OpenWebSocket('ButtonState', bs => {
+            console.info('button state changed to ', bs);
+            this.setState({activeButtonKey: bs.ActiveButtonKey});
         });
     }
 
