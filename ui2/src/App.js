@@ -8,6 +8,7 @@ import {getStaticData} from "./server-proxy/staticData";
 import {getButtons, saveButtons} from "./server-proxy/buttons";
 import {runAnimation} from "./server-proxy/animation";
 import Virtual from "./virtual/Virtual";
+import {OpenWebSocket} from "./server-proxy/webSocket";
 
 // Home page is just a bunch of links for now
 const Home = () => (
@@ -23,18 +24,49 @@ export default class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {allButtons: undefined, allSegments: undefined, allAnimations: undefined}
+        this.state =
+            {
+                allButtons: undefined,
+                allSegments: undefined,
+                allAnimations: undefined,
+                activeButtonKey: 0,
+                buttonPadVersion: 1
+            };
     }
 
     // Get static data from server when mounting
     componentDidMount() {
-        getButtons(
-            buttons => this.setState({allButtons: buttons}),
-            (xhr) => console.error(xhr)); // TODO: Report errors to user
 
+        console.info('getting static data');
         getStaticData(
             sd => this.setState({allSegments: sd.segments, allAnimations: sd.animations}),
-            (xhr) => console.error(xhr)); // TODO: Report errors to user
+            (xhr) => console.error(xhr));
+
+        // Subscribe to button state updates (we get immediate update on connection)
+        this.ws = OpenWebSocket('ButtonState', bs => {
+            console.info('button state changed to ', bs);
+
+            if (this.state.activeButtonKey !== bs.ActiveButtonKey)
+                this.setState({activeButtonKey: bs.ActiveButtonKey});
+
+            if (this.state.buttonPadVersion !== bs.ButtonPadVersion) {
+                this.setState({buttonPadVersion: bs.ButtonPadVersion});
+                this.getButtonConfig();
+            }
+        });
+    }
+
+    getButtonConfig() {
+        console.info('getting button configuration');
+        getButtons(
+            buttons => this.setState({allButtons: buttons}),
+            (xhr) => console.error(xhr));
+    }
+
+    // Close web socket
+    componentWillUnmount() {
+        if (this.ws !== undefined)
+            this.ws.close()
     }
 
     onButtonChanged(button) {
@@ -70,6 +102,7 @@ export default class App extends Component {
 
         let ButtonPadWithProps = props => {
             return (<ButtonPad allButtons={this.state.allButtons}
+                               activeButtonKey={this.state.activeButtonKey}
                                onButtonTap={key => this.onButtonTap(key)}
                                onButtonPress={(history, key) => this.onButtonPress(history, key)}
                                {...props}/>);

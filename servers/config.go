@@ -7,6 +7,8 @@ import (
 	"path"
 )
 
+var configVersion = 0
+
 // Handle HTTP requests to read and write config
 func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Request) {
 
@@ -51,6 +53,10 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 				if err = ioutil.WriteFile(fullPath, content, 0644); err != nil {
 					log.WithField("Error", err.Error()).Error("Failed to write file")
 					http.Error(w, "Failed to write file", 507)
+				} else {
+					// Let clients know the config has been updated
+					configVersion++
+					updateButtonPadVersion(configVersion)
 				}
 			}
 		} else {
