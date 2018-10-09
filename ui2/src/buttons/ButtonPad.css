@@ -1,11 +1,11 @@
-.Bouncefix {
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-}
-
 .button-pad {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: grid;
+    height: 100%;
     grid-template-columns: repeat(3, 1fr);
     grid-column-gap: 6px;
     grid-row-gap: 6px;
@@ -15,7 +15,6 @@
 
 .button-pad > div {
     position: relative;
-    height: 5em;
 }
 
 .button-pad > div > button {
@@ -25,10 +24,8 @@
     border: 2px gainsboro;
     border-radius: 2px;
     background-color: gainsboro;
-    padding: 1em;
-    color: #303040;
-    font-weight: bold;
-    height: 5em;
+    color: black;
+    height: 100%;
     -webkit-tap-highlight-color: #00000000;
 }
 
@@ -36,7 +33,7 @@
     position: absolute;
     left: 0;
     width: 100%;
-    height: 7px;
+    height: 6px;
     background: darkorange;
     border: 2px darkorange;
     border-radius: 2px;
@@ -44,9 +41,4 @@
 
 .button-pad > div > button.button-pressed {
     background-color: darkorange;
-}
-
-.button-pad-bottom-padding {
-    background-color: purple;
-    height: 10000px;
 }

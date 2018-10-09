@@ -13,7 +13,8 @@
 body {
     margin: 0;
     -webkit-user-select: none;
-    font-family: San-Francisco, HelveticaNeue-Light, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
 }
 
 button:focus {

@@ -4,6 +4,7 @@ import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
+	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/servers"
@@ -14,7 +15,7 @@ import (
 	"os"
 	"path"
 	"runtime"
-	"github.com/andew42/brightlight/config"
+	"strings"
 )
 
 // Wrap a Dir file system server object to log failures
@@ -31,6 +32,26 @@ func (d LoggedDir) Open(path string) (http.File, error) {
 			Info("requested static HTTP content not found")
 	}
 	return f, err
+}
+
+// Wrap a Dir file system server object to redirect
+type LoggedRedirectingDir struct {
+	LoggedDir
+	Prefix []string
+}
+
+// Redirect paths in Prefix slice by remove the entry prefix
+// e.g. for entry /buttons path /buttons/index.html -> /index.html
+func (d LoggedRedirectingDir) Open(path string) (http.File, error) {
+
+	for _, p := range d.Prefix {
+		if strings.HasPrefix(path, p) {
+			path = strings.TrimPrefix(path, p)
+			log.WithField("prefix", p).Info("redirecting")
+			break
+		}
+	}
+	return d.LoggedDir.Open(path)
 }
 
 // Main
@@ -69,7 +90,10 @@ func main() {
 	fs1 := http.FileServer(LoggedDir{http.Dir(contentBasePath)})
 	http.Handle("/ui/", fs1)
 	// Serve new react ui on /
-	fs2 := http.FileServer(LoggedDir{http.Dir(contentBasePath + "/ui2/build")})
+	fs2 := http.FileServer(LoggedRedirectingDir{
+		LoggedDir{http.Dir(contentBasePath + "/ui2/build")},
+	//	[]string{"/buttons", "/virtual"}})
+		[]string{}})
 	http.Handle("/", fs2)
 
 	// Config requires PUT (write) support

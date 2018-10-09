@@ -99,7 +99,6 @@ export default class App extends Component {
     }
 
     render() {
-
         let ButtonPadWithProps = props => {
             return (<ButtonPad allButtons={this.state.allButtons}
                                activeButtonKey={this.state.activeButtonKey}
@@ -122,6 +121,8 @@ export default class App extends Component {
             <div className="App" onContextMenu={e => e.preventDefault()}>
                 <Helmet>
                     <meta name="apple-mobile-web-app-capable" content="yes"/>
+                    <meta name="apple-mobile-web-app-title" content="Bright Light"/>
+                    <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
                     <title>Bright Light</title>
                 </Helmet>
                 <BrowserRouter>

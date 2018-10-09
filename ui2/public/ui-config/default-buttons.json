@@ -159,7 +159,7 @@
         "z":1,
         "animation":"Static",
         "params":[
-          {"key":20, "type":"colour", "label":"Colour", "value":{"r":63, "g":63, "b":63}}
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":12, "g":9, "b":3}}
         ]
       }
     ]
@@ -226,6 +226,90 @@
         "animation":"Static",
         "params":[
           {"key":20, "type":"colour", "label":"Colour", "value":{"r":2, "g":2, "b":2}}
+        ]
+      }
+    ]
+  },
+  {
+    "key":16,
+    "name":"",
+    "segments":[
+      {
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+        ]
+      }
+    ]
+  },
+  {
+    "key":17,
+    "name":"",
+    "segments":[
+      {
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+        ]
+      }
+    ]
+  },
+  {
+    "key":18,
+    "name":"",
+    "segments":[
+      {
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+        ]
+      }
+    ]
+  },
+  {
+    "key":19,
+    "name":"",
+    "segments":[
+      {
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+        ]
+      }
+    ]
+  },
+  {
+    "key":20,
+    "name":"",
+    "segments":[
+      {
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
+        ]
+      }
+    ]
+  },
+  {
+    "key":21,
+    "name":"",
+    "segments":[
+      {
+        "name":"All",
+        "z":1,
+        "animation":"Static",
+        "params":[
+          {"key":20, "type":"colour", "label":"Colour", "value":{"r":0, "g":0, "b":0}}
         ]
       }
     ]
