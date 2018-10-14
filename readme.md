@@ -16,7 +16,7 @@ runs on a raspberry Pi or similar.
 ### Setting up new Pi
 * [Download RASPBIAN STRETCH LITE](https://www.raspberrypi.org/downloads/raspbian/)
 * Create a (4G) SD card with [etcher](https://etcher.io/)
-* Create a new file called "ssh" on the SD card. This will enable the SSH daemon immediately after the first boot.
+* Create a new file called "ssh" on the SD card's FAT boot partition. This will enable the SSH daemon immediately after the first boot.
 * SSH onto pi from Windows or Mac (password raspberry)
  ```bash
  ssh pi@192.168.0.46
@@ -34,7 +34,7 @@ export GOPATH=/home/pi
 ```bash
 env GOOS=linux GOARCH=arm go build -o ./brightlight
 ```
-* Copy to executable to pi
+* Copy executable to pi
 ```bash
  scp  ./brightlight pi@192.168.0.46:/home/pi
 ```
@@ -66,6 +66,7 @@ With ANSI terminal emulator enabled for logrus
 #### To Do
 #####UI
 * Scrolling slider for config setting is horrid
+
 #####Engine
 * Candle
 * Fair ground light chasers
