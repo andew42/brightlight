@@ -14,7 +14,7 @@ export default class ButtonPad extends React.Component {
 
     render() {
         if (this.props.allButtons === undefined)
-            return this.waitingForServer();
+            return this.noServer();
 
         return <NoScroll>
             <div className="button-pad">
@@ -30,12 +30,12 @@ export default class ButtonPad extends React.Component {
         </NoScroll>
     }
 
-    waitingForServer() {
+    noServer() {
         return <Message warning icon>
             <Icon name='circle notched' loading/>
             <Message.Content>
-                <Message.Header>Waiting for Server</Message.Header>
-                Ensure phone is connected to correct WiFi
+                <Message.Header>Server Not Found</Message.Header>
+                Ensure phone is connected to WiFi and try again
             </Message.Content>
         </Message>
     }

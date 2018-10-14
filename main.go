@@ -92,8 +92,8 @@ func main() {
 	// Serve new react ui on /
 	fs2 := http.FileServer(LoggedRedirectingDir{
 		LoggedDir{http.Dir(contentBasePath + "/ui2/build")},
-	//	[]string{"/buttons", "/virtual"}})
-		[]string{}})
+		[]string{"/buttons", "/virtual"}})
+	//	[]string{}})
 	http.Handle("/", fs2)
 
 	// Config requires PUT (write) support

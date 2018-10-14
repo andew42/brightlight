@@ -76,10 +76,6 @@ https://github.com/go-lang-plugin-org
 With ANSI terminal emulator enabled for logrus
 
 #### To Do
-#####UI
-* Changing button name / config not reflected in second ui
-* Does not support landscape well (as home screen app)
-* Does not support on call bar well (as home screen app)
 #####Engine
 * Candle
 * Fair ground light chasers
@@ -89,7 +85,6 @@ With ANSI terminal emulator enabled for logrus
 * Security indicators
 * Fade between animations
 * Cylon stacking
-* Twinkle colours
 * Plasma charging bulls
 * Meteors
 * Fireworks
