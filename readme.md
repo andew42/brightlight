@@ -14,68 +14,58 @@ runs on a raspberry Pi or similar.
 * [Install Teensyduino 1.26](https://www.pjrc.com/teensy/td_download.html)
 
 ### Setting up new Pi
-* [Build latest raspbian card](https://www.raspberrypi.org/downloads/)
-* [Download go tar ball 1.5.2](http://dave.cheney.net/unofficial-arm-tarballs)
-* Update profile in /etc to include /usr/local/go/bin in path (sudo nano /etc/profile)
-* Create **clean**, **build** and **run** script and chmod 744 than to make them executable
-* sudo nano /etc/rc.local and add:
+* [Download RASPBIAN STRETCH LITE](https://www.raspberrypi.org/downloads/raspbian/)
+* Create a (4G) SD card with [etcher](https://etcher.io/)
+* Create a new file called "ssh" on the SD card. This will enable the SSH daemon immediately after the first boot.
+* SSH onto pi from Windows or Mac (password raspberry)
+ ```bash
+ ssh pi@192.168.0.46
+ ``` 
+* Set up auto start
 ```bash
-# Start bright light
-export GOPATH=/home/pi/go
-/home/pi/go/bin/brightlight > /dev/null 2>&1 &
+sudo nano /etc/rc.local
 ```
-
-### Scripts
-
-###### OSX: Connecting to raspberry pi fom OSX terminal session
+* Add
 ```bash
-ssh pi@192.168.0.46
+export GOPATH=/home/pi
+/home/pi/brightlight > /dev/null 2>&1 &
 ```
-
-###### Pi: clean
+* Build brightlight on Windows or Mac for Arm
+```bash
+env GOOS=linux GOARCH=arm go build -o ./brightlight
+```
+* Copy to executable to pi
+```bash
+ scp  ./brightlight pi@192.168.0.46:/home/pi
+```
+* Create ui folder
+```bash
+mkdir -p /home/pi/src/github.com/andew42/brightlight/ui2/build
+```
+* Copy ui files (build first)
+```bash
+scp -r . pi@192.168.0.46:/home/pi/src/github.com/andew42/brightlight/ui2/build
+```
+* Killing running copies
 ```bash
 sudo killall -q -9 brightlight
-rm -f -r /home/pi/go
-rm -f /home/pi/brightlight.log
-mkdir -p /home/pi/go/src
-```
-
-###### OSX: copy latest source
-```bash
-rsync -rav -e ssh --exclude='.git' \
-/Users/andrew/Dropbox/go/src/ \
-pi@192.168.0.46:/home/pi/go/src/
-```
-
-###### Pi: build
-```bash
-export GOPATH=/home/pi/go
-cd /home/pi/go/src/github.com/andew42/brightlight
-go install
-```
-
-###### Pi: run
-```bash
-export GOPATH=/home/pi/go
-/home/pi/go/bin/brightlight
 ```
 
 ### Dev Environment
-#### go 1.5.2
+#### go 1.11.1
 https://golang.org/dl/
 
 go get "github.com/Sirupsen/logrus"
 
-#### WebStorm 10.04
-https://www.jetbrains.com/webstorm/
-
-#### Go language plugin 0.9.748
-https://github.com/go-lang-plugin-org
+#### Goland 2018.2
+https://www.jetbrains.com/go/
 
 #### Grep Console plugin
 With ANSI terminal emulator enabled for logrus
 
 #### To Do
+#####UI
+* Scrolling slider for config setting is horrid
 #####Engine
 * Candle
 * Fair ground light chasers
@@ -89,6 +79,3 @@ With ANSI terminal emulator enabled for logrus
 * Meteors
 * Fireworks
 * Support for alexa
-
-#### Building for pi
-env GOOS=linux GOARCH=arm go build -o ./pi
