@@ -14,4 +14,6 @@
 
 .lse-parameters {
     margin: 1rem;
+    /* Without this overflow-x constraint mobile safari enables horizontal scrolling */
+    overflow-x: hidden;
 }
