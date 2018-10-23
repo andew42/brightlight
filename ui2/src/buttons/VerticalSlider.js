@@ -7,6 +7,18 @@ export default class VerticalSlider extends React.Component {
     constructor(props) {
         super(props);
         this.domElement = React.createRef();
+        this.doTouchUpdate = this.doTouchUpdate.bind(this);
+    }
+
+    componentDidMount() {
+        // Attach raw so we can set passive false to prevent scrolling
+        this.domElement.current.addEventListener("touchstart", this.doTouchUpdate, {passive: false});
+        this.domElement.current.addEventListener("touchmove", this.doTouchUpdate, {passive: false});
+    }
+
+    componentWillUnmount() {
+        this.domElement.current.removeEventListener("touchstart", this.doTouchUpdate);
+        this.domElement.current.removeEventListener("touchmove", this.doTouchUpdate);
     }
 
     // Helper converts pixel positions into range position and calls onValueChange
@@ -49,7 +61,10 @@ export default class VerticalSlider extends React.Component {
     };
 
     doTouchUpdate(e) {
+        if (this.domElement === undefined)
+            return;
         this.updatePosition(this.domElement.current, e.targetTouches[0].clientX, e.targetTouches[0].clientY);
+        e.preventDefault();
     }
 
     doMouseDown(e) {
@@ -69,8 +84,6 @@ export default class VerticalSlider extends React.Component {
         let range = this.props.max - this.props.min;
         return <div ref={this.domElement}
                     className={this.props.className}
-                    onTouchStart={e => this.doTouchUpdate(e)}
-                    onTouchMove={e => this.doTouchUpdate(e)}
                     onMouseDown={e => this.doMouseDown(e)}
                     onMouseMove={e => this.doMouseMove(e)}
                     onMouseUp={() => this.mousedown = false}>

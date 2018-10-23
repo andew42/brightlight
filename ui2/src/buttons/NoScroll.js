@@ -10,18 +10,15 @@ export default class NoScroll extends React.Component {
 
     componentDidMount() {
         // Attach raw so we can set passive false to prevent scrolling
-        if (this.dom.current !== null) {
-            this.dom.current.addEventListener("touchmove", this.preventDefault, {passive: false});
-        }
+        this.dom.current.addEventListener("touchmove", NoScroll.preventDefault, {passive: false});
     }
 
-    preventDefault(e) {
+    static preventDefault(e) {
         e.preventDefault();
     }
 
     componentWillUnmount() {
-        if (this.dom.current !== null)
-            this.dom.current.removeEventListener("touchmove", this.preventDefault);
+        this.dom.current.removeEventListener("touchmove", NoScroll.preventDefault);
     }
 
     render() {
