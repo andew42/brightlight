@@ -81,6 +81,12 @@ func (lf *linearFade) animateFrame(frameCount uint, frame segment.Segment) {
 	toPercent := segmentIndex / framesPerSegment
 	fromPercent := 1 - toPercent
 
+	// Make a copy of the frame buffer to a temporary in memory buffer
+	tmpSegment := segment.NewMemSegment(frame.Len())
+	for i := uint(0); i < frame.Len(); i++ {
+		tmpSegment.Set(i, frame.Get(i))
+	}
+
 	// Apply the first animation to the frame buffer and scale with fromPercent
 	from.animateFrame(frameCount, frame)
 	if fromPercent == 100 {
@@ -88,8 +94,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame segment.Segment) {
 	}
 	scaleFrameBuffer(frame, fromPercent)
 
-	// Apply the second animation to a temporary in memory buffer and scale with toPercent
-	tmpSegment := segment.NewMemSegment(frame.Len())
+	// Apply the second animation to the temporary in memory buffer and scale with toPercent
 	to.animateFrame(frameCount, tmpSegment)
 	scaleFrameBuffer(tmpSegment, toPercent)
 
