@@ -49,16 +49,8 @@
     {"name": "Bathroom", "z": 7, "label": "Bathroom"},
     {"name": "Bathroom Ceiling", "z": 8, "label": "Ceiling"},
     {"name": "Bathroom Wall", "z": 9, "label": "Wall"},
-    {"name": "Chest", "z": 10, "label": "Chest"},
-    {"name": "Chest Ceiling", "z": 11, "label": "Ceiling"},
-    {"name": "Chest Wall", "z": 12, "label": "Wall"},
-    {"name": "Dressing", "z": 13, "label": "Dressing"},
-    {"name": "Dressing Ceiling", "z": 14, "label": "Ceiling"},
-    {"name": "Dressing Wall", "z": 15, "label": "Wall"},
-    {"name": "Curtains", "z": 16, "label": "Curtains"},
-    {"name": "Door", "z": 17, "label": "Door"},
-    {"name": "Light Switch", "z": 18, "label": "Light Switch"},
-    {"name": "Strip Three", "z": 19, "label": "Strip Three"},
-    {"name": "Strip Five", "z": 20, "label": "Strip Five"}
+    {"name": "Curtains", "z": 10, "label": "Curtains"},
+    {"name": "Strip Three", "z": 11, "label": "Strip Three"},
+    {"name": "Strip Five", "z": 12, "label": "Strip Five"}
   ]
 }

@@ -7,8 +7,14 @@ export function OpenWebSocket(url, cb) {
     // "ws://localhost:8080/FrameBuffer"
     function wsUri(url) {
 
-        // http:, , 192.168.0.X:8080, virtual.html
+        // http:, , 192.168.0.X:3000, virtual.html
         let parts = document.URL.split('/', 4);
+
+        // Force web sockets to :8080 so it works for development server
+        let ip = parts[2].split(":");
+        if (ip.length === 2)
+            parts[2] = ip[0] + ":8080";
+
         return "ws://" + parts[2] + "/" + url;
     }
 

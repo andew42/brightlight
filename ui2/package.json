@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.4.0",
-    "react-dom": "^16.4.0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
     "react-helmet": "^5.2.0",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^1.1.4",
-    "semantic-ui-css": "~2.2.14",
-    "semantic-ui-react": "^0.78.3"
+    "react-scripts": "^2.1.3",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.84.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -17,12 +17,13 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "proxy": {
-    "/": {
-      "target-elms": "ws://192.168.0.38:8080/",
-      "target-phone": "ws://172.20.10.2:8080/",
-      "target": "ws://172.20.10.2:8080/",
-      "ws": true
-    }
-  }
+  "proxy": "http://192.168.0.38:8080/",
+  "proxy-phone": "http://172.20.10.2:8080/",
+  "proxy-elms": "http://192.168.0.38:8080/",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
