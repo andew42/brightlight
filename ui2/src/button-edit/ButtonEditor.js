@@ -9,8 +9,8 @@ import {Button} from "semantic-ui-react";
 // Shows a list of editors that change to suit the animation
 export default class ButtonEditor extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {selectedSegments: []};
     };
 
@@ -68,8 +68,7 @@ export default class ButtonEditor extends React.Component {
                 ...button,
                 segments: newSegments
             });
-        }
-        else {
+        } else {
             // REMOVE segment from check collection...
             this.setState({selectedSegments: this.state.selectedSegments.filter(s => s !== seg.name)});
 

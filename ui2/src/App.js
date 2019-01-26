@@ -16,6 +16,7 @@ const Home = () => (
         <Link to="/buttons">Buttons</Link>
         <hr/>
         <Link to="/virtual">Virtual</Link>
+        <hr/>
     </nav>
 );
 

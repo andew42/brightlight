@@ -11,14 +11,9 @@ export function LedSegmentEditor(props) {
         <Label content={props.segment.name}
                onRemove={() => props.onRemove(props.segment)}
                color='blue'
-               attached='top left'/>
-        <div>
-            <Image className='lse-image'
-                   size='tiny'
-                   inline
-                   src={"/segment-icons/" + encodeURIComponent(props.segment.name) + ".svg"}/>
-        </div>
-        <div>
+               attached='top left'
+               size='large'/>
+        <div className='lse-animation-name'>
             <Dropdown value={props.segment.animation}
                       options={props.allAnimationNames}
                       onChange={(_, d) => {
@@ -28,19 +23,22 @@ export function LedSegmentEditor(props) {
                               animation: a.text,
                               params: a.params
                           })
-                      }}
-                      className='lse-animation-name'/>
-            <div className='lse-parameters'>
-                {props.segment.params.map(p => <LedSegmentParam
-                    key={p.key}
-                    param={p}
-                    onParamChanged={np => {
-                        props.onSegmentChanged({
-                            ...props.segment,
-                            params: props.segment.params.map(p => p.key === np.key ? np : p)
-                        })
-                    }}/>)}
-            </div>
+                      }}/>
+        </div>
+        <Image className='lse-image'
+               size='tiny'
+               inline
+               src={"/segment-icons/" + encodeURIComponent(props.segment.name) + ".svg"}/>
+        <div className='lse-parameters'>
+            {props.segment.params.map(p => <LedSegmentParam
+                key={p.key}
+                param={p}
+                onParamChanged={np => {
+                    props.onSegmentChanged({
+                        ...props.segment,
+                        params: props.segment.params.map(p => p.key === np.key ? np : p)
+                    })
+                }}/>)}
         </div>
     </Segment>;
 }
@@ -72,8 +70,8 @@ function LedSegmentParam(props) {
                 onChange={newCheckState => props.onParamChanged({
                     ...props.param,
                     value: newCheckState
-                })}/>
+                })}/>;
         default:
-            return "Unknown Param: " + props.param.type;
+            return <div>"Unknown Param: " + props.param.type</div>;
     }
 }

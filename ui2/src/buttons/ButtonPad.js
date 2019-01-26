@@ -14,7 +14,7 @@ export default class ButtonPad extends React.Component {
 
     render() {
         if (this.props.allButtons === undefined)
-            return this.noServer();
+            return ButtonPad.noServer();
 
         return <NoScroll>
             <div className="button-pad">
@@ -30,7 +30,7 @@ export default class ButtonPad extends React.Component {
         </NoScroll>
     }
 
-    noServer() {
+    static noServer() {
         return <Message warning icon>
             <Icon name='circle notched' loading/>
             <Message.Content>

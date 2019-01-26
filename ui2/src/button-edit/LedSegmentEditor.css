@@ -1,19 +1,31 @@
 .lse-container {
     display: grid;
     grid-template-columns: auto 1fr;
-    padding: 0px!important;
+    padding: 0 !important;
 }
 
 .lse-image {
-    margin: 6px 4px 4px;
+    margin: 44px 8px 8px;
 }
 
 .lse-animation-name {
-    margin: 4px;
+    margin: 8px;
+    font-size: large;
+    position: absolute;
+    right: 0;
+    top: -20px;
+    text-align: left;
+    min-width: 40%;
+}
+
+.ui.dropdown .menu {
+    right: 0;
 }
 
 .lse-parameters {
-    margin: 1rem;
-    /* Without this overflow-x constraint mobile safari enables horizontal scrolling */
+    display: inline-block;
+    margin: 38px 0 12px 8px;
+    /* Without these overflow constraints mobile safari enables scrolling */
     overflow-x: hidden;
+    overflow-y: hidden;
 }

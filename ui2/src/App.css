@@ -24,3 +24,9 @@ button:focus {
 input:focus {
     outline: 0;
 }
+
+a {
+    font-size: x-large;
+    margin: 20px 0 20px 0;
+    display: block;
+}
