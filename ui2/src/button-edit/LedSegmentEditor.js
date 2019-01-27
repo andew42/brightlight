@@ -7,6 +7,14 @@ import {RangeEditor} from "./RangeEditor";
 import {CheckboxEditor} from "./CheckboxEditor";
 
 export function LedSegmentEditor(props) {
+    let segmentDefinition = props.allSegments.find(x => x.name === props.segment.name);
+    let icon = <div style={{width:0}}></div>;
+    if (segmentDefinition !== undefined && segmentDefinition.icon) {
+        icon = <Image className='lse-image'
+                          size='tiny'
+                          inline
+                          src={"/segment-icons/" + encodeURIComponent(props.segment.name) + ".svg"}/>
+}
     return <Segment attached color='blue' className='lse-container'>
         <Label content={props.segment.name}
                onRemove={() => props.onRemove(props.segment)}
@@ -25,10 +33,7 @@ export function LedSegmentEditor(props) {
                           })
                       }}/>
         </div>
-        <Image className='lse-image'
-               size='tiny'
-               inline
-               src={"/segment-icons/" + encodeURIComponent(props.segment.name) + ".svg"}/>
+        {icon}
         <div className='lse-parameters'>
             {props.segment.params.map(p => <LedSegmentParam
                 key={p.key}

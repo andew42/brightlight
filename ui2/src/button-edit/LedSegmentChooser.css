@@ -1,5 +1,12 @@
-.lsc-led-segment-list {
+.lsc-led-segment-list-item {
     width: 33%;
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+.lsc-led-segment-list-item-no-icon {
+    width: 33%;
+    vertical-align: top !important;
     margin-top: 2px;
     margin-bottom: 8px;
 }
@@ -8,4 +15,10 @@
     position: absolute;
     bottom: 2px;
     right: 14px;
+}
+
+.lsc-check-mark-no-icon {
+    position: absolute;
+    top: 34px;
+    left: 10px;
 }

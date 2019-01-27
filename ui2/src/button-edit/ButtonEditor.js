@@ -103,6 +103,7 @@ export default class ButtonEditor extends React.Component {
                 {button.segments.map(segment => (
                     <LedSegmentEditor key={key++}
                                       segment={segment}
+                                      allSegments={allSegments}
                                       allAnimationNames={animationNames}
                                       onRemove={seg => this.props.onButtonChanged({
                                           ...button,
