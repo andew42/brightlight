@@ -10,6 +10,6 @@ export function getButtons(success, error) {
     )
 }
 
-export function saveButtons(buttons, success, error) {
-    putJson('/ui-config/user-buttons.json', buttons, success, error);
+export function saveButtons(cfg, success, error) {
+    putJson('/ui-config/user-buttons.json', cfg, success, error);
 }

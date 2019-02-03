@@ -27,7 +27,8 @@ export default class App extends Component {
         super(props);
         this.state =
             {
-                allButtons: undefined,
+                userButtons: undefined,
+                userSegments: undefined,
                 allSegments: undefined,
                 allAnimations: undefined,
                 activeButtonKey: 0,
@@ -43,14 +44,20 @@ export default class App extends Component {
             sd => this.setState({allSegments: sd.segments, allAnimations: sd.animations}),
             (xhr) => console.error(xhr));
 
+        console.info('getting button configuration');
+        this.getButtonConfig();
+
         // Subscribe to button state updates (we get immediate update on connection)
         this.ws = OpenWebSocket('ButtonState', bs => {
             console.info('button state changed to ', bs);
 
-            if (this.state.activeButtonKey !== bs.ActiveButtonKey)
+            if (this.state.activeButtonKey !== bs.ActiveButtonKey) {
+                console.info('updating active button');
                 this.setState({activeButtonKey: bs.ActiveButtonKey});
+            }
 
             if (this.state.buttonPadVersion !== bs.ButtonPadVersion) {
+                console.info('updating button configuration');
                 this.setState({buttonPadVersion: bs.ButtonPadVersion});
                 this.getButtonConfig();
             }
@@ -58,9 +65,8 @@ export default class App extends Component {
     }
 
     getButtonConfig() {
-        console.info('getting button configuration');
         getButtons(
-            buttons => this.setState({allButtons: buttons}),
+            cfg => this.setState({userSegments: cfg.segments, userButtons: cfg.buttons}),
             (xhr) => console.error(xhr));
     }
 
@@ -71,9 +77,9 @@ export default class App extends Component {
     }
 
     onButtonChanged(button) {
-        let allButtons = this.state.allButtons.map(b => b.key === button.key ? button : b);
+        let userButtons = this.state.userButtons.map(b => b.key === button.key ? button : b);
         this.setState((props, state) => {
-            return {...state, allButtons: allButtons}
+            return {...state, userButtons: userButtons}
         });
         runAnimation(button);
     }
@@ -81,13 +87,13 @@ export default class App extends Component {
     onSaveButtonEdit() {
         console.info('onSaveButtonEdit');
         saveButtons(
-            this.state.allButtons,
+            {segments: this.state.userSegments, buttons: this.state.userButtons},
             () => console.info('button state saved'),
             (xhr) => console.error(xhr)); // TODO: Report errors to user
     }
 
     findButton(key) {
-        return this.state.allButtons.find(x => x.key === key);
+        return this.state.userButtons.find(x => x.key === key);
     }
 
     onButtonTap(key) {
@@ -101,16 +107,15 @@ export default class App extends Component {
 
     render() {
         let ButtonPadWithProps = props => {
-            return (<ButtonPad allButtons={this.state.allButtons}
+            return (<ButtonPad allButtons={this.state.userButtons}
                                activeButtonKey={this.state.activeButtonKey}
                                onButtonTap={key => this.onButtonTap(key)}
                                onButtonPress={(history, key) => this.onButtonPress(history, key)}
                                {...props}/>);
         };
 
-        let allButtons = this.state.allButtons;
         let ButtonEditorWithProps = props => {
-            return (<ButtonEditor allButtons={allButtons}
+            return (<ButtonEditor allButtons={this.state.userButtons}
                                   allAnimations={this.state.allAnimations}
                                   allSegments={this.state.allSegments}
                                   onButtonChanged={button => this.onButtonChanged(button)}

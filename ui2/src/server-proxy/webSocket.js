@@ -10,27 +10,31 @@ export function OpenWebSocket(url, cb) {
         // http:, , 192.168.0.X:3000, virtual.html
         let parts = document.URL.split('/', 4);
 
-        // Force web sockets to :8080 so it works for development server
+        // If we are running on the development server (port 3000)
+        // Force web sockets to port 8080 because the development
+        // server proxy doesn't work for web sockets
         let ip = parts[2].split(":");
-        if (ip.length === 2)
+        if (ip.length === 2 && ip[1] === "3000")
             parts[2] = ip[0] + ":8080";
 
         return "ws://" + parts[2] + "/" + url;
     }
 
     // Open socket and wire up handlers
+    let fullUrl = wsUri(url);
+    console.debug("Open " + url + " at " + fullUrl);
     let ws = new WebSocket(wsUri(url), "P1");
 
     ws.onopen = function () {
-        console.info(url + " web socket open")
+        console.debug(url + " web socket open")
     };
 
     ws.onclose = function () {
-        console.info(url + " web socket closed")
+        console.debug(url + " web socket closed")
     };
 
     ws.onerror = function (evt) {
-        console.info(url + " web socket error: " + evt.data);
+        console.error(url + " web socket error: " + evt.data);
     };
 
     let processingMessage = false;
@@ -39,9 +43,11 @@ export function OpenWebSocket(url, cb) {
 
         // Can this ever happen? (single threaded)
         if (processingMessage) {
-            console.info(url + " dropped a message");
+            console.debug(url + " dropped a message");
             return;
         }
+
+        console.debug(url + " web socket message");
 
         processingMessage = true;
         try {
