@@ -11,6 +11,10 @@
     margin-bottom: 8px;
 }
 
+.lsc-led-user-segment-list-item {
+    margin-bottom: 12px;
+}
+
 .lsc-check-mark {
     position: absolute;
     bottom: 2px;

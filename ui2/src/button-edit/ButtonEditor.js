@@ -84,6 +84,7 @@ export default class ButtonEditor extends React.Component {
         let allButtons = this.props.allButtons;
         let allAnimations = this.props.allAnimations;
         let allSegments = this.props.allSegments;
+        let userSegments = this.props.userSegments;
         let buttonKey = this.props.history.location.state.buttonKey;
         let button = allButtons.find(x => x.key === buttonKey);
         let animationNames = allAnimations.map(n => ({'text': n.name, 'value': n.name, 'params': n.params}));
@@ -116,6 +117,7 @@ export default class ButtonEditor extends React.Component {
 
                 <div className='button-editor-ok-cancel-container'>
                     <LedSegmentChooser allSegments={allSegments}
+                                       userSegments={userSegments}
                                        checkedSegmentNames={this.state.selectedSegments}
                                        onOk={() => {
                                            this.preSegChooserButton = undefined;

@@ -11,6 +11,9 @@ export default class LedSegmentChooser extends React.Component {
                           <div className='description'>
                               {this.props.allSegments.map(seg => this.renderSegment(seg))}
                           </div>
+                          <div>
+                              {this.props.userSegments.map(seg => this.renderUserSegment(seg))}
+                          </div>
                       </div>}
                       actions={[
                           {key: 'ok', content: 'OK', primary: true},
@@ -41,6 +44,15 @@ export default class LedSegmentChooser extends React.Component {
                 <Checkbox checked={this.props.checkedSegmentNames.includes(seg.name)}
                           onChange={() => this.props.toggleCheckedSegment(seg)}/>
             </div>
+        </div>;
+    }
+
+    renderUserSegment(seg) {
+        return <div className='lsc-led-user-segment-list-item'
+                    key={seg.name}>
+            <Checkbox label={seg.name}
+                      checked={this.props.checkedSegmentNames.includes(seg.name)}
+                      onChange={() => this.props.toggleCheckedSegment(seg)}/>
         </div>;
     }
 }

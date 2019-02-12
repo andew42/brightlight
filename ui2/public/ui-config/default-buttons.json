@@ -1,11 +1,20 @@
 {
   "segments": [
     {
-      "key": 1,
-      "name": "My Segment",
-      "base": "All",
-      "start": 10,
-      "length": 99
+      "name": "My 3",
+      "z": 100,
+      "icon": false,
+      "base": "Strip Three",
+      "start": 3,
+      "length": 3
+    },
+    {
+      "name": "My 5",
+      "z": 100,
+      "icon": false,
+      "base": "Strip Five",
+      "start": 5,
+      "length": 5
     }
   ],
   "buttons": [

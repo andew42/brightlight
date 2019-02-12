@@ -118,6 +118,7 @@ export default class App extends Component {
             return (<ButtonEditor allButtons={this.state.userButtons}
                                   allAnimations={this.state.allAnimations}
                                   allSegments={this.state.allSegments}
+                                  userSegments={this.state.userSegments}
                                   onButtonChanged={button => this.onButtonChanged(button)}
                                   onOk={() => this.onSaveButtonEdit()}
                                   {...props}/>);
