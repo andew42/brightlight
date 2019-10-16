@@ -3,7 +3,7 @@ package animations
 import (
 	"github.com/andew42/brightlight/segment"
 	"github.com/andew42/brightlight/framebuffer"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type life struct {

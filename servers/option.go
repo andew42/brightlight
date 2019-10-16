@@ -2,7 +2,7 @@ package servers
 
 import (
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/controller"
 	"io/ioutil"
 	"net/http"

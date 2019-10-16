@@ -40,17 +40,17 @@
     ]}
   ],
   "segments": [
-    {"name": "All", "z": 1, "label": "All", "icon":  true},
-    {"name": "All Ceiling", "z": 2, "label": "Ceiling", "icon":  true},
-    {"name": "All Wall", "z": 3, "label": "Wall", "icon":  true},
-    {"name": "Bedroom", "z": 4, "label": "Bedroom", "icon":  true},
-    {"name": "Bedroom Ceiling", "z": 5, "label": "Ceiling", "icon":  true},
-    {"name": "Bedroom Wall", "z": 6, "label": "Wall", "icon":  true},
-    {"name": "Bathroom", "z": 7, "label": "Bathroom", "icon":  true},
-    {"name": "Bathroom Ceiling", "z": 8, "label": "Ceiling", "icon":  true},
-    {"name": "Bathroom Wall", "z": 9, "label": "Wall", "icon":  true},
-    {"name": "Curtains", "z": 10, "label": "Curtains", "icon":  true},
-    {"name": "Strip Three", "z": 11, "label": "Strip Three", "icon":  false},
-    {"name": "Strip Five", "z": 12, "label": "Strip Five", "icon":  false}
+    {"name":"All", "z":1, "label":"All", "len":2027, "icon":true},
+    {"name":"All Ceiling", "z":2, "label":"Ceiling", "len":1189, "icon":true},
+    {"name":"All Wall", "z":3, "label":"Wall", "len":838, "icon":true},
+    {"name":"Bedroom", "z":4, "label":"Bedroom", "len":1281, "icon":true},
+    {"name":"Bedroom Ceiling", "z":5, "label":"Ceiling", "len":828, "icon":true},
+    {"name":"Bedroom Wall", "z":6, "label":"Wall", "len":453, "icon":true},
+    {"name":"Bathroom", "z":7, "label":"Bathroom", "len":746, "icon":true},
+    {"name":"Bathroom Ceiling", "z":8, "label":"Ceiling", "len":361, "icon":true},
+    {"name":"Bathroom Wall", "z":9, "label":"Wall", "len":385, "icon":true},
+    {"name":"Curtains", "z":10, "label":"Curtains", "len":326, "icon":true},
+    {"name":"Strip Three", "z":11, "label":"Strip Three", "len":20, "icon":false},
+    {"name":"Strip Five", "z":12, "label":"Strip Five", "len":19, "icon":false}
   ]
 }

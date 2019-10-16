@@ -55,7 +55,7 @@ sudo killall -q -9 brightlight
 #### go 1.11.1
 https://golang.org/dl/
 
-go get "github.com/Sirupsen/logrus"
+go get "github.com/sirupsen/logrus"
 
 #### Goland 2018.2
 https://www.jetbrains.com/go/

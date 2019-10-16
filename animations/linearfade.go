@@ -4,7 +4,7 @@ import (
 	"time"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/segment"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type linearFade struct {

@@ -1,7 +1,7 @@
 package servers
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
 	"net/http"
 	"strconv"

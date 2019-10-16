@@ -1,6 +1,7 @@
 import * as React from "react";
 import './LedSegmentChooser.css';
-import {Checkbox, Image, Modal} from "semantic-ui-react";
+import {Checkbox, Divider, Image, Modal} from "semantic-ui-react";
+import {UserSegmentEditor} from "./UserSegmentEditor";
 
 export default class LedSegmentChooser extends React.Component {
 
@@ -14,6 +15,9 @@ export default class LedSegmentChooser extends React.Component {
                           <div>
                               {this.props.userSegments.map(seg => this.renderUserSegment(seg))}
                           </div>
+                          <Divider horizontal>New User Segment</Divider>
+                          <UserSegmentEditor predefinedSegments={this.props.allSegments}
+                                             userSegments={this.props.userSegments}/>
                       </div>}
                       actions={[
                           {key: 'ok', content: 'OK', primary: true},

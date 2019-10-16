@@ -4,7 +4,7 @@ import (
 	"path"
 	"io/ioutil"
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // A settings file is a map of named button column definitions

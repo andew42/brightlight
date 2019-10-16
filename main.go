@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
@@ -83,6 +83,14 @@ func main() {
 	framebuffer.StartDriver(renderer)
 	animations.StartDriver(renderer)
 	stats.StartDriver()
+
+	// Dump out the list of named segments with lengths
+	//fb := framebuffer.NewFrameBuffer()
+	//for _, s := range segment.GetAllNamedSegmentNames() {
+	//	seg, _ := segment.GetNamedSegment(s)
+	//	rs := seg.GetSegment(fb)
+	//	fmt.Printf("%s %d\n", s, rs.Len())
+	//}
 
 	// Set up static content serving
 	mime.AddExtensionType(".manifest", "text/cache-manifest")
