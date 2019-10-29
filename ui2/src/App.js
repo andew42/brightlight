@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {Helmet} from "react-helmet";
 import './App.css';
 import ButtonPad from "./buttons/ButtonPad";
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
@@ -126,12 +125,6 @@ export default class App extends Component {
 
         return (
             <div className="App" onContextMenu={e => e.preventDefault()}>
-                <Helmet>
-                    <meta name="apple-mobile-web-app-capable" content="yes"/>
-                    <meta name="apple-mobile-web-app-title" content="Bright Light"/>
-                    <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-                    <title>Bright Light</title>
-                </Helmet>
                 <BrowserRouter>
                     <Switch>
                         <Route path="/buttons" render={ButtonPadWithProps}/>

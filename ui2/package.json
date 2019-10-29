@@ -5,9 +5,8 @@
   "dependencies": {
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-helmet": "^5.2.0",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^2.1.8",
+    "react-scripts": "^3.2.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.84.0"
   },
