@@ -226,11 +226,11 @@
       "name": "Very Low",
       "segments": [
         {
-          "name": "All",
+          "name": "Bathroom",
           "z": 1,
           "animation": "Static",
           "params": [
-            {"key": 20, "type": "colour", "label": "Colour", "value": {"r": 15, "g": 15, "b": 15}}
+            {"key": 20, "type": "colour", "label": "Colour", "value": {"r": 8, "g": 5, "b": 1}}
           ]
         }
       ]
@@ -251,14 +251,63 @@
     },
     {
       "key": 16,
-      "name": "",
+      "name": "20s",
       "segments": [
         {
           "name": "All",
           "z": 1,
           "animation": "Static",
           "params": [
-            {"key": 20, "type": "colour", "label": "Colour", "value": {"r": 0, "g": 0, "b": 0}}
+            {
+              "key": 20,
+              "type": "colour",
+              "label": "Colour",
+              "value": {
+                "h": 38.257839721254356,
+                "s": 100,
+                "v": 14.111498257839722,
+                "r": 36,
+                "g": 23,
+                "b": 0
+              }
+            }
+          ]
+        },
+        {
+          "name": "All Ceiling",
+          "z": 2,
+          "label": "Ceiling",
+          "animation": "Discrete",
+          "params": [
+            {
+              "key": 110,
+              "type": "colour",
+              "label": "Colour",
+              "value": {
+                "h": 37.00348432055749,
+                "s": 87.63066202090593,
+                "v": 42.33449477351917,
+                "r": 108,
+                "g": 72,
+                "b": 13
+              }
+            },
+            {
+              "key": 111,
+              "type": "range",
+              "label": "Width",
+              "min": 1,
+              "max": 10,
+              "value": 2
+            },
+            {
+              "key": 112,
+              "type": "range",
+              "label": "Repeat",
+              "min": 1,
+              "max": 200,
+              "value": 23
+            }
           ]
         }
       ]

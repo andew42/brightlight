@@ -1,5 +1,7 @@
 .button-editor-editor-list {
     padding: 8px;
+    overflow-y: scroll;
+    height: 100%;
 }
 
 .button-editor-ok-cancel-container {
