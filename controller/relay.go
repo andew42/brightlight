@@ -2,16 +2,16 @@ package controller
 
 import (
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
 
 var relayDriverStarted bool
 
-// Run driver as a go routine
+// StartRelayDriver Run driver as a go routine
 func StartRelayDriver() {
 
 	if relayDriverStarted {
@@ -112,7 +112,7 @@ func initRelayBoard(f *os.File) error {
 	// reply 0xAD (2 port). After this it expects 0x51 to put it in
 	// 'run' mode. Now every byte's lower 2 bits are interpreted as a
 	// relay command. Unfortunately we have no way of knowing the
-	// current state and it's not possible to bypass the initial 0x50
+	// current state, and it's not possible to bypass the initial 0x50
 	// handshake. So we send 0x50 and if we get a response send 0x51
 	// 0x00 to turn off the relays. If we don't get a response we
 	// assume the relays are now off, due to the 0x50 and the
@@ -127,17 +127,17 @@ func initRelayBoard(f *os.File) error {
 	response := make([]byte, 1)
 	if err := readUntilBufferFull(f, response, time.Millisecond*200); err != nil {
 
-		// If we timed out assume the board is already initialised so the 0x50
+		// If we timed out, assume the board is already initialised so the 0x50
 		// will be interpreted as turing both relays off, i.e. we are done
 		if err == readTimeoutError {
 			return nil
 		}
 
-		// otherwise we have some sort of real error
+		// Otherwise, we have some sort of real error
 		return err
 	}
 
-	// If we got a response check its the expected one
+	// If we got a response check it's the expected one
 	if response[0] != 0xAD {
 		log.WithField("response", response[0]).Warn("initRelayBoard unexpect initialisation response")
 		return errors.New("unknown relay board")

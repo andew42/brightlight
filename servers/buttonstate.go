@@ -60,8 +60,8 @@ func removeButtonListener(c chan buttonState) {
 // Give each button state listener its own unique ID (for logging)
 var buttonStateListenerId = 0
 
-// Handle button state web socket requests (web socket is closed when
-// we return) We have one of these go routines per web socket request
+// ButtonStateHandler Handle button state web socket requests (web socket is closed
+// when we return) We have one of these go routines per web socket request
 func ButtonStateHandler(ws *websocket.Conn) {
 
 	listenersMux.Lock()

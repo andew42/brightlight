@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// A problem with this is that it fails if there is no router (e.g. no hot spot)
+// GetLocalIP A problem with this is that it fails if there is no router (e.g. no hot spot)
 // http://stackoverflow.com/questions/23558425/how-do-i-get-the-local-ip-address-in-go
 func GetLocalIP() (string, error) {
 

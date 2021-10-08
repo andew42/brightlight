@@ -1,19 +1,19 @@
 package config
 
 import (
-	"path"
-	"io/ioutil"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"path"
 )
 
-// A settings file is a map of named button column definitions
+// SettingsFileDef A settings file is a map of named button column definitions
 type SettingsFileDef map[string]ButtonColumnDef
 
-// A button column definition is a slice of button definitions
+// ButtonColumnDef A button column definition is a slice of button definitions
 type ButtonColumnDef []ButtonDef
 
-// A button definition is a named slice of segments
+// ButtonDef A button definition is a named slice of segments
 type ButtonDef struct {
 	Id       string       `json:"id"`
 	Name     string       `json:"name"`
@@ -30,7 +30,7 @@ type Preset struct {
 	Name string
 }
 
-// Loads the user config json file containing preset (button) definitions set up by the user
+// LoadUserPresets Loads the user config json file containing preset (button) definitions set up by the user
 func LoadUserPresets(configPath string) []Preset {
 
 	presets := make([]Preset, 0)

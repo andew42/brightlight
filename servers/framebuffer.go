@@ -2,8 +2,8 @@ package servers
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 	"strconv"
 )
@@ -11,7 +11,7 @@ import (
 // Give each virtual frame buffer its own unique ID
 var frameBufferListenerId = 0
 
-// Handle frame buffer web socket requests (web socket is closed when we return)
+// FrameBufferHandler Handle frame buffer web socket requests (web socket is closed when we return)
 func FrameBufferHandler(ws *websocket.Conn) {
 
 	// Not thread safe but good enough for debug output

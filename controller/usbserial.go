@@ -21,7 +21,7 @@ var teensyPortMappings = map[string][]string{
 	// Teensy 3.0 "/dev/cu.usbmodem103721"
 	// Teensy 3.1 "/dev/cu.usbmodem103101"
 	"darwin":  {"/dev/cu.usbmodem288181"},
-	"windows": {"COM3", "COM34"},
+	"windows": {"COM4", "COM3"},
 	"linux":   {"/dev/ttyACM0", "/dev/ttyACM1"},
 }
 

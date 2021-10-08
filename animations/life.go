@@ -1,8 +1,8 @@
 package animations
 
 import (
-	"github.com/andew42/brightlight/segment"
 	"github.com/andew42/brightlight/framebuffer"
+	"github.com/andew42/brightlight/segment"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -11,7 +11,7 @@ type life struct {
 	framesPerGeneration uint
 	rule                int
 	autoRepeat          bool
-	repeatGeneration	uint
+	repeatGeneration    uint
 	cachedGeneration    uint
 	cachedState         []bool
 	tempState           []bool
@@ -59,7 +59,7 @@ func (l *life) getGenerationState(generation uint) []bool {
 	}
 
 	if generation == 0 {
-		l.cachedGeneration = 0;
+		l.cachedGeneration = 0
 		l.cachedState = getGenerationZeroState(uint(len(l.cachedState)))
 		return l.cachedState
 	}
@@ -75,9 +75,9 @@ func (l *life) getGenerationState(generation uint) []bool {
 		l.cachedGeneration++
 	}
 
-	// If the state hasn't changed we may need to auto repeat
+	// If the state hasn't changed we may need to auto-repeat
 	if l.autoRepeat && areStatesEqual(l.cachedState, l.tempState) {
-		l.cachedGeneration = 0;
+		l.cachedGeneration = 0
 		l.cachedState = getGenerationZeroState(uint(len(l.cachedState)))
 		l.repeatGeneration = generation
 	}

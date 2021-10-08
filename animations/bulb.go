@@ -18,7 +18,7 @@ func newBulb(colour framebuffer.Rgb, offset uint, width uint) *bulb {
 	return &bulb{colour, offset, width}
 }
 
-func (b *bulb) animateFrame(frameCount uint, frame segment.Segment) {
+func (b *bulb) animateFrame(_ uint, frame segment.Segment) {
 
 	// Return if bulb won't fit
 	if b.offset+b.width > frame.Len() {

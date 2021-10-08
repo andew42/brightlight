@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Statistics on animation frame times and serial send times
+// Stats Statistics on animation frame times and serial send times
 type Stats struct {
 	FrameRenderTime StatsBlock
 	FrameSyncJitter StatsBlock
@@ -29,14 +29,14 @@ type StatsBlock struct {
 	AverageTime   time.Duration
 }
 
-// ByAge implements sort.Interface for []StatsBlock based on name
+// ByName ByAge implements sort.Interface for []StatsBlock based on name
 type ByName []StatsBlock
 
 func (a ByName) Len() int           { return len(a) }
 func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
-// Marshal StatsBlock durations to 2dp we use an embedded struct with type alias technique
+// MarshalJSON Marshal StatsBlock durations to 2dp we use an embedded struct with type alias technique
 // http://choly.ca/post/go-json-marshalling/
 func (sb *StatsBlock) MarshalJSON() ([]byte, error) {
 	type Alias StatsBlock
@@ -81,12 +81,12 @@ func findBlockWithAddByName(blocks *[]StatsBlock, name string) *StatsBlock {
 			return &(*blocks)[i]
 		}
 	}
-	// otherwise append a new block
+	// Otherwise, append a new block
 	newStatsBlock := StatsBlock{}
 	newStatsBlock.resetStatsBlock()
 	newStatsBlock.Name = name
 	*blocks = append(*blocks, newStatsBlock)
-	// Sort the blocks by name so they don't bounce around in the UI
+	// Sort the blocks by name, so they don't bounce around in the UI
 	sort.Sort(ByName(*blocks))
 	return &(*blocks)[len(*blocks)-1]
 }
@@ -109,7 +109,7 @@ func addSampleToBlockList(blocks *[]StatsBlock, name string, sample time.Duratio
 	block.AverageTime = time.Duration(block.TotalTime.Nanoseconds() / block.SampleCount)
 }
 
-// Constructor
+// NewStats Constructor
 func NewStats() *Stats {
 	var s Stats
 	s.reset()

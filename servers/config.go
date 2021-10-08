@@ -9,7 +9,7 @@ import (
 
 var configVersion = 0
 
-// Handle HTTP requests to read and write config
+// GetConfigHandler Handle HTTP requests to read and write config
 func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {

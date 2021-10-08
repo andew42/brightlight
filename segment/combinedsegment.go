@@ -1,8 +1,8 @@
 package segment
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
+	log "github.com/sirupsen/logrus"
 )
 
 type CombinedSegment struct {
@@ -10,13 +10,13 @@ type CombinedSegment struct {
 	Seg2 Segment
 }
 
-// Two segments connected together
+// NewCombinedSegment Two segments connected together
 func NewCombinedSegment(seg1 Segment, seg2 Segment) CombinedSegment {
 
 	return CombinedSegment{seg1, seg2}
 }
 
-// Number of LEDs in the segment
+// Len Number of LEDs in the segment
 func (s CombinedSegment) Len() uint {
 
 	return s.Seg1.Len() + s.Seg2.Len()

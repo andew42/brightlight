@@ -1,8 +1,8 @@
 package segment
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
+	log "github.com/sirupsen/logrus"
 )
 
 type SubSegment struct {
@@ -11,7 +11,7 @@ type SubSegment struct {
 	len     uint
 }
 
-// A sub segment is a slice of another segment
+// NewSubSegment A sub-segment is a slice of another segment
 func NewSubSegment(baseSeg Segment, start uint, len uint) SubSegment {
 
 	baseLen := baseSeg.Len()
@@ -24,7 +24,7 @@ func NewSubSegment(baseSeg Segment, start uint, len uint) SubSegment {
 	return SubSegment{baseSeg, start, len}
 }
 
-// Number of LEDs in the segment
+// Len Number of LEDs in the segment
 func (seg SubSegment) Len() uint {
 
 	return seg.len

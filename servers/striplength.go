@@ -1,14 +1,14 @@
 package servers
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-// Handle HTTP requests to show strip lengths of room lights
+// StripLenHandler Handle HTTP requests to show strip lengths of room lights
 func StripLenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Strip index, length follows request path

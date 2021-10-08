@@ -20,7 +20,7 @@ func (c *cylon) animateFrame(frameCount uint, frame segment.Segment) {
 	}
 
 	// Get an incrementing position twice the frame length (forward then backwards)
-	pos := uint(frameCount) % (frame.Len() * 2)
+	var pos = frameCount % (frame.Len() * 2)
 	if pos >= frame.Len() {
 		// Backwards
 		pos = 2*frame.Len() - pos - 1

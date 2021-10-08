@@ -16,5 +16,5 @@ func newRunner(colour framebuffer.Rgb) *runner {
 
 func (r *runner) animateFrame(frameCount uint, frame segment.Segment) {
 
-	frame.Set(uint(frameCount)%frame.Len(), r.colour)
+	frame.Set(frameCount%frame.Len(), r.colour)
 }

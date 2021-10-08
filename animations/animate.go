@@ -2,11 +2,11 @@ package animations
 
 import (
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/segment"
 	"github.com/andew42/brightlight/stats"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
 )
@@ -18,7 +18,7 @@ type Button struct {
 	Segments segments
 }
 
-// Animation action to perform on a segment (from UI)
+// SegmentAction Animation action to perform on a segment (from UI)
 type SegmentAction struct {
 	Name      string
 	Base      string
@@ -91,7 +91,7 @@ func (params segmentParams) asCheckbox(index int) (bool, error) {
 		return false, errors.New("parameter type 'checkbox' expected but '" + p.Type + "' provided")
 	}
 	if val, ok := p.Value.(bool); ok {
-		return bool(val), nil
+		return val, nil
 	}
 	return false, errors.New("unexpected parameter type")
 }
@@ -135,7 +135,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 
 	switch seg.Animation {
 	case "Off":
-		// Currently used by hue animations to ignore a segment
+		// Currently, used by hue animations to ignore a segment
 
 	case "Static":
 		if colour, err := seg.Params.asColour(0); err == nil {
@@ -207,24 +207,24 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 	case "Christmas":
 		*animators = append(*animators, segActionAndAnimator{seg, newRepeater(
 			newLinearFade(
-				time.Duration(10000*time.Millisecond),
+				10000*time.Millisecond,
 				false,
-				newBulb(framebuffer.Rgb{255, 0, 0}, 0, 1),
-				newBulb(framebuffer.Rgb{255, 122, 0}, 1, 1),
-				newBulb(framebuffer.Rgb{0, 255, 0}, 2, 1),
-				newBulb(framebuffer.Rgb{178, 0, 255}, 3, 1),
-				newBulb(framebuffer.Rgb{0, 0, 255}, 4, 1)),
+				newBulb(framebuffer.Rgb{Red: 255}, 0, 1),
+				newBulb(framebuffer.Rgb{Red: 255, Green: 122}, 1, 1),
+				newBulb(framebuffer.Rgb{Green: 255}, 2, 1),
+				newBulb(framebuffer.Rgb{Red: 178, Blue: 255}, 3, 1),
+				newBulb(framebuffer.Rgb{Blue: 255}, 4, 1)),
 			5)})
 
 	case "Fairground":
 		*animators = append(*animators, segActionAndAnimator{seg, newRepeater(
 			newStepFade(
-				time.Duration(640*time.Millisecond),
+				640*time.Millisecond,
 				false,
-				newBulb(framebuffer.Rgb{175, 107, 1}, 0, 1),
-				newBulb(framebuffer.Rgb{181, 145, 0}, 1, 1),
-				newBulb(framebuffer.Rgb{175, 107, 1}, 2, 1),
-				newBulb(framebuffer.Rgb{181, 145, 0}, 3, 1)),
+				newBulb(framebuffer.Rgb{Red: 175, Green: 107, Blue: 1}, 0, 1),
+				newBulb(framebuffer.Rgb{Red: 181, Green: 145}, 1, 1),
+				newBulb(framebuffer.Rgb{Red: 175, Green: 107, Blue: 1}, 2, 1),
+				newBulb(framebuffer.Rgb{Red: 181, Green: 145}, 3, 1)),
 			4)})
 
 	case "Discrete":
@@ -275,7 +275,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 	}
 }
 
-// High level request to light the first stripLength LEDs of a physical strip
+// AnimateStripLength High level request to light the first stripLength LEDs of a physical strip
 func AnimateStripLength(stripIndex uint, stripLength uint) {
 	// Create a new frame buffer as a model for physical strip lengths
 	fb := framebuffer.NewFrameBuffer()
@@ -336,7 +336,7 @@ func resolveSegment(sa segActionAndAnimator, fb *framebuffer.FrameBuffer) (segme
 	return ns.GetSegment(fb), nil
 }
 
-// Start animate driver
+// StartDriver Start animate driver
 func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 	// Start the animator go routine
 	go func() {

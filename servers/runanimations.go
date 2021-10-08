@@ -2,14 +2,14 @@ package servers
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 )
 
-// Handle HTTP requests to run zero or more animation specified in json payload
+// RunAnimationsHandler Handle HTTP requests to run zero or more animation specified in json payload
 func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// JSON body of form

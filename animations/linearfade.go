@@ -1,10 +1,10 @@
 package animations
 
 import (
-	"time"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/segment"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type linearFade struct {
@@ -26,7 +26,7 @@ func newLinearFade(period time.Duration, reverseOnRepeat bool, animators ...anim
 			Fatal("LinearFade animation requires at least two animations")
 	}
 
-	// Calculate how many frames require to complete animation from -> to
+	// Calculate how many frames required to complete animation from -> to
 	framesPerPeriod := uint(float32(period) / float32(config.FramePeriodMs))
 	if framesPerPeriod <= 0 {
 		// Must be at least two steps
@@ -98,7 +98,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame segment.Segment) {
 	to.animateFrame(frameCount, tmpSegment)
 	scaleFrameBuffer(tmpSegment, toPercent)
 
-	// Finally add the tmp segment into the frame buffer, we should never
+	// Finally, add the tmp segment into the frame buffer, we should never
 	// overflow a byte unless rounding causes a problem...
 	for i := uint(0); i < frame.Len(); i++ {
 		frame.Set(i, frame.Get(i).Add(tmpSegment.Get(i)))

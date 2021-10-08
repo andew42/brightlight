@@ -6,7 +6,7 @@ type MemSegment struct {
 	memory []framebuffer.Rgb
 }
 
-// An in memory segment (uninitialised)
+// NewMemSegment An in memory segment (uninitialised)
 func NewMemSegment(length uint) *MemSegment {
 
 	return &MemSegment{memory: make([]framebuffer.Rgb, length)}

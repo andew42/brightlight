@@ -6,6 +6,7 @@
 
 .lsc-led-segment-list-item-no-icon {
     width: 33%;
+    height: 65px;
     vertical-align: top !important;
     margin-top: 2px;
     margin-bottom: 8px;

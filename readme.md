@@ -5,46 +5,56 @@ Brightlight is a lighting controller for pixel addressable LED strips, intended 
 It has two parts. A low level controller responsible for generating the LED strip waveforms,
 written in Arduino C using the [Teensy 3.x controller](https://www.pjrc.com/teensy/td_libs_OctoWS2811.html).
 
-A web site interface to control one or more Teensy boards via USB. This is written in GO and
+A website interface to control one or more Teensy boards via USB. This is written in GO and
 runs on a raspberry Pi or similar.
 
 ### Setting up Arduino environment
 
 * [Install Arduino 1.6.3](https://www.arduino.cc/en/Main/OldSoftwareReleases#previous)
 * [Install Teensyduino 1.26](https://www.pjrc.com/teensy/td_download.html)
+* [Alternatively use PlatformIO](https://platformio.org/)
 
 ### Setting up new Pi
 * [Download RASPBIAN STRETCH LITE](https://www.raspberrypi.org/downloads/raspbian/)
 * Create a (4G) SD card with [etcher](https://etcher.io/)
 * Create a new file called "ssh" on the SD card's FAT boot partition. This will enable the SSH daemon immediately after the first boot.
-* SSH onto pi from Windows or Mac (password raspberry)
+* SSH onto pi from Windows or Mac (default password raspberry)
  ```bash
- ssh pi@192.168.0.46
+ ssh pi@192.168.0.XXX
  ``` 
-* Set up auto start
+* On pi set up auto start
 ```bash
 sudo nano /etc/rc.local
 ```
-* Add
+* On pi in nano add
 ```bash
-export GOPATH=/home/pi
+export BRIGHTLIGHT=/home/pi
 /home/pi/brightlight > /dev/null 2>&1 &
 ```
-* Build brightlight on Windows or Mac for Arm
+* On PC build website and brightlight executable
 ```bash
-env GOOS=linux GOARCH=arm go build -o ./brightlight
+full-build.bat
 ```
-* Copy executable to pi
+* On PC copy executable to pi
 ```bash
- scp  ./brightlight pi@192.168.0.46:/home/pi
+scp  ./brightlight pi@192.168.0.XXX:/home/pi
 ```
-* Create ui folder
+* On pi make executable run-able
 ```bash
-mkdir -p /home/pi/src/github.com/andew42/brightlight/ui2/build
+sudo chmod +x ./brightlight 
 ```
-* Copy ui files (build first)
+* On pi create folder
 ```bash
-scp -r . pi@192.168.0.46:/home/pi/src/github.com/andew42/brightlight/ui2/build
+mkdir ui2 
+```
+* On PC copy ui files to pi
+```bash
+scp -r ./ui pi@192.168.0.XXX:/home/pi
+scp -r ./ui2/build pi@192.168.0.XXX:/home/pi/ui2
+```
+* Reboot
+```bash
+sudo reboot
 ```
 * Killing running copies
 ```bash
@@ -52,12 +62,10 @@ sudo killall -q -9 brightlight
 ```
 
 ### Dev Environment
-#### go 1.11.1
+#### go 1.17.1
 https://golang.org/dl/
 
-go get "github.com/sirupsen/logrus"
-
-#### Goland 2018.2
+#### Goland 2021.2.3
 https://www.jetbrains.com/go/
 
 #### Grep Console plugin

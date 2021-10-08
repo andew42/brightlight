@@ -3,8 +3,8 @@ package animations
 import (
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
-	"time"
 	"github.com/andew42/brightlight/segment"
+	"time"
 )
 
 type rainbow struct {

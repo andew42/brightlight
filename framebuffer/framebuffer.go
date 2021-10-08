@@ -1,71 +1,83 @@
 package framebuffer
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/stats"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
 )
 
-// Frame buffer is a slice of strips A Mutex
+// FrameBuffer Frame buffer is a slice of strips A Mutex
 // and Cond are used to broadcast changes
 type FrameBuffer struct {
 	Strips []LedStrip
 }
 
-// Create a frame buffer
+// NewFrameBuffer Create a frame buffer
 func NewFrameBuffer() *FrameBuffer {
 
 	var fb FrameBuffer
-
-	// TODO: Make this more dynamic from config file?
 	fb.Strips = make([]LedStrip, 0, config.StripsPerTeensy)
-	// 0, 1 Unused strips
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
 
-	// 2 Bed wall
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 168))
+	if config.Titania {
+		// Titania config
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 229))
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 178))
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 228))
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+	} else {
+		// Bedroom config
+		// 0, 1 Unused strips (bedroom)
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
 
-	// 3 Bed curtains
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 164))
+		// 2 Bed wall
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 168))
 
-	// 4 Bed ceiling
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 165))
+		// 3 Bed curtains
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 164))
 
-	// 5 Dressing table wall
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 85))
+		// 4 Bed ceiling
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 165))
 
-	// 6 Dressing table ceiling
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 80))
+		// 5 Dressing table wall
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 85))
 
-	// 7 Dressing table curtain
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 162))
+		// 6 Dressing table ceiling
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 80))
 
-	// 8 Bathroom mirror wall
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 172))
+		// 7 Dressing table curtain
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 162))
 
-	// 9 Bath ceiling
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 226))
+		// 8 Bathroom mirror wall
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 172))
 
-	// 10 Bath+ wall
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 291))
+		// 9 Bath ceiling
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 226))
 
-	// 11 Bathroom mirror ceiling
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 162))
+		// 10 Bath+ wall
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 291))
 
-	// 12 Unused
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
+		// 11 Bathroom mirror ceiling
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 162))
 
-	// 13 Left of door ceiling
-	fb.Strips = append(fb.Strips, *NewLedStrip(true, 88))
+		// 12 Unused
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 0))
 
-	// 14 Right of door ceiling
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 142))
+		// 13 Left of door ceiling
+		fb.Strips = append(fb.Strips, *NewLedStrip(true, 88))
 
-	// 15 Right of door wall
-	fb.Strips = append(fb.Strips, *NewLedStrip(false, 122))
+		// 14 Right of door ceiling
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 142))
+
+		// 15 Right of door wall
+		fb.Strips = append(fb.Strips, *NewLedStrip(false, 122))
+	}
 
 	// Sanity check
 	numberOfStrips := len(fb.Strips)
@@ -99,7 +111,7 @@ func AddListener(name string, isSerial bool) (src chan *FrameBuffer, done chan<-
 	return newSrc, listenerDone
 }
 
-// Acquire a frame buffer
+// StartDriver Acquire a frame buffer
 func StartDriver(renderer chan *FrameBuffer) {
 
 	go func() {

@@ -2,14 +2,14 @@ package framebuffer
 
 import "strconv"
 
-// Single LED colour
+// Rgb Single LED colour
 type Rgb struct {
 	Red   byte
 	Green byte
 	Blue  byte
 }
 
-// Rgb constructors
+// NewRgb Rgb constructors
 func NewRgb(r byte, g byte, b byte) Rgb {
 
 	return Rgb{r, g, b}
@@ -20,7 +20,7 @@ func NewRgbFromInt(colour int) Rgb {
 	return Rgb{byte(colour >> 16), byte(colour >> 8), byte(colour)}
 }
 
-// Convert led RGB (3 bytes) to JSON colour (int)
+// MarshalJSON Convert LED RGB (3 bytes) to JSON colour (int)
 func (led Rgb) MarshalJSON() ([]byte, error) {
 
 	rc := make([]byte, 0, 16)
@@ -28,7 +28,7 @@ func (led Rgb) MarshalJSON() ([]byte, error) {
 	return rc, nil
 }
 
-// Convert HSL (Hue, Saturation, Lightness) to RGB (Red, Green, Blue)
+// NewRgbFromHsl Convert HSL (Hue, Saturation, Lightness) to RGB (Red, Green, Blue)
 //
 //   hue:        0 to 359 - position on the color wheel, 0=red, 60=orange,
 //                            120=yellow, 180=green, 240=blue, 300=violet
@@ -105,7 +105,7 @@ func (led Rgb) IsLedOn() bool {
 	return led.Red != 0 || led.Green != 0 || led.Blue != 0
 }
 
-// Assumes no overflow of a byte
+// Add Assumes no overflow of a byte
 func (led Rgb) Add(right Rgb) Rgb {
 	return Rgb{
 		Red:   led.Red + right.Red,
@@ -114,7 +114,7 @@ func (led Rgb) Add(right Rgb) Rgb {
 	}
 }
 
-// Scale an RGB colour by f between 0 -> 1
+// ScaleRgb Scale an RGB colour by f between 0 -> 1
 func (led Rgb) ScaleRgb(f float32) Rgb {
 
 	return Rgb{

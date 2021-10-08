@@ -2,8 +2,8 @@ package servers
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/controller"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 )
@@ -13,7 +13,7 @@ type cmd struct {
 	Param string
 }
 
-// Handle HTTP requests to set a server option
+// OptionHandler Handle HTTP requests to set a server option
 func OptionHandler(w http.ResponseWriter, r *http.Request) {
 
 	// JSON body of form

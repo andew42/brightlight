@@ -1,15 +1,15 @@
 package stats
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/config"
+	log "github.com/sirupsen/logrus"
 	"runtime/debug"
 	"strconv"
 	"time"
 )
 
 const (
-	statFrameRenderTime         = iota
+	statFrameRenderTime = iota
 	statFrameSyncJitter
 	statSerialSendTime
 	statSerialDroppedFrame
@@ -26,7 +26,7 @@ func AddFrameRenderTimeSample(sample time.Duration) {
 	statSampleChannel <- statSample{statFrameRenderTime, "Frame Render", sample}
 }
 
-// Public calls to add new stats samples
+// AddFrameSyncJitterSample Public calls to add new stats samples
 func AddFrameSyncJitterSample(sample time.Duration) {
 	statSampleChannel <- statSample{statFrameSyncJitter, "Frame Sync Jitter", sample}
 }
@@ -64,7 +64,7 @@ func AddListener(name string) (src chan *Stats, done chan<- chan *Stats) {
 var addListener = make(chan addListenerParams)
 var listenerDone = make(chan chan *Stats)
 
-// Stats driver waits for samples and publishes results to listeners
+// StartDriver Stats driver waits for samples and publishes results to listeners
 func StartDriver() {
 	go func() {
 		var gcStats debug.GCStats
@@ -84,7 +84,7 @@ func StartDriver() {
 				}
 				// Send to all listeners, that are idle, the most recent frame buffer
 				for k := range listeners {
-					// Send a the latest stats if listener has processed the last one
+					// Send the latest stats if listener has processed the last one
 					select {
 					case k <- stats:
 					default:

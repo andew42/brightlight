@@ -2,28 +2,29 @@ package main
 
 import (
 	"flag"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/stats"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 	"mime"
 	"net/http"
 	"os"
-	"path"
+	// "os"
+	// "path"
 	"runtime"
 	"strings"
 )
 
-// Wrap a Dir file system server object to log failures
+// LoggedDir Wrap a Dir file system server object to log failures
 type LoggedDir struct {
 	http.Dir
 }
 
-// Log requests for non existent content
+// Open Log requests for non existent content
 func (d LoggedDir) Open(path string) (http.File, error) {
 
 	f, err := d.Dir.Open(path)
@@ -34,13 +35,13 @@ func (d LoggedDir) Open(path string) (http.File, error) {
 	return f, err
 }
 
-// Wrap a Dir file system server object to redirect
+// LoggedRedirectingDir Wrap a Dir file system server object to redirect
 type LoggedRedirectingDir struct {
 	LoggedDir
 	Prefix []string
 }
 
-// Redirect paths in Prefix slice by remove the entry prefix
+// Open Redirect paths in Prefix slice by remove the entry prefix
 // e.g. for entry /buttons path /buttons/index.html -> /index.html
 func (d LoggedRedirectingDir) Open(path string) (http.File, error) {
 
@@ -67,11 +68,14 @@ func main() {
 	// Report what are we running on
 	log.WithFields(
 		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).
-		Info("brightlight environment")
+		Info("environment")
 
-	// Figure out where the content directory is, GOPATH may contain : separated paths
-	// contentPath1 supports the original ractive ui
-	contentBasePath := path.Join(os.Getenv("GOPATH"), "src/github.com/andew42/brightlight")
+	// Figure out where the content directory is by loading BRIGHTLIGHT
+	contentBasePath := os.Getenv("BRIGHTLIGHT")
+	if len(contentBasePath) == 0 {
+		log.Fatal("BRIGHTLIGHT environment variable not set (web root)")
+	}
+	// contentBasePath := "C:/Users/Andrew/GolandProjects/brightlight"
 	log.WithFields(
 		log.Fields{"contentBasePath": contentBasePath}).
 		Info("HTTP content base path")

@@ -1,10 +1,10 @@
 package animations
 
 import (
-	"time"
 	"github.com/andew42/brightlight/config"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/segment"
+	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type stepFade struct {

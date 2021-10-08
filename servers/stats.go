@@ -2,8 +2,8 @@ package servers
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/stats"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 	"strconv"
 )
@@ -11,7 +11,7 @@ import (
 // Give each stats listener its own unique ID
 var statsListenerId = 0
 
-// Handle stats web socket requests (web socket is closed when we return)
+// StatsHandler Handle stats web socket requests (web socket is closed when we return)
 func StatsHandler(ws *websocket.Conn) {
 
 	// Not thread safe but good enough for debug output

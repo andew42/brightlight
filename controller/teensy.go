@@ -1,16 +1,16 @@
 package controller
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/stats"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
 var teensyDriverStarted bool
 
-// Run driver or two as a go routine
+// StartTeensyDriver Run driver or two as a go routine
 func StartTeensyDriver() {
 
 	if teensyDriverStarted {

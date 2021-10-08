@@ -1,15 +1,15 @@
 package segment
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/andew42/brightlight/framebuffer"
+	log "github.com/sirupsen/logrus"
 )
 
 type PhySegment struct {
 	Strips []framebuffer.LedStrip
 }
 
-// A physical segment aggregates a number of LedStrips
+// NewPhySegment A physical segment aggregates a number of LedStrips
 func NewPhySegment(strips []framebuffer.LedStrip) PhySegment {
 
 	// Strip out zero length segments
@@ -22,7 +22,7 @@ func NewPhySegment(strips []framebuffer.LedStrip) PhySegment {
 	return ps
 }
 
-// Number of LEDs in the segment
+// Len Number of LEDs in the segment
 func (seg PhySegment) Len() uint {
 
 	l := uint(0)
