@@ -8,7 +8,7 @@ export default class MountNotifier extends React.Component {
     }
 
     render() {
-        // renter nothing
-        return '';
+        // render nothing
+        return null;
     }
 }

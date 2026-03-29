@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './App.css';
 import ButtonPad from "./buttons/ButtonPad";
-import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
+import {BrowserRouter, Link, Route, Routes, useNavigate, useLocation} from 'react-router-dom'
 import ButtonEditor from "./button-edit/ButtonEditor";
 import {getStaticData} from "./server-proxy/staticData";
 import {getButtons, saveButtons} from "./server-proxy/buttons";
@@ -18,6 +18,29 @@ const Home = () => (
         <hr/>
     </nav>
 );
+
+// Wrapper providing useNavigate to ButtonPad (class component can't use hooks)
+function ButtonPadRoute({allButtons, activeButtonKey, onButtonTap, onButtonPress}) {
+    const navigate = useNavigate();
+    return <ButtonPad allButtons={allButtons}
+                      activeButtonKey={activeButtonKey}
+                      onButtonTap={onButtonTap}
+                      onButtonPress={key => onButtonPress(navigate, key)}/>;
+}
+
+// Wrapper providing useNavigate/useLocation to ButtonEditor (class component can't use hooks)
+function ButtonEditorRoute({allButtons, allAnimations, allSegments, userSegments, onButtonChanged, onOk}) {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const history = {location, goBack: () => navigate(-1)};
+    return <ButtonEditor allButtons={allButtons}
+                         allAnimations={allAnimations}
+                         allSegments={allSegments}
+                         userSegments={userSegments}
+                         onButtonChanged={onButtonChanged}
+                         onOk={onOk}
+                         history={history}/>;
+}
 
 // The main application navigates between components
 export default class App extends Component {
@@ -99,39 +122,37 @@ export default class App extends Component {
         runAnimation(this.findButton(key));
     }
 
-    onButtonPress(history, key) {
+    onButtonPress(navigate, key) {
         runAnimation(this.findButton(key));
-        history.push('/button-edit', {'buttonKey': key});
+        navigate('/button-edit', {state: {'buttonKey': key}});
     }
 
     render() {
-        let ButtonPadWithProps = props => {
-            return (<ButtonPad allButtons={this.state.userButtons}
-                               activeButtonKey={this.state.activeButtonKey}
-                               onButtonTap={key => this.onButtonTap(key)}
-                               onButtonPress={(history, key) => this.onButtonPress(history, key)}
-                               {...props}/>);
-        };
-
-        let ButtonEditorWithProps = props => {
-            return (<ButtonEditor allButtons={this.state.userButtons}
-                                  allAnimations={this.state.allAnimations}
-                                  allSegments={this.state.allSegments}
-                                  userSegments={this.state.userSegments}
-                                  onButtonChanged={button => this.onButtonChanged(button)}
-                                  onOk={() => this.onSaveButtonEdit()}
-                                  {...props}/>);
-        };
-
         return (
             <div className="App" onContextMenu={e => e.preventDefault()}>
                 <BrowserRouter>
-                    <Switch>
-                        <Route path="/buttons" render={ButtonPadWithProps}/>
-                        <Route path="/button-edit" render={ButtonEditorWithProps}/>
-                        <Route path="/virtual" component={Virtual}/>
-                        <Route path="/" component={Home}/>
-                    </Switch>
+                    <Routes>
+                        <Route path="/buttons" element={
+                            <ButtonPadRoute
+                                allButtons={this.state.userButtons}
+                                activeButtonKey={this.state.activeButtonKey}
+                                onButtonTap={key => this.onButtonTap(key)}
+                                onButtonPress={(navigate, key) => this.onButtonPress(navigate, key)}
+                            />
+                        }/>
+                        <Route path="/button-edit" element={
+                            <ButtonEditorRoute
+                                allButtons={this.state.userButtons}
+                                allAnimations={this.state.allAnimations}
+                                allSegments={this.state.allSegments}
+                                userSegments={this.state.userSegments}
+                                onButtonChanged={button => this.onButtonChanged(button)}
+                                onOk={() => this.onSaveButtonEdit()}
+                            />
+                        }/>
+                        <Route path="/virtual" element={<Virtual/>}/>
+                        <Route path="/" element={<Home/>}/>
+                    </Routes>
                 </BrowserRouter>
             </div>
         );

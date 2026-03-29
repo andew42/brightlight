@@ -22,7 +22,7 @@ export default class ButtonPad extends React.Component {
                     <div key={button.key}>
                         <Button active={button.key === this.props.activeButtonKey}
                                 onTap={() => this.props.onButtonTap(button.key)}
-                                onPressUp={() => this.props.onButtonPress(this.props.history, button.key)}
+                                onPressUp={() => this.props.onButtonPress(button.key)}
                                 label={button.name}/>
                         <div className={button.key === this.props.activeButtonKey ? 'active' : ''}/>
                     </div>)}
