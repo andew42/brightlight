@@ -2,16 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-    plugins: [react({ include: /\.(jsx|js)$/ })],
-    esbuild: {
-        loader: 'jsx',
-        include: /src\/.*\.js$/,
-        exclude: []
-    },
-    optimizeDeps: {
-        esbuildOptions: {
-            loader: { '.js': 'jsx' }
-        }
+    plugins: [react()],
+    css: {
+        // semantic-ui-css 2.5.0 contains a technically invalid selector
+        // ([data-tooltip]:after .header) that lightningcss rejects without this
+        lightningcss: { errorRecovery: true }
     },
     build: {
         outDir: 'build'

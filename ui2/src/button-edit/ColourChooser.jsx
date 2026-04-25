@@ -1,7 +1,6 @@
 import * as React from "react";
 import './ColourChooser.css';
 import {Modal} from "semantic-ui-react";
-import "../colour/Colour.js"
 import VerticalSlider from "../buttons/VerticalSlider";
 import MountNotifier from "./MountNotifier";
 import Colour from "../colour/Colour";
