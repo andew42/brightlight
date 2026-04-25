@@ -13,6 +13,9 @@ export default defineConfig({
             loader: { '.js': 'jsx' }
         }
     },
+    build: {
+        outDir: 'build'
+    },
     server: {
         proxy: {
             '/RunAnimations': 'http://192.168.0.68:8080'
