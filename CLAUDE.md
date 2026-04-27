@@ -41,7 +41,7 @@ brightlight/
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 19, React Router 7, Semantic UI React 2, Vite 8 |
-| Backend | Go 1.17, logrus, golang.org/x/net/websocket |
+| Backend | Go 1.25, logrus, golang.org/x/net/websocket |
 | Hardware | Raspberry Pi (Linux ARM), Teensy 3.x, WS2811 LED strips |
 | Build | Vite (frontend), cross-compiled Go GOARCH=arm GOARM=5 (backend) |
 
