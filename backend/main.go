@@ -13,8 +13,6 @@ import (
 	"mime"
 	"net/http"
 	"os"
-	// "os"
-	// "path"
 	"runtime"
 	"strings"
 )
@@ -98,19 +96,14 @@ func main() {
 
 	// Set up static content serving
 	mime.AddExtensionType(".manifest", "text/cache-manifest")
-	// Serve original ui on /ui
-	fs1 := http.FileServer(LoggedDir{http.Dir(contentBasePath)})
-	http.Handle("/ui/", fs1)
-	// Serve new react ui on /
+	// Serve react frontend on /
 	fs2 := http.FileServer(LoggedRedirectingDir{
-		LoggedDir{http.Dir(contentBasePath + "/ui2/build")},
+		LoggedDir{http.Dir(contentBasePath + "/frontend/build")},
 		[]string{"/buttons", "/virtual"}})
-	//	[]string{}})
 	http.Handle("/", fs2)
 
-	// Config requires PUT (write) support
-	http.HandleFunc("/config/", servers.GetConfigHandler(contentBasePath+"/ui"))
-	http.HandleFunc("/ui-config/", servers.GetConfigHandler(contentBasePath+"/ui2/build"))
+	// ui-config requires PUT (write) support for saving button config
+	http.HandleFunc("/ui-config/", servers.GetConfigHandler(contentBasePath+"/frontend/build"))
 
 	// Requests to run zero or more animation (json payload)
 	http.HandleFunc("/RunAnimations/", servers.RunAnimationsHandler)
@@ -138,7 +131,7 @@ func main() {
 	}
 	ipAndPort += ":8080"
 	log.WithField("address", ipAndPort).
-		Info("serving old UI at /ui/html and new UI at /")
+		Info("serving frontend at /")
 	if err := http.ListenAndServe(ipAndPort, nil); err != nil {
 		log.Error(err.Error())
 	}
