@@ -12,7 +12,8 @@ A lighting controller for pixel-addressable WS2811 LED strips intended for domes
 
 ```
 frontend/   React 19 + Vite 8 web app
-backend/    Go server + Arduino firmware
+backend/    Go server
+firmware/   Arduino/Teensy C firmware (OctoWS2811)
 deploy/     Build output staging area for Pi deployment (see deploy/README.md)
 ```
 

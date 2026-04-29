@@ -18,17 +18,17 @@ brightlight/
 │   ├── package.json   npm deps with overrides for React 19 peer dep compat
 │   ├── vite.config.js Vite 8 config: outDir=build, esbuild CSS minify
 │   └── ui-asset-source/ Pixelmator source for apple-touch-icon
-├── backend/           Go server + Arduino firmware
+├── backend/           Go server
 │   ├── main.go        Entry point; serves frontend/build/ as static files
-│   ├── go.mod         module github.com/andew42/brightlight, Go 1.17
+│   ├── go.mod         module github.com/andew42/brightlight, Go 1.25
 │   ├── animations/    LED animation effects (14 animations)
 │   ├── config/        Network config, presets, static data
 │   ├── controller/    Teensy USB serial driver + relay driver
 │   ├── framebuffer/   In-memory LED frame buffer
 │   ├── segment/       Named/physical/combined LED segment abstractions
 │   ├── servers/       HTTP handlers (animations, config, websockets)
-│   ├── stats/         Performance statistics
-│   └── firmware/      Arduino/Teensy C firmware (OctoWS2811)
+│   └── stats/         Performance statistics
+├── firmware/          Arduino/Teensy C firmware (OctoWS2811)
 ├── deploy/            Staging area for Pi deployment artefacts (generated)
 │   └── README.md      How to build and deploy
 ├── full-build.bat     Windows build script: builds frontend + backend → deploy/
