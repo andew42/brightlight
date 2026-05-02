@@ -1,11 +1,12 @@
 package servers
 
 import (
-	"io/ioutil"
-	"net/http"
-	"path"
-
 	log "github.com/sirupsen/logrus"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 var configVersion = 0
@@ -13,21 +14,31 @@ var configVersion = 0
 // GetConfigHandler Handle HTTP requests to read and write config
 func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Request) {
 
+	// Compute the canonical base path once for traversal checks
+	cleanBase := filepath.Clean(contentPath)
+
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// Construct file system path to config
-		fullPath := path.Join(contentPath, r.URL.Path)
+		// Construct file system path to config and guard against path traversal
+		fullPath := filepath.Join(contentPath, filepath.FromSlash(r.URL.Path))
+		if !strings.HasPrefix(filepath.Clean(fullPath)+string(filepath.Separator), cleanBase+string(filepath.Separator)) {
+			log.WithField("FullPath", fullPath).Warn("configHandler path traversal attempt")
+			http.Error(w, "Forbidden", 403)
+			return
+		}
 
 		if r.Method == "GET" {
 
 			log.WithField("FullPath", fullPath).Info("configHandler GET called")
-			content, err := ioutil.ReadFile(fullPath)
+			content, err := os.ReadFile(fullPath)
 			if err != nil {
 				log.WithField("Error", err.Error()).Warn("Failed to load config file")
 				http.Error(w, "Failed to load config file", 404)
 			} else {
 				w.Header().Set("Content-Type", "application/json")
-				w.Write(content)
+				if _, err = w.Write(content); err != nil {
+					log.WithField("Error", err.Error()).Warn("configHandler GET failed to write response")
+				}
 			}
 		} else if r.Method == "PUT" {
 
@@ -40,18 +51,13 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 				return
 			}
 
-			// up to a size of 10K
-			if r.ContentLength > 10000 {
-				log.WithField("ContentLength", r.ContentLength).Warn("Config file content too large")
-				http.Error(w, "Update content too large", 413)
-				return
-			}
-
-			if content, err := ioutil.ReadAll(r.Body); err != nil {
+			// Limit body to 10K regardless of whether Content-Length header is present
+			r.Body = http.MaxBytesReader(w, r.Body, 10000)
+			if content, err := io.ReadAll(r.Body); err != nil {
 				log.WithField("Error", err.Error()).Warn("Failed to read PUT body content")
 				http.Error(w, "Failed to read PUT content", 400)
 			} else {
-				if err = ioutil.WriteFile(fullPath, content, 0644); err != nil {
+				if err = os.WriteFile(fullPath, content, 0644); err != nil {
 					log.WithField("Error", err.Error()).Error("Failed to write file")
 					http.Error(w, "Failed to write file", 507)
 				} else {
@@ -62,7 +68,7 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 			}
 		} else {
 			log.WithField("Method", r.Method).Warn("Unknown config server method")
-			http.Error(w, "Failed to write file", 405)
+			http.Error(w, "Method not allowed", 405)
 		}
 	}
 }

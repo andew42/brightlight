@@ -1,11 +1,10 @@
 package animations
 
 import (
-	"time"
-
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/segment"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type linearFade struct {
@@ -90,7 +89,7 @@ func (lf *linearFade) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Apply the first animation to the frame buffer and scale with fromPercent
 	from.animateFrame(frameCount, frame)
-	if fromPercent == 100 {
+	if fromPercent == 1.0 {
 		return
 	}
 	scaleFrameBuffer(frame, fromPercent)

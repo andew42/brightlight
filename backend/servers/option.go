@@ -2,11 +2,10 @@ package servers
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
-
 	"github.com/andew42/brightlight/controller"
 	log "github.com/sirupsen/logrus"
+	"io"
+	"net/http"
 )
 
 type cmd struct {
@@ -19,7 +18,7 @@ func OptionHandler(w http.ResponseWriter, r *http.Request) {
 
 	// JSON body of form
 	// {"cmd": "outputMapping", "param": "Linear"},
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.WithField("err", err.Error()).Error("OptionHandler bad body")
 		http.Error(w, err.Error(), 400)

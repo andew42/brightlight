@@ -2,10 +2,9 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"path"
-
 	log "github.com/sirupsen/logrus"
+	"os"
+	"path"
 )
 
 // SettingsFileDef A settings file is a map of named button column definitions
@@ -37,11 +36,11 @@ func LoadUserPresets(configPath string) []Preset {
 	presets := make([]Preset, 0)
 
 	// Try loading user settings first
-	fileContent, err := ioutil.ReadFile(path.Join(configPath, "/config/user.json"))
+	fileContent, err := os.ReadFile(path.Join(configPath, "/config/user.json"))
 	if err != nil {
 		log.WithField("error", err).Warn("Failed to open user.json")
 		// No user settings, try loading the defaults
-		if fileContent, err = ioutil.ReadFile(path.Join(configPath, "/config/default.json")); err != nil {
+		if fileContent, err = os.ReadFile(path.Join(configPath, "/config/default.json")); err != nil {
 			log.WithField("error", err).Error("Failed to open default.json")
 			// Return an empty preset list
 			return presets

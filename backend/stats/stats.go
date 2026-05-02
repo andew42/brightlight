@@ -2,11 +2,10 @@ package stats
 
 import (
 	"encoding/json"
+	"github.com/andew42/brightlight/config"
 	"sort"
 	"strconv"
 	"time"
-
-	"github.com/andew42/brightlight/config"
 )
 
 // Stats Statistics on animation frame times and serial send times
@@ -89,7 +88,14 @@ func findBlockWithAddByName(blocks *[]StatsBlock, name string) *StatsBlock {
 	*blocks = append(*blocks, newStatsBlock)
 	// Sort the blocks by name, so they don't bounce around in the UI
 	sort.Sort(ByName(*blocks))
-	return &(*blocks)[len(*blocks)-1]
+	// Find the newly inserted block by name after sorting, since the sort
+	// reorders the slice and the new block is no longer necessarily at the end
+	for i, b := range *blocks {
+		if b.Name == name {
+			return &(*blocks)[i]
+		}
+	}
+	panic("findBlockWithAddByName: newly inserted block not found after sort")
 }
 
 func addSampleToBlockList(blocks *[]StatsBlock, name string, sample time.Duration) {
