@@ -186,6 +186,24 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 	case "Twinkle":
 		*animators = append(*animators, segActionAndAnimator{seg, newTwinkle()})
 
+	case "Plasma":
+		var err error
+		speed, err := seg.Params.asRange(0)
+		var brightness int
+		if err == nil {
+			brightness, err = seg.Params.asRange(1)
+		}
+		var palette int
+		if err == nil {
+			palette, err = seg.Params.asRange(2)
+		}
+		if err == nil {
+			*animators = append(*animators,
+				segActionAndAnimator{seg, newPlasma(float64(speed), brightness, palette)})
+		} else {
+			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+		}
+
 	case "Baby Bows":
 		var err error
 		length, err := seg.Params.asRange(0)

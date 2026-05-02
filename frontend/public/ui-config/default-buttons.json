@@ -145,14 +145,16 @@
     },
     {
       "key": 11,
-      "name": "",
+      "name": "Plasma Lava Lamp",
       "segments": [
         {
           "name": "All",
           "z": 1,
-          "animation": "Static",
+          "animation": "Plasma",
           "params": [
-            {"key": 20, "type": "colour", "label": "Colour", "value": {"r": 0, "g": 0, "b": 0}}
+            {"key": 110, "type": "range", "label": "Speed", "min": 1, "max": 100, "value": 50},
+            {"key": 111, "type": "range", "label": "Brightness", "min": 10, "max": 60, "value": 50},
+            {"key": 112, "type": "range", "label": "Palette", "min": 0, "max": 3, "value": 0}
           ]
         }
       ]
