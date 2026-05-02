@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"log/slog"
 )
 
 // By OS a list of relay port names in index order
@@ -31,12 +31,12 @@ func getPortName(portMappings map[string][]string, index int) string {
 
 	portNames, ok := portMappings[runtime.GOOS]
 	if !ok {
-		log.WithField("os", runtime.GOOS).Warn("No port mappings for OS")
+		slog.Warn("No port mappings for OS", "os", runtime.GOOS)
 		return ""
 	}
 
 	if index < 0 || index >= len(portNames) {
-		log.WithField("index", index).Warn("No port mappings for index")
+		slog.Warn("No port mappings for index", "index", index)
 		return ""
 	}
 
@@ -50,14 +50,14 @@ func openUsbPortWithRetry(port string) *os.File {
 	for {
 		f, err := os.OpenFile(port, os.O_RDWR, 0)
 		if err == nil {
-			log.WithField("port", port).Info("openUsbPortWithRetry connected")
+			slog.Info("openUsbPortWithRetry connected", "port", port)
 
 			// Set raw mode on raspberry pi, if we don't set raw mode
 			// xon/xoff character in the frame buffer cause problems
 			if runtime.GOOS == "linux" {
 				cmd := exec.Command("stty", "-F", port, "raw")
 				if err := cmd.Run(); err != nil {
-					log.WithField("error", err.Error()).Error("openUsbPortWithRetry failed to set stty raw mode")
+					slog.Error("openUsbPortWithRetry failed to set stty raw mode", "error", err.Error())
 				}
 			}
 
@@ -65,7 +65,7 @@ func openUsbPortWithRetry(port string) *os.File {
 		}
 
 		if !errorLogged {
-			log.WithField("error", err.Error()).Warn("openUsbPortWithRetry failed to open port")
+			slog.Warn("openUsbPortWithRetry failed to open port", "error", err.Error())
 			errorLogged = true
 		}
 

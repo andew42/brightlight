@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
+	"log/slog"
+
 	"golang.org/x/net/websocket"
 )
 
@@ -70,7 +71,7 @@ func ButtonStateHandler(ws *websocket.Conn) {
 	// Create an id for this listener go routine
 	buttonStateListenerId++
 	listenerId := buttonStateListenerId
-	log.WithField("id", listenerId).Info("adding button state listener")
+	slog.Info("adding button state listener", "id", listenerId)
 
 	// Add our listener channel
 	update := make(chan buttonState)
@@ -102,7 +103,7 @@ func ButtonStateHandler(ws *websocket.Conn) {
 				return
 			}
 		case <-closeSocket: // closeSocket sends us read errors (i.e. socket closed by client)
-			log.WithField("id", listenerId).Info("closing button state listener")
+			slog.Info("closing button state listener", "id", listenerId)
 			removeButtonListener(update)
 			return
 		}
@@ -112,7 +113,7 @@ func ButtonStateHandler(ws *websocket.Conn) {
 // Render button state key as JSON
 func sendButtonStateToWebSocket(listenerId int, bs buttonState, ws *websocket.Conn, c chan buttonState) error {
 
-	log.WithFields(log.Fields{"id": listenerId, "state": bs}).Info("sending button state")
+	slog.Info("sending button state", "id", listenerId, "state", bs)
 
 	// Send back the frame buffer as JSON
 	rc, err := json.MarshalIndent(bs, "", " ")
@@ -121,7 +122,7 @@ func sendButtonStateToWebSocket(listenerId int, bs buttonState, ws *websocket.Co
 	}
 
 	if err != nil {
-		log.Info("buttonStateSocketHandler " + err.Error())
+		slog.Info("buttonStateSocketHandler " + err.Error())
 		// Un-subscribe before returning and closing connection
 		removeButtonListener(c)
 	}

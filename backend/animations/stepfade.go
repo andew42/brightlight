@@ -1,11 +1,11 @@
 package animations
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/segment"
-	log "github.com/sirupsen/logrus"
 )
 
 type stepFade struct {
@@ -21,8 +21,8 @@ func newStepFade(period time.Duration, reverseOnRepeat bool, animators ...animat
 
 	// Must be at least two animations
 	if len(animators) < 2 {
-		log.WithField("animators", len(animators)).
-			Fatal("StepFade animation requires at least two animations")
+		slog.Error("StepFade animation requires at least two animations", "animators", len(animators))
+		panic("StepFade animation requires at least two animations")
 	}
 
 	// Calculate how many frames require to complete entire animation

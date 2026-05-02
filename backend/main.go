@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	"log/slog"
 	"mime"
 	"net/http"
 	"os"
@@ -14,7 +14,6 @@ import (
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/stats"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 )
 
@@ -28,8 +27,7 @@ func (d LoggedDir) Open(path string) (http.File, error) {
 
 	f, err := d.Dir.Open(path)
 	if err != nil {
-		log.WithField("path", path).
-			Info("requested static HTTP content not found")
+		slog.Info("requested static HTTP content not found", "path", path)
 	}
 	return f, err
 }
@@ -47,7 +45,7 @@ func (d LoggedRedirectingDir) Open(path string) (http.File, error) {
 	for _, p := range d.Prefix {
 		if strings.HasPrefix(path, p) {
 			path = strings.TrimPrefix(path, p)
-			log.WithField("prefix", p).Info("redirecting")
+			slog.Info("redirecting", "prefix", p)
 			break
 		}
 	}
@@ -57,27 +55,19 @@ func (d LoggedRedirectingDir) Open(path string) (http.File, error) {
 // Main
 func main() {
 
-	// Force logrus to use console colouring
-	var forceColours = flag.Bool("logrusforcecolours", false, "force logrus to use console colouring")
-	flag.Parse()
-	if *forceColours {
-		log.SetFormatter(&log.TextFormatter{ForceColors: true})
-	}
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
 
 	// Report what are we running on
-	log.WithFields(
-		log.Fields{"gover": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}).
-		Info("environment")
+	slog.Info("environment", "gover", runtime.Version(), "goos", runtime.GOOS, "goarch", runtime.GOARCH)
 
 	// Figure out where the content directory is by loading BRIGHTLIGHT
 	contentBasePath := os.Getenv("BRIGHTLIGHT")
 	if len(contentBasePath) == 0 {
-		log.Fatal("BRIGHTLIGHT environment variable not set (web root)")
+		slog.Error("BRIGHTLIGHT environment variable not set (web root)")
+		os.Exit(1)
 	}
 	// contentBasePath := "C:/Users/Andrew/GolandProjects/brightlight"
-	log.WithFields(
-		log.Fields{"contentBasePath": contentBasePath}).
-		Info("HTTP content base path")
+	slog.Info("HTTP content base path", "contentBasePath", contentBasePath)
 
 	// Start drivers
 	controller.StartTeensyDriver()
@@ -127,15 +117,14 @@ func main() {
 	// Start web server
 	ipAndPort, err := config.GetLocalIP()
 	if err != nil {
-		log.WithField("err", err).
-			Fatal("Failed to find an IP address on which to serve content")
+		slog.Error("Failed to find an IP address on which to serve content", "err", err)
+		os.Exit(1)
 	}
 	ipAndPort += ":8080"
-	log.WithField("address", ipAndPort).
-		Info("serving frontend at /")
+	slog.Info("serving frontend at /", "address", ipAndPort)
 	if err := http.ListenAndServe(ipAndPort, nil); err != nil {
-		log.Error(err.Error())
+		slog.Error(err.Error())
 	}
 
-	log.Info("brightlight exited")
+	slog.Info("brightlight exited")
 }

@@ -5,8 +5,9 @@ import (
 	"strconv"
 	"time"
 
+	"log/slog"
+
 	"github.com/andew42/brightlight/config"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -115,12 +116,12 @@ func StartDriver() {
 
 				// Process new listener requests
 			case newListener := <-addListener:
-				log.WithField("name", newListener.name).Info("Stats listener added")
+				slog.Info("Stats listener added", "name", newListener.name)
 				listeners[newListener.src] = newListener.name
 
 				// Process remove listener request
 			case listenerToRemove := <-listenerDone:
-				log.WithField("name", listeners[listenerToRemove]).Info("Stats listener removed")
+				slog.Info("Stats listener removed", "name", listeners[listenerToRemove])
 				delete(listeners, listenerToRemove)
 			}
 		}

@@ -1,8 +1,9 @@
 package segment
 
 import (
+	"log/slog"
+
 	"github.com/andew42/brightlight/framebuffer"
-	log "github.com/sirupsen/logrus"
 )
 
 type SubSegment struct {
@@ -16,10 +17,12 @@ func NewSubSegment(baseSeg Segment, start uint, len uint) SubSegment {
 
 	baseLen := baseSeg.Len()
 	if start >= baseLen {
-		log.Panic("invalid segment start")
+		slog.Error("invalid segment start")
+		panic("invalid segment start")
 	}
 	if start+len > baseLen {
-		log.Panic("invalid segment length")
+		slog.Error("invalid segment length")
+		panic("invalid segment length")
 	}
 	return SubSegment{baseSeg, start, len}
 }
@@ -35,7 +38,8 @@ func (seg SubSegment) Get(pos uint) framebuffer.Rgb {
 
 	// Is position out of range?
 	if pos >= seg.len {
-		log.Panic("position out of range")
+		slog.Error("position out of range")
+		panic("position out of range")
 	}
 	// Get at position within segment
 	return seg.baseSeg.Get(seg.start + pos)
@@ -46,7 +50,8 @@ func (seg SubSegment) Set(pos uint, colour framebuffer.Rgb) {
 
 	// Is position out of range?
 	if pos >= seg.len {
-		log.Panic("position out of range")
+		slog.Error("position out of range")
+		panic("position out of range")
 	}
 	// Set at position within segment
 	seg.baseSeg.Set(seg.start+pos, colour)

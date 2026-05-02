@@ -1,8 +1,9 @@
 package segment
 
 import (
+	"log/slog"
+
 	"github.com/andew42/brightlight/framebuffer"
-	log "github.com/sirupsen/logrus"
 )
 
 type PhySegment struct {
@@ -65,7 +66,8 @@ func (seg PhySegment) locate(pos uint) (stripIndex int, stripPos uint) {
 
 	// Was the position out of range?
 	if stripIndex == len(seg.Strips) {
-		log.Panic("position out of range")
+		slog.Error("position out of range")
+		panic("position out of range")
 	}
 
 	// Transpose strip position if LedStrip is anti-clockwise

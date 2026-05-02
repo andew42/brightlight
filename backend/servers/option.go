@@ -2,10 +2,11 @@ package servers
 
 import (
 	"encoding/json"
-	"github.com/andew42/brightlight/controller"
-	log "github.com/sirupsen/logrus"
 	"io"
+	"log/slog"
 	"net/http"
+
+	"github.com/andew42/brightlight/controller"
 )
 
 type cmd struct {
@@ -20,7 +21,7 @@ func OptionHandler(w http.ResponseWriter, r *http.Request) {
 	// {"cmd": "outputMapping", "param": "Linear"},
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.WithField("err", err.Error()).Error("OptionHandler bad body")
+		slog.Error("OptionHandler bad body", "err", err.Error())
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -28,18 +29,18 @@ func OptionHandler(w http.ResponseWriter, r *http.Request) {
 	// Un-marshal JSON into typed cmd
 	var cmd cmd
 	if err = json.Unmarshal(body, &cmd); err != nil {
-		log.WithField("err", err.Error()).Error("OptionHandler bad body JSON")
+		slog.Error("OptionHandler bad body JSON", "err", err.Error())
 		http.Error(w, err.Error(), 400)
 		return
 	}
 
-	log.WithFields(map[string]interface{}{"cmd": cmd.Cmd, "param": cmd.Param}).Info("OptionHandler called")
+	slog.Info("OptionHandler called", "cmd", cmd.Cmd, "param", cmd.Param)
 
 	// Perform the command
 	switch cmd.Cmd {
 	case "outputMapping":
 		controller.SetOutputMapping(cmd.Param)
 	default:
-		log.WithField("cmd", cmd.Cmd).Warn("OptionHandler unknown command")
+		slog.Warn("OptionHandler unknown command", "cmd", cmd.Cmd)
 	}
 }

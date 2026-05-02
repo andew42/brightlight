@@ -1,9 +1,10 @@
 package animations
 
 import (
+	"log/slog"
+
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/segment"
-	log "github.com/sirupsen/logrus"
 )
 
 type life struct {
@@ -37,7 +38,8 @@ func (l *life) animateFrame(frameCount uint, frame segment.Segment) {
 
 	// Don't support change of frame length
 	if uint(len(l.cachedState)) != frame.Len() {
-		log.Fatal("attempt to change frame length in life animation")
+		slog.Error("attempt to change frame length in life animation")
+		panic("attempt to change frame length in life animation")
 	}
 
 	// Work out the required generation
@@ -65,7 +67,8 @@ func (l *life) getGenerationState(generation uint) []bool {
 	}
 
 	if l.cachedGeneration > generation {
-		log.Fatal("attempt to regress generation in life animation")
+		slog.Error("attempt to regress generation in life animation")
+		panic("attempt to regress generation in life animation")
 	}
 
 	// Move to the required generation

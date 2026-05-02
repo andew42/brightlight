@@ -3,10 +3,11 @@ package controller
 import (
 	"time"
 
+	"log/slog"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/stats"
-	log "github.com/sirupsen/logrus"
 )
 
 var teensyDriverStarted bool
@@ -15,7 +16,8 @@ var teensyDriverStarted bool
 func StartTeensyDriver() {
 
 	if teensyDriverStarted {
-		log.Panic("Teensy driver started twice")
+		slog.Error("Teensy driver started twice")
+		panic("Teensy driver started twice")
 	}
 	teensyDriverStarted = true
 
@@ -37,7 +39,7 @@ func teensyDriver(driverIndex int) {
 
 	port := getPortName(teensyPortMappings, driverIndex)
 	if port == "" {
-		log.WithField("driverIndex", driverIndex).Warn("teensyDriver unknown port name")
+		slog.Warn("teensyDriver unknown port name", "driverIndex", driverIndex)
 		return
 	}
 
@@ -101,7 +103,7 @@ func teensyDriver(driverIndex int) {
 				}
 
 				if _, err := f.Write(data); err != nil {
-					log.WithField("error", err.Error()).Warn("teensyDriver send failed")
+					slog.Warn("teensyDriver send failed", "error", err.Error())
 					f.Close()
 
 					// Close down listener

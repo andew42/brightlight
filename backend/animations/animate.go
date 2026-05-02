@@ -5,11 +5,12 @@ import (
 	"strconv"
 	"time"
 
+	"log/slog"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/segment"
 	"github.com/andew42/brightlight/stats"
-	log "github.com/sirupsen/logrus"
 )
 
 // Button request to animate
@@ -143,7 +144,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 			*animators = append(*animators,
 				segActionAndAnimator{seg, newStaticColour(colour)})
 		} else {
-			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
 
 	case "Runner":
@@ -165,7 +166,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 				segActionAndAnimator{seg,
 					newRainbow(time.Second*time.Duration(duration), brightness)})
 		} else {
-			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
 
 	case "Sweet Shop":
@@ -201,7 +202,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 			*animators = append(*animators,
 				segActionAndAnimator{seg, newPlasma(float64(speed), brightness, palette)})
 		} else {
-			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
 
 	case "Baby Bows":
@@ -220,7 +221,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 				segActionAndAnimator{seg, newRepeater(
 					newRainbow(time.Second*time.Duration(duration), brightness), uint(length))})
 		} else {
-			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
 
 	case "Christmas":
@@ -264,7 +265,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 			*animators = append(*animators, segActionAndAnimator{seg, newRepeater(
 				newBulb(colour, 0, uint(width)), uint(repeat))})
 		} else {
-			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
 
 	case "Life":
@@ -286,11 +287,11 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 			*animators = append(*animators, segActionAndAnimator{seg,
 				newLife(colour, uint(duration), rule, autoRepeat)})
 		} else {
-			log.WithFields(log.Fields{"params": seg.Params, "Error": err.Error()}).Warn("Bad animation parameter")
+			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
 
 	default:
-		log.WithField("action", seg.Animation).Warn("Unknown animation action")
+		slog.Warn("Unknown animation action", "action", seg.Animation)
 	}
 }
 

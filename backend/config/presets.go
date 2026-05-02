@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
+	"log/slog"
 	"os"
 	"path"
 )
@@ -38,10 +38,10 @@ func LoadUserPresets(configPath string) []Preset {
 	// Try loading user settings first
 	fileContent, err := os.ReadFile(path.Join(configPath, "/config/user.json"))
 	if err != nil {
-		log.WithField("error", err).Warn("Failed to open user.json")
+		slog.Warn("Failed to open user.json", "error", err)
 		// No user settings, try loading the defaults
 		if fileContent, err = os.ReadFile(path.Join(configPath, "/config/default.json")); err != nil {
-			log.WithField("error", err).Error("Failed to open default.json")
+			slog.Error("Failed to open default.json", "error", err)
 			// Return an empty preset list
 			return presets
 		}
@@ -50,7 +50,7 @@ func LoadUserPresets(configPath string) []Preset {
 	// Parse the setting file
 	var settings SettingsFileDef
 	if err = json.Unmarshal(fileContent, &settings); err != nil {
-		log.WithField("error", err).Error("Failed to unmarshal settings json")
+		slog.Error("Failed to unmarshal settings json", "error", err)
 		// Return an empty preset list
 		return presets
 	}

@@ -1,8 +1,9 @@
 package segment
 
 import (
+	"log/slog"
+
 	"github.com/andew42/brightlight/framebuffer"
-	log "github.com/sirupsen/logrus"
 )
 
 type CombinedSegment struct {
@@ -41,7 +42,8 @@ func (s CombinedSegment) locate(pos uint) (Segment, uint) {
 
 	// Is position out of range?
 	if pos >= s.Len() {
-		log.Panic("position out of range")
+		slog.Error("position out of range")
+		panic("position out of range")
 	}
 
 	// Located in seg 1 or seg 2

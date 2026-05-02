@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"log/slog"
+
 	"github.com/andew42/brightlight/stats"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 )
 
@@ -26,7 +27,7 @@ func StatsHandler(ws *websocket.Conn) {
 			if rc, err := json.MarshalIndent(statsUpdate, "", " "); err == nil {
 				_, err = ws.Write(rc)
 			} else {
-				log.Info("statsSocketHandler" + err.Error())
+				slog.Info("statsSocketHandler" + err.Error())
 				// Un-subscribe before returning and closing connection
 				done <- src
 				return

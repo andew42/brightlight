@@ -1,12 +1,11 @@
 package framebuffer
 
 import (
-	"strconv"
+	"log/slog"
 	"time"
 
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/stats"
-	log "github.com/sirupsen/logrus"
 )
 
 // FrameBuffer Frame buffer is a slice of strips A Mutex
@@ -83,7 +82,8 @@ func NewFrameBuffer() *FrameBuffer {
 	// Sanity check
 	numberOfStrips := len(fb.Strips)
 	if numberOfStrips <= 0 || numberOfStrips%config.StripsPerTeensy != 0 {
-		log.WithField("StripsPerTeensy", strconv.Itoa(config.StripsPerTeensy)).Panic("framebuffer strips must be multiple of")
+		slog.Error("framebuffer strips must be multiple of", "StripsPerTeensy", config.StripsPerTeensy)
+		panic("framebuffer strips must be multiple of StripsPerTeensy")
 	}
 	return &fb
 }
@@ -163,12 +163,12 @@ func StartDriver(renderer chan *FrameBuffer) {
 
 				// Process new listener requests
 			case newListener := <-addListener:
-				log.WithField("name", newListener.name).Info("Framebuffer listener added")
+				slog.Info("Framebuffer listener added", "name", newListener.name)
 				listeners[newListener.src] = listenerInfo{newListener.name, newListener.isSerial}
 
 				// Process remove listener request
 			case listenerToRemove := <-listenerDone:
-				log.WithField("name", listeners[listenerToRemove]).Info("Framebuffer listener removed")
+				slog.Info("Framebuffer listener removed", "name", listeners[listenerToRemove])
 				delete(listeners, listenerToRemove)
 			}
 		}

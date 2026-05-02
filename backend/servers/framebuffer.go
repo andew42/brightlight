@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"log/slog"
+
 	"github.com/andew42/brightlight/framebuffer"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 )
 
@@ -24,7 +25,7 @@ func FrameBufferHandler(ws *websocket.Conn) {
 		case fb := <-src:
 			// Fails if the client has disappeared
 			if err := sendFrameBufferToWebSocket(fb, ws); err != nil {
-				log.Info("frameBufferSocketHandler " + err.Error())
+				slog.Info("frameBufferSocketHandler " + err.Error())
 				// Un-subscribe before returning and closing connection
 				done <- src
 				return

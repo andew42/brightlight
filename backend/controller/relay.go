@@ -5,9 +5,10 @@ import (
 	"os"
 	"time"
 
+	"log/slog"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
-	log "github.com/sirupsen/logrus"
 )
 
 var relayDriverStarted bool
@@ -16,7 +17,8 @@ var relayDriverStarted bool
 func StartRelayDriver() {
 
 	if relayDriverStarted {
-		log.Panic("Relay driver started twice")
+		slog.Error("Relay driver started twice")
+		panic("Relay driver started twice")
 	}
 	relayDriverStarted = true
 
@@ -36,7 +38,7 @@ func relayDriver() {
 
 	port := getPortName(relayPortMappings, 0)
 	if port == "" {
-		log.Warn("relayDriver unknown port name")
+		slog.Warn("relayDriver unknown port name")
 		return
 	}
 
@@ -56,7 +58,7 @@ connectLoop:
 		// Initially we set all relays off
 		relayStates := [2]relayState{}
 		if err := initRelayBoard(f); err != nil {
-			log.WithField("error", err.Error()).Warn("relayDriver failed to initialise relay board")
+			slog.Warn("relayDriver failed to initialise relay board", "error", err.Error())
 			continue connectLoop
 		}
 
@@ -89,10 +91,10 @@ connectLoop:
 
 				// Update if changed
 				if updateRequired {
-					log.WithField("new states", newRelayStates).Info("relayDriver update relays")
+					slog.Info("relayDriver update relays", "new states", newRelayStates)
 					if err := sendRelayState(f, newRelayStates); err != nil {
 
-						log.WithField("error", err.Error()).Warn("relayDriver failed to send relay command")
+						slog.Warn("relayDriver failed to send relay command", "error", err.Error())
 						f.Close()
 
 						// Close down listener
@@ -140,7 +142,7 @@ func initRelayBoard(f *os.File) error {
 
 	// If we got a response check it's the expected one
 	if response[0] != 0xAD {
-		log.WithField("response", response[0]).Warn("initRelayBoard unexpect initialisation response")
+		slog.Warn("initRelayBoard unexpect initialisation response", "response", response[0])
 		return errors.New("unknown relay board")
 	}
 
@@ -165,7 +167,7 @@ func sendRelayState(f *os.File, state [2]bool) error {
 	// Send the relay commands
 	_, err := f.Write(data)
 	if err == nil {
-		log.WithField("parameter", data[0]).Info("Relay command sent")
+		slog.Info("Relay command sent", "parameter", data[0])
 	}
 	return err
 }

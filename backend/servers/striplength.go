@@ -5,8 +5,9 @@ import (
 	"strconv"
 	"strings"
 
+	"log/slog"
+
 	"github.com/andew42/brightlight/animations"
-	log "github.com/sirupsen/logrus"
 )
 
 // StripLenHandler Handle HTTP requests to show strip lengths of room lights
@@ -16,7 +17,7 @@ func StripLenHandler(w http.ResponseWriter, r *http.Request) {
 	extIndex := strings.LastIndex(r.URL.Path, `/`)
 	if extIndex == -1 {
 		http.Error(w, "No parameters specified", 406)
-		log.Info("stripLengthHandler called with no parameters")
+		slog.Info("stripLengthHandler called with no parameters")
 		return
 	}
 
@@ -34,5 +35,5 @@ func StripLenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	animations.AnimateStripLength(uint(index), uint(length))
-	log.WithFields(log.Fields{"index": index, "length": length, "err": err}).Info("stripLengthHandler called")
+	slog.Info("stripLengthHandler called", "index", index, "length", length, "err", err)
 }

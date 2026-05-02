@@ -1,10 +1,11 @@
 package animations
 
 import (
+	"log/slog"
+	"time"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/segment"
-	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type linearFade struct {
@@ -22,8 +23,8 @@ func newLinearFade(period time.Duration, reverseOnRepeat bool, animators ...anim
 
 	// Must be at least two animations
 	if len(animators) < 2 {
-		log.WithField("animators", len(animators)).
-			Fatal("LinearFade animation requires at least two animations")
+		slog.Error("LinearFade animation requires at least two animations", "animators", len(animators))
+		panic("LinearFade animation requires at least two animations")
 	}
 
 	// Calculate how many frames required to complete animation from -> to
