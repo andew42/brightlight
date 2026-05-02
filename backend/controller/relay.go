@@ -2,11 +2,12 @@ package controller
 
 import (
 	"errors"
+	"os"
+	"time"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"time"
 )
 
 var relayDriverStarted bool
@@ -128,7 +129,7 @@ func initRelayBoard(f *os.File) error {
 	if err := readUntilBufferFull(f, response, time.Millisecond*200); err != nil {
 
 		// If we timed out, assume the board is already initialised so the 0x50
-		// will be interpreted as turing both relays off, i.e. we are done
+		// will be interpreted as turning both relays off, i.e. we are done
 		if err == readTimeoutError {
 			return nil
 		}

@@ -2,10 +2,11 @@ package servers
 
 import (
 	"encoding/json"
+	"strconv"
+
 	"github.com/andew42/brightlight/framebuffer"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
-	"strconv"
 )
 
 // Give each virtual frame buffer its own unique ID

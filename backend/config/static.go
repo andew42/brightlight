@@ -5,7 +5,7 @@ import "time"
 // Titania (or bedroom)
 const Titania = true
 
-// MaxLedStripLen Maximum led strip length (must match teensy firmware)
+// MaxLedStripLen Maximum led strip length (must match Teensy firmware)
 const MaxLedStripLen = 300
 const StripsPerTeensy = 8
 

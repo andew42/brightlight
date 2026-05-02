@@ -2,10 +2,11 @@ package servers
 
 import (
 	"encoding/json"
+	"strconv"
+
 	"github.com/andew42/brightlight/stats"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
-	"strconv"
 )
 
 // Give each stats listener its own unique ID

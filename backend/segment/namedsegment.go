@@ -2,10 +2,11 @@ package segment
 
 import (
 	"errors"
-	"github.com/andew42/brightlight/config"
-	"github.com/andew42/brightlight/framebuffer"
 	"strconv"
 	"strings"
+
+	"github.com/andew42/brightlight/config"
+	"github.com/andew42/brightlight/framebuffer"
 )
 
 // Named segments are used to build scenes in the UI

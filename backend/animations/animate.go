@@ -2,13 +2,14 @@ package animations
 
 import (
 	"errors"
+	"strconv"
+	"time"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/segment"
 	"github.com/andew42/brightlight/stats"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"time"
 )
 
 // Button request to animate

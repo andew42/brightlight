@@ -1,11 +1,12 @@
 package stats
 
 import (
-	"github.com/andew42/brightlight/config"
-	log "github.com/sirupsen/logrus"
 	"runtime/debug"
 	"strconv"
 	"time"
+
+	"github.com/andew42/brightlight/config"
+	log "github.com/sirupsen/logrus"
 )
 
 const (

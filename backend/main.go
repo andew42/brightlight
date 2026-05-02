@@ -2,6 +2,12 @@ package main
 
 import (
 	"flag"
+	"mime"
+	"net/http"
+	"os"
+	"runtime"
+	"strings"
+
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/controller"
@@ -10,11 +16,6 @@ import (
 	"github.com/andew42/brightlight/stats"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
-	"mime"
-	"net/http"
-	"os"
-	"runtime"
-	"strings"
 )
 
 // LoggedDir Wrap a Dir file system server object to log failures

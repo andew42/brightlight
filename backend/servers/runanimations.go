@@ -2,11 +2,12 @@ package servers
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/controller"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"net/http"
 )
 
 // RunAnimationsHandler Handle HTTP requests to run zero or more animation specified in json payload

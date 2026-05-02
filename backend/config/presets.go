@@ -2,9 +2,10 @@ package config
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"path"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // SettingsFileDef A settings file is a map of named button column definitions

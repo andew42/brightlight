@@ -2,9 +2,10 @@ package servers
 
 import (
 	"encoding/json"
+	"sync"
+
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
-	"sync"
 )
 
 // Track the currently active button and version of the button pad save

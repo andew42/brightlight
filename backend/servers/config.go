@@ -1,10 +1,11 @@
 package servers
 
 import (
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"path"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var configVersion = 0

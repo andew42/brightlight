@@ -1,9 +1,10 @@
 package animations
 
 import (
+	"math/rand"
+
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/segment"
-	"math/rand"
 )
 
 // Twinkle inspired by:

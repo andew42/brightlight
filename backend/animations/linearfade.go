@@ -1,10 +1,11 @@
 package animations
 
 import (
+	"time"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/segment"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type linearFade struct {

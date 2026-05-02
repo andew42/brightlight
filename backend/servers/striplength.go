@@ -1,11 +1,12 @@
 package servers
 
 import (
-	"github.com/andew42/brightlight/animations"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/andew42/brightlight/animations"
+	log "github.com/sirupsen/logrus"
 )
 
 // StripLenHandler Handle HTTP requests to show strip lengths of room lights

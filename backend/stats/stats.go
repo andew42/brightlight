@@ -2,10 +2,11 @@ package stats
 
 import (
 	"encoding/json"
-	"github.com/andew42/brightlight/config"
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/andew42/brightlight/config"
 )
 
 // Stats Statistics on animation frame times and serial send times

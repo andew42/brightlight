@@ -30,13 +30,12 @@ func (led Rgb) MarshalJSON() ([]byte, error) {
 
 // NewRgbFromHsl Convert HSL (Hue, Saturation, Lightness) to RGB (Red, Green, Blue)
 //
-//   hue:        0 to 359 - position on the color wheel, 0=red, 60=orange,
-//                            120=yellow, 180=green, 240=blue, 300=violet
+//	hue:        0 to 359 - position on the colour wheel, 0=red, 60=orange,
+//	                         120=yellow, 180=green, 240=blue, 300=violet
 //
-//   saturation: 0 to 100 - how bright or dull the color, 100=full, 0=gray
+//	saturation: 0 to 100 - how bright or dull the colour, 100=full, 0=grey
 //
-//   lightness:  0 to 100 - how light the color is, 100=white, 50=color, 0=black
-//
+//	lightness:  0 to 100 - how light the colour is, 100=white, 50=colour, 0=black
 func NewRgbFromHsl(hue uint, saturation uint, lightness uint) Rgb {
 
 	if hue > 359 {

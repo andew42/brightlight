@@ -1,11 +1,12 @@
 package framebuffer
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/stats"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"time"
 )
 
 // FrameBuffer Frame buffer is a slice of strips A Mutex

@@ -2,10 +2,11 @@ package servers
 
 import (
 	"encoding/json"
-	"github.com/andew42/brightlight/controller"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/andew42/brightlight/controller"
+	log "github.com/sirupsen/logrus"
 )
 
 type cmd struct {

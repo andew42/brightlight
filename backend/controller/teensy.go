@@ -1,11 +1,12 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/andew42/brightlight/config"
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/stats"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 var teensyDriverStarted bool
