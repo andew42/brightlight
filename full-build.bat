@@ -18,4 +18,7 @@ cd ..
 echo Copying frontend build to deploy...
 robocopy frontend\build deploy\frontend\build /MIR /NFL /NDL /NJH /NJS /NC /NS /NP
 
+echo Copying ui-config to deploy...
+robocopy backend\ui-config deploy\backend\ui-config /MIR /NFL /NDL /NJH /NJS /NC /NS /NP
+
 echo Done. Deploy directory is ready for scp to Pi.

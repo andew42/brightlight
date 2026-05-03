@@ -11,16 +11,18 @@ import (
 
 var configVersion = 0
 
-// GetConfigHandler Handle HTTP requests to read and write config
-func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Request) {
+// GetConfigHandler Handle HTTP requests to read and write ui-config files.
+// uiConfigDir is the filesystem path to the ui-config directory.
+func GetConfigHandler(uiConfigDir string) func(http.ResponseWriter, *http.Request) {
 
 	// Compute the canonical base path once for traversal checks
-	cleanBase := filepath.Clean(contentPath)
+	cleanBase := filepath.Clean(uiConfigDir)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// Construct file system path to config and guard against path traversal
-		fullPath := filepath.Join(contentPath, filepath.FromSlash(r.URL.Path))
+		// Strip the /api/ui-config prefix so paths resolve inside uiConfigDir
+		rel := strings.TrimPrefix(r.URL.Path, "/api/ui-config")
+		fullPath := filepath.Join(uiConfigDir, filepath.FromSlash(rel))
 		if !strings.HasPrefix(filepath.Clean(fullPath)+string(filepath.Separator), cleanBase+string(filepath.Separator)) {
 			slog.Warn("configHandler path traversal attempt", "FullPath", fullPath)
 			http.Error(w, "Forbidden", 403)
@@ -45,7 +47,7 @@ func GetConfigHandler(contentPath string) func(http.ResponseWriter, *http.Reques
 			slog.Info("configHandler PUT called", "FullPath", fullPath)
 
 			// Only support writing user.json (ui) and user-buttons.json (ui2)
-			if r.URL.Path != "/config/user.json" && r.URL.Path != "/ui-config/user-buttons.json" {
+			if r.URL.Path != "/api/ui-config/user-buttons.json" {
 				slog.Warn("Unsupported config file name", "FileName", r.URL.Path)
 				http.Error(w, "File name not allowed", 401)
 				return

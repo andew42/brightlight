@@ -1,9 +1,14 @@
 import * as React from "react";
-import {Checkbox} from 'semantic-ui-react'
+import './CheckboxEditor.css';
 
 export function CheckboxEditor(props) {
-    return <Checkbox
-        label={props.label}
-        checked={props.checked}
-        onChange={(_, d) => props.onChange(d.checked)}/>
+    return (
+        <label className='cbe-label'>
+            <input type='checkbox'
+                   className='cbe-checkbox'
+                   checked={props.checked}
+                   onChange={e => props.onChange(e.target.checked)}/>
+            {props.label}
+        </label>
+    );
 }

@@ -7,9 +7,15 @@
 .colour-editor-button {
     width: 2.2rem;
     height: 2rem;
-    border: solid 1px lightgray !important;
+    border: solid 1px lightgray;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
 }
 
 .colour-editor-label {
-    -webkit-tap-highlight-color: #00000000;
+    margin-left: 10px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.7);
 }

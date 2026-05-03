@@ -1,31 +1,63 @@
 .lse-container {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    padding: 0 !important;
+    border: 1px solid #2185d0;
+    border-radius: 4px;
+    padding: 8px 14px 14px;
+    margin: 0 0 10px;
+    background: white;
+}
+
+.lse-container > legend {
+    padding: 0 6px;
+    color: #2185d0;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lse-remove {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 2px;
+}
+
+.lse-remove:hover {
+    color: #db2828;
+}
+
+.lse-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
 .lse-image {
-    margin: 44px 0 8px 8px;
+    width: 48px;
+    flex-shrink: 0;
 }
 
 .lse-animation-name {
-    margin: 8px;
-    font-size: large;
-    position: absolute;
-    right: 0;
-    top: -20px;
-    text-align: left;
-    min-width: 40%;
+    flex: 1;
+    text-align: right;
 }
 
-.ui.dropdown .menu {
-    right: 0;
+.lse-animation-name select {
+    font-size: 14px;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    background: white;
+    min-width: 50%;
 }
 
 .lse-parameters {
-    display: inline-block;
-    margin: 38px 0 12px 8px;
-    /* Without these overflow constraints mobile safari enables scrolling */
-    overflow-x: hidden;
-    overflow-y: hidden;
+    display: block;
+    overflow: hidden;
 }

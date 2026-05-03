@@ -21,7 +21,7 @@ export function runAnimation(button) {
     } else {
         currentAnimationRequest = button;
         let req = new XMLHttpRequest();
-        req.open("POST", "/RunAnimations/");
+        req.open("POST", "/api/RunAnimations/");
         req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         req.send(JSON.stringify(button));
         req.onreadystatechange = function () {

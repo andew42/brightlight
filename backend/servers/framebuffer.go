@@ -2,46 +2,46 @@ package servers
 
 import (
 	"encoding/json"
+	"fmt"
+	"log/slog"
+	"net/http"
 	"strconv"
 
-	"log/slog"
-
 	"github.com/andew42/brightlight/framebuffer"
-	"golang.org/x/net/websocket"
 )
 
 // Give each virtual frame buffer its own unique ID
 var frameBufferListenerId = 0
 
-// FrameBufferHandler Handle frame buffer web socket requests (web socket is closed when we return)
-func FrameBufferHandler(ws *websocket.Conn) {
+func FrameBufferHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Not thread safe but good enough for debug output
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
 	frameBufferListenerId++
 	src, done := framebuffer.AddListener("Virtual Frame Buffer "+strconv.Itoa(frameBufferListenerId), false)
+
 	for {
 		select {
-		// src sends us frame buffer updates
 		case fb := <-src:
-			// Fails if the client has disappeared
-			if err := sendFrameBufferToWebSocket(fb, ws); err != nil {
-				slog.Info("frameBufferSocketHandler " + err.Error())
-				// Un-subscribe before returning and closing connection
+			data, err := json.Marshal(fb)
+			if err != nil {
+				slog.Info("frameBufferHandler marshal error", "err", err)
 				done <- src
 				return
 			}
+			if _, err = fmt.Fprintf(w, "data: %s\n\n", data); err != nil {
+				slog.Info("frameBufferHandler write error", "err", err)
+				done <- src
+				return
+			}
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+		case <-r.Context().Done():
+			done <- src
+			return
 		}
 	}
-}
-
-// Render the frame buffer as JSON
-func sendFrameBufferToWebSocket(fb *framebuffer.FrameBuffer, ws *websocket.Conn) error {
-
-	// Send back the frame buffer as JSON
-	rc, err := json.MarshalIndent(fb, "", " ")
-	if err != nil {
-		return err
-	}
-	_, err = ws.Write(rc)
-	return err
 }

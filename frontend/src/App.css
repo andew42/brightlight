@@ -12,6 +12,7 @@
 /* Set body margin and selection semantics */
 body {
     margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;

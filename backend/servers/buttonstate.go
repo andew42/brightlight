@@ -2,11 +2,10 @@ package servers
 
 import (
 	"encoding/json"
-	"sync"
-
+	"fmt"
 	"log/slog"
-
-	"golang.org/x/net/websocket"
+	"net/http"
+	"sync"
 )
 
 // Track the currently active button and version of the button pad save
@@ -46,7 +45,6 @@ func updateCurrentButtonState(f func()) {
 
 // Called when a web socket closes to remove its listener
 func removeButtonListener(c chan buttonState) {
-
 	listenersMux.Lock()
 	defer listenersMux.Unlock()
 	for i, l := range listeners {
@@ -64,7 +62,11 @@ var buttonStateListenerId = 0
 
 // ButtonStateHandler Handle button state web socket requests (web socket is closed
 // when we return) We have one of these go routines per web socket request
-func ButtonStateHandler(ws *websocket.Conn) {
+func ButtonStateHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
 
 	listenersMux.Lock()
 
@@ -78,54 +80,42 @@ func ButtonStateHandler(ws *websocket.Conn) {
 	listeners = append(listeners, update)
 
 	// Copy the current button state
-	buttonState := currentButtonState
-
+	bs := currentButtonState
 	listenersMux.Unlock()
 
 	// Send the current state immediately
-	if err := sendButtonStateToWebSocket(listenerId, buttonState, ws, update); err != nil {
+	sendEvent := func(bs buttonState) error {
+		slog.Info("sending button state", "id", listenerId, "state", bs)
+		data, err := json.Marshal(bs)
+		if err != nil {
+			return err
+		}
+		if _, err = fmt.Fprintf(w, "data: %s\n\n", data); err != nil {
+			return err
+		}
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		return nil
+	}
+
+	if err := sendEvent(bs); err != nil {
+		removeButtonListener(update)
 		return
 	}
 
-	// Watch for client closeSocket operations by setting up a read go routine, we
-	// never expect anything from the client but the read fails on closeSocket
-	// https://groups.google.com/forum/#!topic/golang-nuts/pXNSBx4wgAw
-	closeSocket := make(chan int)
-	go func() {
-		websocket.Message.Receive(ws, nil)
-		closeSocket <- 0
-	}()
-
 	for {
 		select {
-		case bs := <-update: // update sends us button state updates
-			if err := sendButtonStateToWebSocket(listenerId, bs, ws, update); err != nil {
+		case bs := <-update:
+			if err := sendEvent(bs); err != nil {
+				slog.Info("button state listener write error", "id", listenerId, "err", err)
+				removeButtonListener(update)
 				return
 			}
-		case <-closeSocket: // closeSocket sends us read errors (i.e. socket closed by client)
+		case <-r.Context().Done():
 			slog.Info("closing button state listener", "id", listenerId)
 			removeButtonListener(update)
 			return
 		}
 	}
-}
-
-// Render button state key as JSON
-func sendButtonStateToWebSocket(listenerId int, bs buttonState, ws *websocket.Conn, c chan buttonState) error {
-
-	slog.Info("sending button state", "id", listenerId, "state", bs)
-
-	// Send back the frame buffer as JSON
-	rc, err := json.MarshalIndent(bs, "", " ")
-	if err == nil {
-		_, err = ws.Write(rc)
-	}
-
-	if err != nil {
-		slog.Info("buttonStateSocketHandler " + err.Error())
-		// Un-subscribe before returning and closing connection
-		removeButtonListener(c)
-	}
-
-	return err
 }

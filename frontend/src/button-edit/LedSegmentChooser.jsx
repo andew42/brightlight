@@ -1,62 +1,72 @@
 import * as React from "react";
 import './LedSegmentChooser.css';
-import {Checkbox, Divider, Image, Modal} from "semantic-ui-react";
+import Dialog from "../dialog/Dialog";
 import {UserSegmentEditor} from "./UserSegmentEditor";
 
 export default class LedSegmentChooser extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {open: false};
+    }
+
     render() {
-        return <Modal trigger={this.props.trigger}
-                      header='Select Light Segment'
-                      content={<div className='scrolling content'>
-                          <div className='description'>
-                              {this.props.allSegments.map(seg => this.renderSegment(seg))}
-                          </div>
-                          <div>
-                              {this.props.userSegments.map(seg => this.renderUserSegment(seg))}
-                          </div>
-                          <Divider horizontal>New User Segment</Divider>
-                          <UserSegmentEditor predefinedSegments={this.props.allSegments}
-                                             userSegments={this.props.userSegments}/>
-                      </div>}
-                      actions={[
-                          {key: 'ok', content: 'OK', primary: true},
-                          {key: 'cancel', content: 'Cancel'}
-                      ]}
-                      onActionClick={e => e.target.textContent === 'OK' ?
-                          (this.props.onOk !== undefined && this.props.onOk()) :
-                          this.props.onCancel()}>
-        </Modal>
+        return <>
+            <span onClick={() => this.setState({open: true})}>{this.props.trigger}</span>
+            <Dialog open={this.state.open}
+                    header='Select Light Segment'
+                    actions={[
+                        {key: 'ok', content: 'OK', primary: true, onClick: () => {
+                            this.props.onOk && this.props.onOk();
+                            this.setState({open: false});
+                        }},
+                        {key: 'cancel', content: 'Cancel', onClick: () => {
+                            this.props.onCancel();
+                            this.setState({open: false});
+                        }}
+                    ]}
+                    onClose={() => this.setState({open: false})}>
+                <div>
+                    {this.props.allSegments.map(seg => this.renderSegment(seg))}
+                </div>
+                <div>
+                    {this.props.userSegments.map(seg => this.renderUserSegment(seg))}
+                </div>
+                <hr className='lsc-divider'/>
+                <div className='lsc-divider-label'>New User Segment</div>
+                <UserSegmentEditor predefinedSegments={this.props.allSegments}
+                                   userSegments={this.props.userSegments}/>
+            </Dialog>
+        </>;
     }
 
     renderSegment(seg) {
-        if (!seg.icon)
-            return <div className='ui image lsc-led-segment-list-item-no-icon'
-                        key={seg.name}>
-                <Image label={seg.label}/>
-                <div className='lsc-check-mark-no-icon'>
-                    <Checkbox checked={this.props.checkedSegmentNames.includes(seg.name)}
-                              onChange={() => this.props.toggleCheckedSegment(seg)}/>
-                </div>
-            </div>;
-
-        return <div className='ui image lsc-led-segment-list-item'
-                    key={seg.name}>
-            <Image label={seg.label}
-                   src={"/segment-icons/" + encodeURIComponent(seg.name) + ".svg"}/>
-            <div className='lsc-check-mark'>
-                <Checkbox checked={this.props.checkedSegmentNames.includes(seg.name)}
-                          onChange={() => this.props.toggleCheckedSegment(seg)}/>
-            </div>
-        </div>;
+        const checked = this.props.checkedSegmentNames.includes(seg.name);
+        return (
+            <label className='lsc-led-segment-list-item' key={seg.name}>
+                <img className='lsc-icon'
+                     alt=''
+                     src={"/segment-icons/" + encodeURIComponent(seg.name) + ".svg"}
+                     onError={e => e.target.style.display = 'none'}/>
+                <span className='lsc-segment-label'>{seg.label}</span>
+                <input type='checkbox'
+                       className='lsc-check'
+                       checked={checked}
+                       onChange={() => this.props.toggleCheckedSegment(seg)}/>
+            </label>
+        );
     }
 
     renderUserSegment(seg) {
-        return <div className='lsc-led-user-segment-list-item'
-                    key={seg.name}>
-            <Checkbox label={seg.name}
-                      checked={this.props.checkedSegmentNames.includes(seg.name)}
-                      onChange={() => this.props.toggleCheckedSegment(seg)}/>
-        </div>;
+        return (
+            <div className='lsc-led-user-segment-list-item' key={seg.name}>
+                <label className='lsc-user-label'>
+                    <input type='checkbox'
+                           checked={this.props.checkedSegmentNames.includes(seg.name)}
+                           onChange={() => this.props.toggleCheckedSegment(seg)}/>
+                    {seg.name}
+                </label>
+            </div>
+        );
     }
 }

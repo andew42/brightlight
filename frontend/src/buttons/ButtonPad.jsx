@@ -1,7 +1,6 @@
 import * as React from "react";
 import './ButtonPad.css';
 import Button from "./Button";
-import {Icon, Message} from "semantic-ui-react";
 import NoScroll from "./NoScroll";
 
 // Display an array of buttons and handle tap and press
@@ -27,16 +26,16 @@ export default class ButtonPad extends React.Component {
                         <div className={button.key === this.props.activeButtonKey ? 'active' : ''}/>
                     </div>)}
             </div>
-        </NoScroll>
+        </NoScroll>;
     }
 
     static noServer() {
-        return <Message warning icon>
-            <Icon name='circle notched' loading/>
-            <Message.Content>
-                <Message.Header>Server Not Found</Message.Header>
-                Ensure phone is connected to WiFi and try again
-            </Message.Content>
-        </Message>
+        return (
+            <div className='bp-no-server'>
+                <div className='bp-spinner'/>
+                <div className='bp-no-server-title'>Server Not Found</div>
+                <div>Ensure phone is connected to WiFi and try again</div>
+            </div>
+        );
     }
 }

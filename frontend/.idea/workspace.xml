@@ -5,18 +5,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e4ff6688-c8f1-40a5-9fb8-460a033ae0df" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../.idea/brightlight.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/codeStyleSettings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/codeStyles/Project.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/dictionaries/andrew.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/dictionaries/root.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/webResources.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/servers/buttonstate.go" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/servers/buttonstate.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/servers/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/servers/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/servers/framebuffer.go" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/servers/framebuffer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/servers/stats.go" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/servers/stats.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/ui-config/default-buttons-bedroom.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/ui-config/default-buttons-titania.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/ui-config/default-buttons.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/ui-config/static-data-bedroom.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/ui-config/static-data-titania.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/ui-config/static-data.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/ButtonEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/ButtonEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/ButtonEditor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/ButtonEditor.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/CheckboxEditor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/CheckboxEditor.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/ColourChooser.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/ColourChooser.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/ColourChooser.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/ColourChooser.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/ColourEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/ColourEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/ColourEditor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/ColourEditor.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/LedSegmentChooser.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/LedSegmentChooser.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/LedSegmentChooser.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/LedSegmentChooser.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/LedSegmentEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/LedSegmentEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/LedSegmentEditor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/LedSegmentEditor.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/NameEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/NameEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/NameEditor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/NameEditor.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/UserSegmentEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/UserSegmentEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/button-edit/UserSegmentEditor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/button-edit/UserSegmentEditor.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buttons/ButtonPad.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/buttons/ButtonPad.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buttons/ButtonPad.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/buttons/ButtonPad.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server-proxy/animation.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/server-proxy/animation.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server-proxy/buttons.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/server-proxy/buttons.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server-proxy/staticData.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/server-proxy/staticData.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server-proxy/webSocket.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/server-proxy/webSocket.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../full-build.bat" beforeDir="false" afterPath="$PROJECT_DIR$/../full-build.bat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,6 +186,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;andew42&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/andew42/brightlight.git&quot;,
+    &quot;accountId&quot;: &quot;fb31edbf-d9d2-4e7b-8d19-e10100a5dac9&quot;
+  }
+}</component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -242,7 +283,7 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;claude/update-react-latest-qCbDY&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/andrew/IdeaProjects/brightlight/frontend&quot;,
@@ -264,6 +305,8 @@
       <workItem from="1777359004037" duration="896000" />
       <workItem from="1777713915422" duration="183000" />
       <workItem from="1777714336316" duration="377000" />
+      <workItem from="1777757787770" duration="333000" />
+      <workItem from="1777758229625" duration="10076000" />
     </task>
     <servers />
   </component>
@@ -292,6 +335,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/public/favicon.ico">

@@ -2,36 +2,46 @@ package servers
 
 import (
 	"encoding/json"
+	"fmt"
+	"log/slog"
+	"net/http"
 	"strconv"
 
-	"log/slog"
-
 	"github.com/andew42/brightlight/stats"
-	"golang.org/x/net/websocket"
 )
 
 // Give each stats listener its own unique ID
 var statsListenerId = 0
 
-// StatsHandler Handle stats web socket requests (web socket is closed when we return)
-func StatsHandler(ws *websocket.Conn) {
+func StatsHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Not thread safe but good enough for debug output
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
 	statsListenerId++
 	src, done := stats.AddListener("Stats Listener " + strconv.Itoa(statsListenerId))
+
 	for {
 		select {
-		// src sends us stats updates
 		case statsUpdate := <-src:
-			// Render the stats as JSON (fails if the client has disappeared)
-			if rc, err := json.MarshalIndent(statsUpdate, "", " "); err == nil {
-				_, err = ws.Write(rc)
-			} else {
-				slog.Info("statsSocketHandler" + err.Error())
-				// Un-subscribe before returning and closing connection
+			data, err := json.Marshal(statsUpdate)
+			if err != nil {
+				slog.Info("statsHandler marshal error", "err", err)
 				done <- src
 				return
 			}
+			if _, err = fmt.Fprintf(w, "data: %s\n\n", data); err != nil {
+				slog.Info("statsHandler write error", "err", err)
+				done <- src
+				return
+			}
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+		case <-r.Context().Done():
+			done <- src
+			return
 		}
 	}
 }

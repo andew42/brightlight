@@ -1,26 +1,31 @@
 .cp-content-height {
+    display: flex;
+    flex-direction: column;
     height: 25rem;
+    width: 18rem;
 }
 
 .cp-colour-swatch {
     width: 80%;
-    margin-left: 10%;
+    margin: 0 auto 16px;
     height: 40px;
     border-radius: 10px;
+    flex-shrink: 0;
+    border: 1px solid #ddd;
 }
 
 .cp-sliders {
-    position: absolute;
-    top: 104px;
-    bottom: 69px;
+    display: flex;
+    flex: 1;
     width: 100%;
+    min-height: 0;
 }
 
 .cp-slider {
-    float: left;
-    width: 30%;
+    flex: 1;
     height: 100%;
     padding: 15px;
+    box-sizing: border-box;
 }
 
 /* 0 - 360 in 60 degree stops http://en.wikipedia.org/wiki/HSL_and_HSV */

@@ -4,7 +4,6 @@ import './ButtonEditor.css';
 import {LedSegmentEditor} from "./LedSegmentEditor";
 import {NameEditor} from "./NameEditor";
 import LedSegmentChooser from "./LedSegmentChooser";
-import {Button} from "semantic-ui-react";
 
 // Shows a list of editors that change to suit the animation
 export default class ButtonEditor extends React.Component {
@@ -93,13 +92,9 @@ export default class ButtonEditor extends React.Component {
         return <div className="button-editor-editor-list">
             <Fragment>
                 <NameEditor name={button.name}
-                            onNameChanged={newName => this.props.onButtonChanged({
-                                ...button,
-                                name: newName
-                            })}
+                            onNameChanged={newName => this.props.onButtonChanged({...button, name: newName})}
                             error={otherButtonNames.find(x => x.toUpperCase() === button.name.toUpperCase()) ?
-                                'Name already exists' :
-                                undefined}/>
+                                'Name already exists' : undefined}/>
 
                 {button.segments.map(segment => (
                     <LedSegmentEditor key={key++}
@@ -131,19 +126,17 @@ export default class ButtonEditor extends React.Component {
                                            this.setState({selectedSegments: []});
                                        }}
                                        toggleCheckedSegment={seg => this.toggleSelectedSegment(seg)}
-                                       trigger={<Button icon='plus'
-                                                        circular
-                                                        floated='left'/>}/>
-                    <Button primary onClick={() => {
+                                       trigger={<button className='be-btn be-btn-icon'>＋</button>}/>
+                    <button className='be-btn be-btn-primary' onClick={() => {
                         this.props.onOk();
                         this.props.history.goBack();
-                    }} content='OK'/>
-                    <Button secondary onClick={() => {
+                    }}>OK</button>
+                    <button className='be-btn' onClick={() => {
                         this.props.onButtonChanged(this.preEditButton);
                         this.props.history.goBack();
-                    }} content='Cancel'/>
+                    }}>Cancel</button>
                 </div>
             </Fragment>
-        </div>
+        </div>;
     }
 }

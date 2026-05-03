@@ -14,7 +14,6 @@ import (
 	"github.com/andew42/brightlight/framebuffer"
 	"github.com/andew42/brightlight/servers"
 	"github.com/andew42/brightlight/stats"
-	"golang.org/x/net/websocket"
 )
 
 // LoggedDir Wrap a Dir file system server object to log failures
@@ -63,11 +62,10 @@ func main() {
 	// Figure out where the content directory is by loading BRIGHTLIGHT
 	contentBasePath := os.Getenv("BRIGHTLIGHT")
 	if len(contentBasePath) == 0 {
-		slog.Error("BRIGHTLIGHT environment variable not set (web root)")
-		os.Exit(1)
+		slog.Warn("BRIGHTLIGHT environment variable not set — static content will not be served (use Vite dev server)")
+	} else {
+		slog.Info("HTTP content base path", "contentBasePath", contentBasePath)
 	}
-	// contentBasePath := "C:/Users/Andrew/GolandProjects/brightlight"
-	slog.Info("HTTP content base path", "contentBasePath", contentBasePath)
 
 	// Start drivers
 	controller.StartTeensyDriver()
@@ -85,44 +83,37 @@ func main() {
 	//	fmt.Printf("%s %d\n", s, rs.Len())
 	//}
 
-	// Set up static content serving
-	mime.AddExtensionType(".manifest", "text/cache-manifest")
-	// Serve react frontend on /
-	fs2 := http.FileServer(LoggedRedirectingDir{
-		LoggedDir{http.Dir(contentBasePath + "/frontend/build")},
-		[]string{"/buttons", "/virtual"}})
-	http.Handle("/", fs2)
-
-	// ui-config requires PUT (write) support for saving button config
-	http.HandleFunc("/ui-config/", servers.GetConfigHandler(contentBasePath+"/frontend/build"))
-
-	// Requests to run zero or more animation (json payload)
-	http.HandleFunc("/RunAnimations/", servers.RunAnimationsHandler)
-
-	// Requests to show a strip length on the room lights
-	http.HandleFunc("/StripLength/", servers.StripLenHandler)
-
-	// Push button state changes over a web socket to keep UIs in sync
-	http.Handle("/ButtonState", websocket.Handler(servers.ButtonStateHandler))
-
-	// Push frame buffer changes over a web socket for virtual framebuffer debugging
-	http.Handle("/FrameBuffer", websocket.Handler(servers.FrameBufferHandler))
-
-	// Push stats info over a web socket
-	http.Handle("/Stats", websocket.Handler(servers.StatsHandler))
-
-	// Request to set server options
-	http.HandleFunc("/option/", servers.OptionHandler)
-
-	// Start web server
-	ipAndPort, err := config.GetLocalIP()
-	if err != nil {
-		slog.Error("Failed to find an IP address on which to serve content", "err", err)
-		os.Exit(1)
+	// ui-config lives alongside the backend binary; fall back to relative path for dev
+	uiConfigDir := "ui-config"
+	if len(contentBasePath) > 0 {
+		uiConfigDir = contentBasePath + "/backend/ui-config"
 	}
-	ipAndPort += ":8080"
-	slog.Info("serving frontend at /", "address", ipAndPort)
-	if err := http.ListenAndServe(ipAndPort, nil); err != nil {
+	http.HandleFunc("/api/ui-config/", servers.GetConfigHandler(uiConfigDir))
+	http.HandleFunc("/api/RunAnimations/", servers.RunAnimationsHandler)
+	http.HandleFunc("/api/StripLength/", servers.StripLenHandler)
+	http.HandleFunc("/api/ButtonState", servers.ButtonStateHandler)
+	http.HandleFunc("/api/FrameBuffer", servers.FrameBufferHandler)
+	http.HandleFunc("/api/Stats", servers.StatsHandler)
+	http.HandleFunc("/api/option/", servers.OptionHandler)
+
+	// Set up static content serving (skipped when BRIGHTLIGHT is unset — Vite serves the frontend)
+	if len(contentBasePath) > 0 {
+		err := mime.AddExtensionType(".manifest", "text/cache-manifest")
+		if err != nil {
+			slog.Error("failed to add extension type")
+			return
+		}
+		fs2 := http.FileServer(LoggedRedirectingDir{
+			LoggedDir{http.Dir(contentBasePath + "/frontend/build")},
+			[]string{"/buttons", "/virtual"}})
+		http.Handle("/", fs2)
+	}
+
+	// Start web server — listen on all interfaces so both LAN IP and localhost work
+	if localIP, err := config.GetLocalIP(); err == nil {
+		slog.Info("serving on", "address", localIP+":8080")
+	}
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		slog.Error(err.Error())
 	}
 

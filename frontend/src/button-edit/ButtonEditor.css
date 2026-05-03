@@ -1,10 +1,50 @@
 .button-editor-editor-list {
-    padding: 8px;
+    padding: 12px;
     overflow-y: scroll;
     height: 100%;
+    background: #f7f7f7;
 }
 
 .button-editor-ok-cancel-container {
-    text-align: right;
-    margin: 16px;
+    margin: 16px 0 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: center;
+}
+
+.be-btn {
+    cursor: pointer;
+    padding: 9px 20px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #444;
+    font-size: 14px;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.be-btn:hover {
+    background: #f0f0f0;
+}
+
+.be-btn-primary {
+    background: #2185d0;
+    color: white;
+    border-color: #1a69a4;
+}
+
+.be-btn-primary:hover {
+    background: #1a6cb0;
+}
+
+.be-btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 1;
+    margin-right: auto;
 }
