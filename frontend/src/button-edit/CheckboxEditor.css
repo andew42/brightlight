@@ -1,0 +1,13 @@
+.cbe-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cbe-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
