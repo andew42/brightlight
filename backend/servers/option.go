@@ -19,7 +19,7 @@ func OptionHandler(w http.ResponseWriter, r *http.Request) {
 
 	// JSON body of form
 	// {"cmd": "outputMapping", "param": "Linear"},
-	body, err := io.ReadAll(r.Body)
+	body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 4096))
 	if err != nil {
 		slog.Error("OptionHandler bad body", "err", err.Error())
 		http.Error(w, err.Error(), 400)

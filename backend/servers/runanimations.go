@@ -31,7 +31,7 @@ func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
 	//   ]
 	// },
 
-	body, err := io.ReadAll(r.Body)
+	body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 65536))
 	if err != nil {
 		slog.Error("RunAnimationsHandler bad body", "err", err.Error())
 		http.Error(w, err.Error(), 400)

@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"log/slog"
@@ -28,10 +29,10 @@ func StartRelayDriver() {
 
 func IsRelayDriverConnected() bool {
 
-	return relayUsbConnected
+	return relayUsbConnected.Load()
 }
 
-var relayUsbConnected bool
+var relayUsbConnected atomic.Bool
 
 // Monitors changes to frame buffer and turns power supplies on or off via USB relay board
 func relayDriver() {
@@ -51,9 +52,9 @@ func relayDriver() {
 
 connectLoop:
 	for {
-		relayUsbConnected = false
+		relayUsbConnected.Store(false)
 		f := openUsbPortWithRetry(port)
-		relayUsbConnected = true
+		relayUsbConnected.Store(true)
 
 		// Initially we set all relays off
 		relayStates := [2]relayState{}
@@ -65,44 +66,45 @@ connectLoop:
 		// Request frame buffer updates
 		src, done := framebuffer.AddListener(port, false)
 
-		// Push frame buffer changes to Teensy
+		// Push frame buffer changes to the relay board
 	pushLoop:
 		for {
-			select {
-			case fb := <-src:
-				now := time.Now()
-				// foreach controller
-				controllerCount := len(fb.Strips) / config.StripsPerTeensy
-				for c := 0; c < controllerCount; c++ {
-					firstStripForController := c * config.StripsPerTeensy
-					// Should the controller's relay be off or on?
-					relayStates[c].requestState(
-						areAnyLedsOn(fb.Strips[firstStripForController:firstStripForController+config.StripsPerTeensy]),
-						now)
-				}
+			fb := <-src
+			now := time.Now()
+			// foreach controller
+			controllerCount := len(fb.Strips) / config.StripsPerTeensy
+			if controllerCount > len(relayStates) {
+				controllerCount = len(relayStates)
+			}
+			for c := 0; c < controllerCount; c++ {
+				firstStripForController := c * config.StripsPerTeensy
+				// Should the controller's relay be off or on?
+				relayStates[c].requestState(
+					areAnyLedsOn(fb.Strips[firstStripForController:firstStripForController+config.StripsPerTeensy]),
+					now)
+			}
 
-				// Work out the new actual states at this point in time
-				newRelayStates := [2]bool{}
-				updateRequired := false
-				for i := 0; i < len(newRelayStates); i++ {
-					updateRequired = relayStates[i].updateState(now) || updateRequired
-					newRelayStates[i] = relayStates[i].current
-				}
+			// Work out the new actual states at this point in time
+			newRelayStates := [2]bool{}
+			updateRequired := false
+			for i := 0; i < len(newRelayStates); i++ {
+				updateRequired = relayStates[i].updateState(now) || updateRequired
+				newRelayStates[i] = relayStates[i].current
+			}
 
-				// Update if changed
-				if updateRequired {
-					slog.Info("relayDriver update relays", "new states", newRelayStates)
-					if err := sendRelayState(f, newRelayStates); err != nil {
+			// Update if changed
+			if updateRequired {
+				slog.Info("relayDriver update relays", "new states", newRelayStates)
+				if err := sendRelayState(f, newRelayStates); err != nil {
 
-						slog.Warn("relayDriver failed to send relay command", "error", err.Error())
-						f.Close()
+					slog.Warn("relayDriver failed to send relay command", "error", err.Error())
+					f.Close()
 
-						// Close down listener
-						done <- src
+					// Close down listener
+					done <- src
 
-						// Try and reconnect
-						break pushLoop
-					}
+					// Try and reconnect
+					break pushLoop
 				}
 			}
 		}

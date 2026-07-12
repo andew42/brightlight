@@ -216,6 +216,9 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 		if err == nil {
 			brightness, err = seg.Params.asRange(2)
 		}
+		if err == nil && length < 1 {
+			err = errors.New("bad length parameter")
+		}
 		if err == nil {
 			*animators = append(*animators,
 				segActionAndAnimator{seg, newRepeater(
@@ -282,6 +285,9 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 		var autoRepeat bool
 		if err == nil {
 			autoRepeat, err = seg.Params.asCheckbox(3)
+		}
+		if err == nil && duration < 1 {
+			err = errors.New("bad duration parameter")
 		}
 		if err == nil {
 			*animators = append(*animators, segActionAndAnimator{seg,
@@ -356,6 +362,17 @@ func resolveSegment(sa segActionAndAnimator, fb *framebuffer.FrameBuffer) (segme
 	return ns.GetSegment(fb), nil
 }
 
+// Animation parameters arrive over HTTP so a panicking animator must not
+// take down the whole server, drop its frame and keep rendering the rest
+func animateFrameSafely(a animator, frameCounter uint, seg segment.Segment) {
+	defer func() {
+		if r := recover(); r != nil {
+			slog.Warn("animator panic recovered", "panic", r)
+		}
+	}()
+	a.animateFrame(frameCounter, seg)
+}
+
 // StartDriver Start animate driver
 func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 	// Start the animator go routine
@@ -376,7 +393,7 @@ func StartDriver(renderer chan *framebuffer.FrameBuffer) {
 				for _, v := range animators {
 					// Resolve the segment to animate, based on string name
 					if seg, err := resolveSegment(v, fb); err == nil {
-						v.animator.animateFrame(frameCounter, seg)
+						animateFrameSafely(v.animator, frameCounter, seg)
 					}
 				}
 

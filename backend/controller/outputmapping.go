@@ -1,9 +1,19 @@
 package controller
 
-import "github.com/andew42/brightlight/framebuffer"
+import (
+	"sync/atomic"
 
-var mappingEnabled = true
-var outputMappingTable = linear128
+	"github.com/andew42/brightlight/framebuffer"
+)
+
+// The current mapping table (nil when mapping is disabled), an atomic
+// pointer as it is set from HTTP handlers while teensy driver go routines
+// read it on every frame
+var outputMappingTable atomic.Pointer[[256]byte]
+
+func init() {
+	outputMappingTable.Store(&linear128)
+}
 
 var linear128 = [256]byte{
 	0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7,
@@ -66,27 +76,24 @@ func SetOutputMapping(mapping string) {
 
 	switch mapping {
 	case "Linear 128":
-		outputMappingTable = linear128
-		mappingEnabled = true
+		outputMappingTable.Store(&linear128)
 	case "Cie 128":
-		outputMappingTable = cie128
-		mappingEnabled = true
+		outputMappingTable.Store(&cie128)
 	case "Cie 256":
-		outputMappingTable = cie256
-		mappingEnabled = true
+		outputMappingTable.Store(&cie256)
 	default:
-		mappingEnabled = false
+		outputMappingTable.Store(nil)
 	}
 }
 
 func mapOutput(in framebuffer.Rgb) framebuffer.Rgb {
 
-	if !mappingEnabled {
+	table := outputMappingTable.Load()
+	if table == nil {
 		return in
-	} else {
-		return framebuffer.Rgb{
-			Red:   outputMappingTable[in.Red],
-			Green: outputMappingTable[in.Green],
-			Blue:  outputMappingTable[in.Blue]}
 	}
+	return framebuffer.Rgb{
+		Red:   table[in.Red],
+		Green: table[in.Green],
+		Blue:  table[in.Blue]}
 }

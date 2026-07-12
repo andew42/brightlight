@@ -15,14 +15,11 @@ type SubSegment struct {
 // NewSubSegment A sub-segment is a slice of another segment
 func NewSubSegment(baseSeg Segment, start uint, len uint) SubSegment {
 
-	baseLen := baseSeg.Len()
-	if start >= baseLen {
-		slog.Error("invalid segment start")
-		panic("invalid segment start")
-	}
-	if start+len > baseLen {
-		slog.Error("invalid segment length")
-		panic("invalid segment length")
+	// A zero length sub-segment is valid (nothing to light) so only the
+	// combination of start and length must fit within the base segment
+	if start+len > baseSeg.Len() {
+		slog.Error("invalid segment start or length")
+		panic("invalid segment start or length")
 	}
 	return SubSegment{baseSeg, start, len}
 }
