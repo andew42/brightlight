@@ -141,6 +141,14 @@ speakable button names, not code.
    server (including config PUT, which writes files) to the internet, and Alexa knows
    button *names*, not the full segment payload that endpoint requires.
 
+## Decisions (agreed 2026-07-12)
+
+Inbound HTTPS with port-forward; ui2 `user-buttons.json` (fallback
+`default-buttons.json`) is the only button source; simple Go Lambda with manual slot
+sync (no dynamic entities); "ask" as the connecting word ("Alexa, ask bedroom lights
+for rainbow"); fuzzy matching includes digit/word equivalence ("2" = "two").
+Implemented in `servers/alexa.go` and `alexa/`; deployment steps in `alexa/readme.md`.
+
 ## Open questions to agree before coding
 
 1. Inbound HTTPS + port-forward (this plan) vs outbound MQTT (alternative 2)?

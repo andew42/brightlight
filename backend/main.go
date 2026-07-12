@@ -96,6 +96,10 @@ func main() {
 	http.HandleFunc("/api/Stats", servers.StatsHandler)
 	http.HandleFunc("/api/option/", servers.OptionHandler)
 
+	// Alexa voice control endpoint (HTTPS on its own port, disabled unless
+	// BRIGHTLIGHT_ALEXA_TOKEN is set)
+	servers.StartAlexaServer(uiConfigDir)
+
 	// Set up static content serving (skipped when BRIGHTLIGHT is unset — Vite serves the frontend)
 	if len(contentBasePath) > 0 {
 		err := mime.AddExtensionType(".manifest", "text/cache-manifest")
