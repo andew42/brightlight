@@ -21,6 +21,17 @@ type NamedSegment struct {
 	GetSegment func(fb *framebuffer.FrameBuffer) Segment
 }
 
+// Strip lengths of the static frame buffer layout, used to validate pXX:YY
+// segment requests up front rather than panicking in the animation driver
+var stripLengths = func() []uint {
+	fb := framebuffer.NewFrameBuffer()
+	lengths := make([]uint, len(fb.Strips))
+	for i := range fb.Strips {
+		lengths[i] = uint(len(fb.Strips[i].Leds))
+	}
+	return lengths
+}()
+
 // GetNamedSegment Return a particular named segment
 func GetNamedSegment(name string) (NamedSegment, error) {
 
@@ -30,6 +41,12 @@ func GetNamedSegment(name string) (NamedSegment, error) {
 		colonIndex := strings.IndexByte(name, ':')
 		if stripIndex, err := strconv.Atoi(name[1:colonIndex]); err == nil {
 			if length, err := strconv.Atoi(name[colonIndex+1:]); err == nil {
+				// The name arrives from the HTTP API so a bad strip index or
+				// length must be rejected, not trusted
+				if stripIndex < 0 || stripIndex >= len(stripLengths) ||
+					length < 0 || uint(length) > stripLengths[stripIndex] {
+					return NamedSegment{}, errors.New("Segment '" + name + "' out of range")
+				}
 				return NamedSegment{
 					Name: name,
 					GetSegment: func(fb *framebuffer.FrameBuffer) Segment {

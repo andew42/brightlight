@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-var configVersion = 0
-
 // GetConfigHandler Handle HTTP requests to read and write ui-config files.
 // uiConfigDir is the filesystem path to the ui-config directory.
 func GetConfigHandler(uiConfigDir string) func(http.ResponseWriter, *http.Request) {
@@ -46,10 +44,10 @@ func GetConfigHandler(uiConfigDir string) func(http.ResponseWriter, *http.Reques
 
 			slog.Info("configHandler PUT called", "FullPath", fullPath)
 
-			// Only support writing user.json (ui) and user-buttons.json (ui2)
+			// Only support writing user-buttons.json
 			if r.URL.Path != "/api/ui-config/user-buttons.json" {
 				slog.Warn("Unsupported config file name", "FileName", r.URL.Path)
-				http.Error(w, "File name not allowed", 401)
+				http.Error(w, "File name not allowed", 403)
 				return
 			}
 
@@ -64,8 +62,7 @@ func GetConfigHandler(uiConfigDir string) func(http.ResponseWriter, *http.Reques
 					http.Error(w, "Failed to write file", 507)
 				} else {
 					// Let clients know the config has been updated
-					configVersion++
-					updateButtonPadVersion(configVersion)
+					incrementButtonPadVersion()
 				}
 			}
 		} else {

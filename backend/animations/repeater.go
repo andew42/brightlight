@@ -20,6 +20,10 @@ func newRepeater(animator animator, repeatLength uint) *repeater {
 
 func (r *repeater) animateFrame(frameCount uint, frame segment.Segment) {
 
+	if r.repeatLength == 0 {
+		return
+	}
+
 	// Number of repeats and remaining pixels
 	repeat := frame.Len() / r.repeatLength
 	// TODO HOW TO HANDLE REMAINDER (SEPARATE CLASSES OR REMAINDER MODE)

@@ -28,8 +28,13 @@ func newTwinkle() *twinkle {
 }
 
 func randBetween(min int, max int) uint {
-	x := max - min
-	return uint(rand.Intn(x)) + uint(min)
+	if min < 0 {
+		min = 0
+	}
+	if max <= min {
+		return uint(min)
+	}
+	return uint(rand.Intn(max-min)) + uint(min)
 }
 
 // 8 bit saturation math subtraction
@@ -54,7 +59,7 @@ func (t *twinkle) animateFrame(frameCount uint, frame segment.Segment) {
 	}
 
 	// Adding heat every frame is too much so do it every 2 frames
-	if (frameCount % 2) == 0 {
+	if (frameCount%2) == 0 && len(t.pixies) > 0 {
 
 		// Add some heat to some random pixies
 		numPixiesToHeat := (len(t.pixies) * heatPercentage) / 100
@@ -62,7 +67,7 @@ func (t *twinkle) animateFrame(frameCount uint, frame segment.Segment) {
 			numPixiesToHeat = 1
 		}
 		for j := 0; j < numPixiesToHeat; j++ {
-			index := rand.Intn(len(t.pixies) - 1)
+			index := rand.Intn(len(t.pixies))
 			heat := uint8(randBetween(50, 255))
 			if heat > t.pixies[index] {
 				t.pixies[index] = heat

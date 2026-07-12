@@ -21,8 +21,14 @@ func StripLenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// index
 	configStrings := strings.Split(r.URL.Path[extIndex+1:], ",")
+	if len(configStrings) != 2 {
+		http.Error(w, "Expected index,length parameters", 406)
+		slog.Info("stripLengthHandler called with wrong parameter count")
+		return
+	}
+
+	// index
 	index, err := strconv.ParseInt(configStrings[0], 10, 32)
 	if err != nil {
 		index = -1

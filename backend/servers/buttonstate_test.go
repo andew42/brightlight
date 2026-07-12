@@ -29,7 +29,7 @@ func TestButtonStateBroadcastDoesNotBlock(t *testing.T) {
 				listenersMux.Unlock()
 
 				updateActiveButtonKey(i)
-				updateButtonPadVersion(i)
+				incrementButtonPadVersion()
 
 				// Remove without draining, racing with other broadcasts
 				removeButtonListener(c)

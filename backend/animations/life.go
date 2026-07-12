@@ -20,6 +20,10 @@ type life struct {
 
 func newLife(colour framebuffer.Rgb, framesPerGeneration uint, rule int, autoRepeat bool) *life {
 
+	// Guard against division by zero in animateFrame
+	if framesPerGeneration == 0 {
+		framesPerGeneration = 1
+	}
 	return &life{colour: colour, framesPerGeneration: framesPerGeneration, rule: rule, autoRepeat: autoRepeat}
 }
 

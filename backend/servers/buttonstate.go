@@ -27,10 +27,11 @@ func updateActiveButtonKey(key int) {
 	})
 }
 
-// Called by config server to update button pad save version
-func updateButtonPadVersion(ver int) {
+// Called by config server when the button pad has been saved, the mutex
+// makes the increment safe when several saves arrive concurrently
+func incrementButtonPadVersion() {
 	updateCurrentButtonState(func() {
-		currentButtonState.ButtonPadVersion = ver
+		currentButtonState.ButtonPadVersion++
 	})
 }
 
