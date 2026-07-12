@@ -6,12 +6,13 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/andew42/brightlight/stats"
 )
 
-// Give each stats listener its own unique ID
-var statsListenerId = 0
+// Give each stats listener its own unique ID (atomic as handlers run concurrently)
+var statsListenerId atomic.Int64
 
 func StatsHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -19,8 +20,7 @@ func StatsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	statsListenerId++
-	src, done := stats.AddListener("Stats Listener " + strconv.Itoa(statsListenerId))
+	src, done := stats.AddListener("Stats Listener " + strconv.FormatInt(statsListenerId.Add(1), 10))
 
 	for {
 		select {

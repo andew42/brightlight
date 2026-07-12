@@ -6,12 +6,13 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/andew42/brightlight/framebuffer"
 )
 
-// Give each virtual frame buffer its own unique ID
-var frameBufferListenerId = 0
+// Give each virtual frame buffer its own unique ID (atomic as handlers run concurrently)
+var frameBufferListenerId atomic.Int64
 
 func FrameBufferHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -19,8 +20,7 @@ func FrameBufferHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	frameBufferListenerId++
-	src, done := framebuffer.AddListener("Virtual Frame Buffer "+strconv.Itoa(frameBufferListenerId), false)
+	src, done := framebuffer.AddListener("Virtual Frame Buffer "+strconv.FormatInt(frameBufferListenerId.Add(1), 10), false)
 
 	for {
 		select {
