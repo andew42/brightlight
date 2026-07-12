@@ -39,11 +39,18 @@ func updateCurrentButtonState(f func()) {
 	defer listenersMux.Unlock()
 	f()
 	for _, l := range listeners {
+		// Latest-wins send that can never block: drain any undelivered
+		// state then queue the new one. A blocking send here deadlocks
+		// with removeButtonListener when a listener exits concurrently.
+		select {
+		case <-l:
+		default:
+		}
 		l <- currentButtonState
 	}
 }
 
-// Called when a web socket closes to remove its listener
+// Called when an SSE stream closes to remove its listener
 func removeButtonListener(c chan buttonState) {
 	listenersMux.Lock()
 	defer listenersMux.Unlock()
@@ -60,8 +67,8 @@ func removeButtonListener(c chan buttonState) {
 // Give each button state listener its own unique ID (for logging)
 var buttonStateListenerId = 0
 
-// ButtonStateHandler Handle button state web socket requests (web socket is closed
-// when we return) We have one of these go routines per web socket request
+// ButtonStateHandler Handle button state SSE requests (the stream is closed
+// when we return) We have one of these go routines per SSE request
 func ButtonStateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/event-stream")
@@ -75,8 +82,9 @@ func ButtonStateHandler(w http.ResponseWriter, r *http.Request) {
 	listenerId := buttonStateListenerId
 	slog.Info("adding button state listener", "id", listenerId)
 
-	// Add our listener channel
-	update := make(chan buttonState)
+	// Add our listener channel (capacity 1 so broadcasts never block;
+	// only the latest state matters)
+	update := make(chan buttonState, 1)
 	listeners = append(listeners, update)
 
 	// Copy the current button state
