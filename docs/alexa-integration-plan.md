@@ -89,6 +89,33 @@ writes, no file access, no UI exposure.
   `alexa/interaction-model.json` (skill definition for the Alexa developer console),
   `alexa/readme.md` (build/deploy steps: `GOOS=linux go build`, zip, upload).
 
+## Voice-to-button-name mapping
+
+Buttons are arbitrarily user-entered, so the mapping is done in two stages:
+
+**Stage 1 — Alexa speech → slot text.** The `ButtonName` custom slot's value list is
+training data, not a closed enum: Alexa biases recognition toward listed values but still
+returns its best-guess transcription for anything else. Keeping the list in sync:
+
+1. *Manual (v1)*: paste names into the developer console when buttons change;
+   `GET /alexa/Buttons` makes this a copy-paste job.
+2. *Dynamic entities (v2)*: Lambda fetches `/alexa/Buttons` at session start and injects
+   live names via `Dialog.UpdateDynamicEntities` (≤100 values) — recognition then tracks
+   button edits automatically; ~30 extra Lambda lines.
+3. *SMAPI model rebuilds*: overkill.
+
+**Stage 2 — slot text → button.** In `servers/alexa.go`:
+
+1. Normalise both sides: lowercase, trim, collapse whitespace, strip punctuation
+   ("sweet shop" ↔ "Sweet Shop", "off" ↔ "OFF").
+2. Exact match on normalised form.
+3. Fuzzy fallback for speech quirks: digit/word equivalence ("two" ↔ "2"), plus a small
+   prefix/edit-distance pass ("rainbows" → "Rainbow"). ~20 lines, no library.
+4. No match → 404; the Lambda speaks back what it heard so misrecognitions are audible.
+
+Caveat: unpronounceable names ("My 3", "BR2-Low") will always be unreliable — the fix is
+speakable button names, not code.
+
 ## Prerequisites (not code)
 
 * A stable way to reach home: DDNS hostname or static IP, and one router port-forward
