@@ -22,7 +22,10 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version-file: backend/go.mod
-          cache-dependency-path: backend/go.sum
+          # The backend has no external dependencies so there is nothing
+          # worth caching; an empty module cache also triggers a warning
+          # in the post-job cache step.
+          cache: false
 
       - name: Vet
         run: go vet ./...
