@@ -1,0 +1,14 @@
+[Unit]
+Description=Brightlight LED lighting controller
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Environment=BRIGHTLIGHT=/opt/brightlight
+WorkingDirectory=/opt/brightlight
+ExecStart=/opt/brightlight/brightlight
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,40 +1,42 @@
 # Deploy
 
-This directory is the staging area for artefacts deployed to the Raspberry Pi controller.
+## Automated install on the Pi (recommended)
 
-## Contents (generated, not committed)
+CI packages every push into a rolling `latest` GitHub release containing the
+ARMv7 binary, the built frontend, the ui-config files, a systemd unit and an
+installer. On the Pi run:
+
+```bash
+curl -fsSL https://github.com/andew42/brightlight/releases/latest/download/install.sh | sudo bash
+```
+
+This installs everything to `/opt/brightlight`, sets up the `brightlight`
+systemd service so it starts on boot, and preserves `user-buttons.json`
+across upgrades. Useful commands afterwards:
+
+```bash
+systemctl status brightlight     # service state
+journalctl -u brightlight -f     # follow logs
+sudo systemctl restart brightlight
+```
+
+The web UI is served on port 8080. The installer sources live in
+`packaging/`; the bundle is assembled by `.github/workflows/build.yml`.
+
+## Manual build (this directory)
+
+This directory is the staging area for locally built artefacts.
 
 | Path | Source | Description |
 |------|--------|-------------|
-| `brightlight` | `backend/` Go build | Linux ARM binary (GOARCH=arm GOARM=5) |
+| `brightlight` | `backend/` Go build | Linux ARM binary |
 | `frontend/build/` | `frontend/` Vite build | React app static files |
+| `backend/ui-config/` | `backend/ui-config/` | Button/segment config JSON |
 
-Run `full-build.bat` (Windows) from the repo root to populate this directory.
+Run `full-build.sh` (Linux/macOS) or `full-build.bat` (Windows) from the repo
+root to populate it, then copy the three entries above to the Pi. With
+`BRIGHTLIGHT=<base>` the server expects:
 
-## Deploying to the Pi
-
-```bash
-# Copy binary
-scp ./deploy/brightlight pi@192.168.0.XXX:/home/pi/brightlight
-
-# Copy frontend assets
-scp -r ./deploy/frontend/build pi@192.168.0.XXX:/home/pi/frontend/build
-
-# Make binary executable (run on Pi)
-sudo chmod +x /home/pi/brightlight
-```
-
-## Pi setup
-
-The binary reads the `BRIGHTLIGHT` environment variable to locate static files.
-Set it in `/etc/rc.local` so it persists across reboots:
-
-```bash
-export BRIGHTLIGHT=/home/pi
-/home/pi/brightlight > /dev/null 2>&1 &
-```
-
-With `BRIGHTLIGHT=/home/pi` the server expects:
-- Binary at `/home/pi/brightlight`
-- Frontend at `/home/pi/frontend/build/`
-- Button config at `/home/pi/frontend/build/ui-config/`
+- Binary anywhere (conventionally `<base>/brightlight`)
+- Frontend at `<base>/frontend/build/`
+- Button config at `<base>/backend/ui-config/`

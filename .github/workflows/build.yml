@@ -73,3 +73,67 @@ jobs:
           name: frontend-build
           path: frontend/build
           retention-days: 30
+
+  package:
+    name: Package (Pi install bundle)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Download backend executable
+        uses: actions/download-artifact@v8
+        with:
+          name: brightlight-linux-armv7
+          path: staging/backend-bin
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-build
+          path: staging/frontend-build
+
+      # Bundle layout matches the BRIGHTLIGHT=/opt/brightlight runtime paths:
+      # binary at the root, frontend/build/ and backend/ui-config/ beside it.
+      - name: Assemble bundle
+        run: |
+          mkdir -p bundle/frontend bundle/backend
+          cp staging/backend-bin/brightlight bundle/brightlight
+          chmod +x bundle/brightlight
+          cp -r staging/frontend-build bundle/frontend/build
+          cp -r backend/ui-config bundle/backend/ui-config
+          cp packaging/brightlight.service packaging/install.sh bundle/
+          tar -czf brightlight-pi.tar.gz -C bundle .
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: brightlight-pi
+          path: brightlight-pi.tar.gz
+          retention-days: 30
+
+      # Rolling 'latest' release so the Pi can fetch a stable URL:
+      #   https://github.com/<repo>/releases/latest/download/brightlight-pi.tar.gz
+      # Recreated each push so the release date/commit stay accurate. Must not
+      # be a prerelease or the releases/latest download path stops resolving.
+      - name: Publish rolling release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > release-notes.md <<EOF
+          Rolling release updated by CI on every push to master/develop.
+
+          Install or upgrade on a Raspberry Pi with:
+
+              curl -fsSL https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/install.sh | sudo bash
+          EOF
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest \
+            --target "$GITHUB_SHA" \
+            --title "Latest build" \
+            --notes-file release-notes.md \
+            brightlight-pi.tar.gz packaging/install.sh
