@@ -1,9 +1,23 @@
 package config
 
-import "time"
+import (
+	"os"
+	"strings"
+	"time"
+)
+
+// Site names the hardware installation this server drives. Selected at
+// runtime with the BRIGHTLIGHT_SITE environment variable ("titania" or
+// "bedroom"); anything else falls back to titania.
+var Site = func() string {
+	if strings.EqualFold(os.Getenv("BRIGHTLIGHT_SITE"), "bedroom") {
+		return "bedroom"
+	}
+	return "titania"
+}()
 
 // Titania (or bedroom)
-const Titania = true
+var Titania = Site == "titania"
 
 // MaxLedStripLen Maximum led strip length (must match Teensy firmware)
 const MaxLedStripLen = 300

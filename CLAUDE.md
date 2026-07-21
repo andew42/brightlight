@@ -49,6 +49,13 @@ brightlight/
 
 ## Runtime configuration
 
+`BRIGHTLIGHT_SITE` env var selects the hardware site layout at runtime:
+`titania` (default) or `bedroom`. It switches the frame-buffer strip layout
+and named segments (`config.Site` / `config.Titania`), and makes the config
+server serve `static-data-<site>.json` / `default-buttons-<site>.json` when
+the UI requests the generic names. On a Pi it is set via a systemd drop-in
+written by `packaging/install.sh --site <site>`.
+
 The Go binary uses `BRIGHTLIGHT` env var as the base path for static files.
 With `BRIGHTLIGHT=/home/pi` it looks for:
 - Frontend: `/home/pi/frontend/build/` (index.html, assets/)

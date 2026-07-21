@@ -12,7 +12,22 @@ curl -fsSL https://github.com/andew42/brightlight/releases/latest/download/insta
 
 This installs everything to `/opt/brightlight`, sets up the `brightlight`
 systemd service so it starts on boot, and preserves `user-buttons.json`
-across upgrades. Useful commands afterwards:
+across upgrades.
+
+### Site selection
+
+One build drives both installations. Select which hardware layout a Pi runs
+with `--site` on first install (stored in a systemd drop-in and kept across
+upgrades; default is `titania`):
+
+```bash
+curl -fsSL https://github.com/andew42/brightlight/releases/latest/download/install.sh | sudo bash -s -- --site bedroom
+```
+
+The server reads the `BRIGHTLIGHT_SITE` environment variable at startup: it
+selects the strip/segment layout compiled into the binary and which
+`static-data-<site>.json` / `default-buttons-<site>.json` variants are served
+to the UI. Useful commands afterwards:
 
 ```bash
 systemctl status brightlight     # service state

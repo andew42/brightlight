@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/andew42/brightlight/config"
 )
 
 // GetConfigHandler Handle HTTP requests to read and write ui-config files.
@@ -28,6 +30,18 @@ func GetConfigHandler(uiConfigDir string) func(http.ResponseWriter, *http.Reques
 		}
 
 		if r.Method == "GET" {
+
+			// The frontend always requests the generic file names; serve the
+			// site-specific variant (e.g. static-data-bedroom.json) when one
+			// exists for the configured site (BRIGHTLIGHT_SITE)
+			name := filepath.Base(fullPath)
+			if name == "static-data.json" || name == "default-buttons.json" {
+				variant := strings.TrimSuffix(name, ".json") + "-" + config.Site + ".json"
+				variantPath := filepath.Join(filepath.Dir(fullPath), variant)
+				if _, err := os.Stat(variantPath); err == nil {
+					fullPath = variantPath
+				}
+			}
 
 			slog.Info("configHandler GET called", "FullPath", fullPath)
 			content, err := os.ReadFile(fullPath)

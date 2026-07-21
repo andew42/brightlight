@@ -59,6 +59,9 @@ func main() {
 	// Report what are we running on
 	slog.Info("environment", "gover", runtime.Version(), "goos", runtime.GOOS, "goarch", runtime.GOARCH)
 
+	// Report which hardware site layout is active (BRIGHTLIGHT_SITE)
+	slog.Info("site configuration", "site", config.Site)
+
 	// Figure out where the content directory is by loading BRIGHTLIGHT
 	contentBasePath := os.Getenv("BRIGHTLIGHT")
 	if len(contentBasePath) == 0 {
