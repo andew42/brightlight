@@ -1,0 +1,35 @@
+.ne-section {
+    border: 1px solid #2185d0;
+    border-radius: 4px;
+    padding: 10px 14px 14px;
+    margin: 0 0 10px;
+    background: white;
+}
+
+.ne-section > legend {
+    padding: 0 6px;
+    color: #2185d0;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.ne-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.ne-input:focus {
+    outline: none;
+    border-color: #2185d0;
+}
+
+.ne-error {
+    margin-top: 6px;
+    color: #db2828;
+    font-size: 13px;
+}

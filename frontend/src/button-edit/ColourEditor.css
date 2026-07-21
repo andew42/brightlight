@@ -1,0 +1,21 @@
+.colour-editor-container {
+    display: flex;
+    align-items: center;
+    margin: .5rem;
+}
+
+.colour-editor-button {
+    width: 2.2rem;
+    height: 2rem;
+    border: solid 1px lightgray;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.colour-editor-label {
+    margin-left: 10px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.7);
+}

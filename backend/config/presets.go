@@ -1,0 +1,65 @@
+package config
+
+import (
+	"encoding/json"
+	"log/slog"
+	"os"
+	"path"
+)
+
+// SettingsFileDef A settings file is a map of named button column definitions
+type SettingsFileDef map[string]ButtonColumnDef
+
+// ButtonColumnDef A button column definition is a slice of button definitions
+type ButtonColumnDef []ButtonDef
+
+// ButtonDef A button definition is a named slice of segments
+type ButtonDef struct {
+	Id       string       `json:"id"`
+	Name     string       `json:"name"`
+	Segments []SegmentDef `json:"segments"`
+}
+
+type SegmentDef struct {
+	Name      string `json:"segment"`
+	Animation string `json:"animation"`
+	Params    string `json:"params"`
+}
+
+type Preset struct {
+	Name string
+}
+
+// LoadUserPresets Loads the user config json file containing preset (button) definitions set up by the user
+func LoadUserPresets(configPath string) []Preset {
+
+	presets := make([]Preset, 0)
+
+	// Try loading user settings first
+	fileContent, err := os.ReadFile(path.Join(configPath, "/config/user.json"))
+	if err != nil {
+		slog.Warn("Failed to open user.json", "error", err)
+		// No user settings, try loading the defaults
+		if fileContent, err = os.ReadFile(path.Join(configPath, "/config/default.json")); err != nil {
+			slog.Error("Failed to open default.json", "error", err)
+			// Return an empty preset list
+			return presets
+		}
+	}
+
+	// Parse the setting file
+	var settings SettingsFileDef
+	if err = json.Unmarshal(fileContent, &settings); err != nil {
+		slog.Error("Failed to unmarshal settings json", "error", err)
+		// Return an empty preset list
+		return presets
+	}
+
+	// Return list of presets (button names)
+	for _, col := range settings {
+		for _, button := range col {
+			presets = append(presets, Preset{Name: button.Name})
+		}
+	}
+	return presets
+}

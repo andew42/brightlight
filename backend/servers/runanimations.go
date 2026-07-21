@@ -1,0 +1,63 @@
+package servers
+
+import (
+	"encoding/json"
+	"io"
+	"log/slog"
+	"net/http"
+
+	"github.com/andew42/brightlight/animations"
+	"github.com/andew42/brightlight/controller"
+)
+
+// RunAnimationsHandler Handle HTTP requests to run zero or more animation specified in json payload
+func RunAnimationsHandler(w http.ResponseWriter, r *http.Request) {
+
+	// JSON body of form
+	// {
+	// 	 "key":3,
+	//	 "name":"Sweet Shop",
+	//	 "segments":[
+	//	   {
+	//	     "name":"All",
+	//	     "z":1,
+	//	     "animation":"Sweet Shop",
+	//	     "params":[
+	//	       {"key":60, "type":"range", "label":"Duration(frames)", "min":1, "max":100, "value":25},
+	//	       {"key":61, "type":"range", "label":"Brightness", "min":20, "max":60, "value":50},
+	//	       {"key":62, "type":"range", "label":"Min Saturation", "min":0, "max":99, "value":50}
+	//	     ]
+	//	   }
+	//   ]
+	// },
+
+	body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 65536))
+	if err != nil {
+		slog.Error("RunAnimationsHandler bad body", "err", err.Error())
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	// Un-marshal JSON
+	var button animations.Button
+	if err = json.Unmarshal(body, &button); err != nil {
+		slog.Error("RunAnimationsHandler bad body JSON", "err", err.Error())
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	slog.Info("RunAnimationsHandler called", "Decoded JSON", button)
+
+	// Perform the animation
+	animations.RunAnimations(button.Segments)
+
+	// Update button state (i.e. the button key for the animation we are running)
+	updateActiveButtonKey(button.Key)
+
+	// Return controller status
+	allConnected := true
+	for _, v := range controller.TeensyConnections() {
+		allConnected = allConnected && v
+	}
+	d, _ := json.Marshal(allConnected)
+	w.Write(d)
+}

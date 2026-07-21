@@ -1,0 +1,52 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "bedroom lights",
+      "intents": [
+        {
+          "name": "RunButtonIntent",
+          "slots": [
+            {
+              "name": "buttonName",
+              "type": "BUTTON_NAME"
+            }
+          ],
+          "samples": [
+            "{buttonName}",
+            "for {buttonName}",
+            "to run {buttonName}",
+            "run {buttonName}",
+            "to set {buttonName}",
+            "set {buttonName}"
+          ]
+        },
+        { "name": "AMAZON.HelpIntent", "samples": [] },
+        { "name": "AMAZON.StopIntent", "samples": [] },
+        { "name": "AMAZON.CancelIntent", "samples": [] },
+        { "name": "AMAZON.NavigateHomeIntent", "samples": [] },
+        { "name": "AMAZON.FallbackIntent", "samples": [] }
+      ],
+      "types": [
+        {
+          "name": "BUTTON_NAME",
+          "values": [
+            { "name": { "value": "off" } },
+            { "name": { "value": "full" } },
+            { "name": { "value": "low" } },
+            { "name": { "value": "mid" } },
+            { "name": { "value": "high" } },
+            { "name": { "value": "nearly off" } },
+            { "name": { "value": "sweet shop" } },
+            { "name": { "value": "twinkle" } },
+            { "name": { "value": "baby bows" } },
+            { "name": { "value": "runner" } },
+            { "name": { "value": "rainbow" } },
+            { "name": { "value": "one" } },
+            { "name": { "value": "two" } },
+            { "name": { "value": "three" } }
+          ]
+        }
+      ]
+    }
+  }
+}
