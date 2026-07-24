@@ -10,6 +10,10 @@
     grid-column-gap: 6px;
     grid-row-gap: 6px;
     padding: 6px;
+    /* Dead area below the bottom button row so the iOS swipe-up home
+       gesture doesn't trigger a button (.App's safe-area-inset-bottom
+       alone isn't enough — the swipe registers a touch above it) */
+    padding-bottom: 38px;
     background-color: purple;
 }
 
