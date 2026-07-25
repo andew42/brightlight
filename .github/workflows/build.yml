@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [master, develop]
+    branches: [master]
   pull_request:
-    branches: [master, develop]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -125,7 +125,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cat > release-notes.md <<EOF
-          Rolling release updated by CI on every push to master/develop.
+          Rolling release updated by CI on every push to master.
 
           Install or upgrade on a Raspberry Pi with:
 

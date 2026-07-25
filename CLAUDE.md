@@ -95,8 +95,8 @@ full-build.sh    # Linux/macOS
 full-build.bat   # Windows
 ```
 
-CI (`.github/workflows/build.yml`) runs on every push/PR to `master` or
-`develop`: it vets and cross-compiles the backend for Raspberry Pi 2B
+CI (`.github/workflows/build.yml`) runs on every push/PR to `master`:
+it vets and cross-compiles the backend for Raspberry Pi 2B
 (GOARM=7), builds the frontend with Vite (`npm ci && npm run build`), then on
 push assembles `brightlight-pi.tar.gz` (binary, frontend build, ui-config,
 systemd unit, installer) and republishes it as the rolling `latest` GitHub
@@ -179,7 +179,7 @@ in `alexa/readme.md`; design discussion in `docs/alexa-integration-plan.md`.
 `.github/workflows/build.yml` builds backend (ARMv7, GOARM=7 — the target is a
 Pi 2B; the old scripts used GOARM=5) and frontend, then packages a Pi bundle
 and republishes it as the rolling `latest` GitHub release on every push to
-`master`/`develop`. A Pi installs or upgrades with
+`master`. A Pi installs or upgrades with
 `curl -fsSL .../releases/latest/download/install.sh | sudo bash`, which
 installs to `/opt/brightlight` and sets up a systemd service (`packaging/`),
 replacing the old manual scp + `/etc/rc.local` flow. `full-build.sh`/`.bat`

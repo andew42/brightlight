@@ -25,8 +25,8 @@ docs/       Design notes
 
 ### CI (GitHub Actions)
 
-`.github/workflows/build.yml` runs on every push and pull request to `master`
-or `develop`:
+`.github/workflows/build.yml` runs on every push and pull request to
+`master`:
 
 1. Vets and cross-compiles the Go backend for Raspberry Pi 2B
    (`GOOS=linux GOARCH=arm GOARM=7`)
