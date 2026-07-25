@@ -142,12 +142,16 @@ sync
 # Arm the hardware watchdog: opening /dev/watchdog starts a ~15s countdown
 # that hard-resets the Pi unless petted, and a background petter keeps it
 # at bay. If killing the wedged old process freezes the kernel, the petter
-# freezes too and the watchdog reboots us into the new install
+# freezes too and the watchdog reboots us into the new install.
+# The open fails with EBUSY when something already owns the watchdog
+# (e.g. systemd's RuntimeWatchdogSec) — that's fine: the existing owner
+# provides the same freeze protection, so continue without it
 WD_PET=""
-if [ -w /dev/watchdog ]; then
-    exec 3>/dev/watchdog
+if { exec 3>/dev/watchdog; } 2>/dev/null; then
     ( while true; do printf '.' >&3; sleep 5; done ) &
     WD_PET=$!
+else
+    echo "Hardware watchdog unavailable (absent or already in use); continuing without it"
 fi
 
 if ! timeout 30 systemctl restart brightlight; then
