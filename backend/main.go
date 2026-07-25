@@ -5,8 +5,11 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"os/signal"
 	"runtime"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/andew42/brightlight/animations"
 	"github.com/andew42/brightlight/config"
@@ -73,6 +76,20 @@ func main() {
 	// Start drivers
 	controller.StartTeensyDriver()
 	controller.StartRelayDriver()
+
+	// Shut down cleanly on SIGTERM (systemctl stop) or Ctrl-C: quiesce the
+	// serial drivers and close their ports before exiting. Dying mid-write
+	// leaves the kernel to tear down a tty with a full output queue, which
+	// has been seen to wedge the Pi's dwc_otg USB controller and freeze
+	// the whole machine (Ethernet shares that USB bus)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		s := <-sigChan
+		slog.Info("shutting down", "signal", s.String())
+		controller.Shutdown(3 * time.Second)
+		os.Exit(0)
+	}()
 	renderer := make(chan *framebuffer.FrameBuffer)
 	framebuffer.StartDriver(renderer)
 	animations.StartDriver(renderer)

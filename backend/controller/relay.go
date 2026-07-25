@@ -24,6 +24,7 @@ func StartRelayDriver() {
 	relayDriverStarted = true
 
 	// Start driver
+	shutdownWaitGroup.Add(1)
 	go relayDriver()
 }
 
@@ -36,6 +37,8 @@ var relayUsbConnected atomic.Bool
 
 // Monitors changes to frame buffer and turns power supplies on or off via USB relay board
 func relayDriver() {
+
+	defer shutdownWaitGroup.Done()
 
 	port := getPortName(relayPortMappings, 0)
 	if port == "" {
@@ -54,6 +57,10 @@ connectLoop:
 	for {
 		relayUsbConnected.Store(false)
 		f := openUsbPortWithRetry(port)
+		if f == nil {
+			// Shutdown requested while waiting for the port
+			return
+		}
 		relayUsbConnected.Store(true)
 
 		// Initially we set all relays off
@@ -69,7 +76,14 @@ connectLoop:
 		// Push frame buffer changes to the relay board
 	pushLoop:
 		for {
-			fb := <-src
+			var fb *framebuffer.FrameBuffer
+			select {
+			case fb = <-src:
+			case <-shutdownChan:
+				// Quiesced close: no writes in progress, queue flushed
+				closePortQuiesced(f)
+				return
+			}
 			now := time.Now()
 			// foreach controller
 			controllerCount := len(fb.Strips) / config.StripsPerTeensy

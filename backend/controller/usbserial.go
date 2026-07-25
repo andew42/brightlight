@@ -43,11 +43,16 @@ func getPortName(portMappings map[string][]string, index int) string {
 	return portNames[index]
 }
 
-// Retry port open until it succeeds
+// Retry port open until it succeeds, or nil once shutdown is requested
 func openUsbPortWithRetry(port string) *os.File {
 
 	errorLogged := false
 	for {
+		select {
+		case <-shutdownChan:
+			return nil
+		default:
+		}
 		f, err := os.OpenFile(port, os.O_RDWR, 0)
 		if err == nil {
 			slog.Info("openUsbPortWithRetry connected", "port", port)

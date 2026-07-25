@@ -23,6 +23,7 @@ func StartTeensyDriver() {
 	teensyDriverStarted = true
 
 	// Start 2 sub drivers (16 channels)
+	shutdownWaitGroup.Add(2)
 	go teensyDriver(0)
 	go teensyDriver(1)
 }
@@ -36,8 +37,17 @@ func TeensyConnections() []bool {
 
 var teensyConnections [2]atomic.Bool
 
+// How long a frame write to the Teensy may take before we treat the
+// connection as dead. A healthy frame takes a few ms at 12Mb USB speed;
+// a Teensy that has crashed or stopped draining its serial input would
+// otherwise block the write forever with a full kernel tty queue —
+// exactly the state that wedges the Pi's USB controller on process exit
+const teensyWriteTimeout = 2 * time.Second
+
 // Monitors changes to frame buffer and update Teensy via USB
 func teensyDriver(driverIndex int) {
+
+	defer shutdownWaitGroup.Done()
 
 	port := getPortName(teensyPortMappings, driverIndex)
 	if port == "" {
@@ -48,6 +58,10 @@ func teensyDriver(driverIndex int) {
 	for {
 		teensyConnections[driverIndex].Store(false)
 		f := openUsbPortWithRetry(port)
+		if f == nil {
+			// Shutdown requested while waiting for the port
+			return
+		}
 		teensyConnections[driverIndex].Store(true)
 
 		// Allocate buffer once to avoid garbage collections in loop
@@ -58,7 +72,14 @@ func teensyDriver(driverIndex int) {
 
 		// Push frame buffer changes to Teensy
 		for {
-			fb := <-src
+			var fb *framebuffer.FrameBuffer
+			select {
+			case fb = <-src:
+			case <-shutdownChan:
+				// Quiesced close: no writes in progress, queue flushed
+				closePortQuiesced(f)
+				return
+			}
 
 			// Skip if the frame buffer has no strips for this Teensy
 			// (e.g. a single Teensy configuration with a second port present)
@@ -108,9 +129,12 @@ func teensyDriver(driverIndex int) {
 				i++
 			}
 
+			// Bound the write; ignore the error as not all platforms
+			// support deadlines on serial ports (Linux does)
+			_ = f.SetWriteDeadline(time.Now().Add(teensyWriteTimeout))
 			if _, err := f.Write(data); err != nil {
 				slog.Warn("teensyDriver send failed", "error", err.Error())
-				f.Close()
+				closePortQuiesced(f)
 
 				// Close down listener then try and reconnect
 				done <- src
