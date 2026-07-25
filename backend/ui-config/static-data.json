@@ -60,6 +60,14 @@
     ]
     },
     {
+      "name": "Lava Lamp", "params": [
+      {"key": 140, "type": "colour", "label": "Blob Colour", "value": {"r": 255, "g": 16, "b": 0}},
+      {"key": 141, "type": "colour", "label": "Background", "value": {"r": 48, "g": 0, "b": 64}},
+      {"key": 142, "type": "range", "label": "Speed", "min": 1, "max": 10, "value": 3},
+      {"key": 143, "type": "range", "label": "Blobs", "min": 1, "max": 12, "value": 5}
+    ]
+    },
+    {
       "name": "Life", "params": [
       {"key": 120, "type": "colour", "label": "Colour", "value": {"r": 128, "g": 128, "b": 128}},
       {"key": 121, "type": "range", "label": "Duration(frames)", "min": 1, "max": 100, "value": 25},
