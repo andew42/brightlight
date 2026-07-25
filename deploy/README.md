@@ -40,17 +40,21 @@ The web UI is served on port 8080. The installer sources live in
 
 ## Manual build (this directory)
 
-This directory is the staging area for locally built artefacts.
+This directory is the staging area for locally built artefacts. Its layout
+matches the CI Pi bundle:
 
 | Path | Source | Description |
 |------|--------|-------------|
-| `brightlight` | `backend/` Go build | Linux ARM binary |
+| `brightlight` | `backend/` Go build | Linux ARMv7 binary (GOARM=7) |
 | `frontend/build/` | `frontend/` Vite build | React app static files |
 | `backend/ui-config/` | `backend/ui-config/` | Button/segment config JSON |
+| `brightlight.service` | `packaging/` | systemd unit |
+| `install.sh` | `packaging/` | Pi installer script |
 
 Run `full-build.sh` (Linux/macOS) or `full-build.bat` (Windows) from the repo
-root to populate it, then copy the three entries above to the Pi. With
-`BRIGHTLIGHT=<base>` the server expects:
+root to populate it — the scripts run the same steps as CI (`npm ci` +
+Vite build, `go vet`, ARMv7 cross-compile) — then copy the entries above to
+the Pi. With `BRIGHTLIGHT=<base>` the server expects:
 
 - Binary anywhere (conventionally `<base>/brightlight`)
 - Frontend at `<base>/frontend/build/`
