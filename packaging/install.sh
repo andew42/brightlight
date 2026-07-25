@@ -14,17 +14,26 @@
 #
 # The choice is stored in a systemd drop-in and kept across upgrades; when no
 # site is given the existing choice (or the built-in default, titania) is kept.
+#
+# The install itself runs detached (setsid) once the download completes, so a
+# dropped SSH connection can't kill it part-way: on a Pi 2B the Ethernet is on
+# the USB bus, and a wedged USB serial port can take the network (and this
+# session) down while the old service is being stopped. Progress is logged to
+# /var/log/brightlight-install.log — check it after reconnecting if the
+# session drops.
 
 set -euo pipefail
 
 main() {
     REPO="andew42/brightlight"
-    INSTALL_DIR="/opt/brightlight"
     TARBALL_URL="https://github.com/${REPO}/releases/latest/download/brightlight-pi.tar.gz"
-    USER_BUTTONS="${INSTALL_DIR}/backend/ui-config/user-buttons.json"
-    DROPIN_DIR="/etc/systemd/system/brightlight.service.d"
+    LOG="/var/log/brightlight-install.log"
 
-    SITE="${BRIGHTLIGHT_SITE:-}"
+    export INSTALL_DIR="/opt/brightlight"
+    export USER_BUTTONS_NAME="backend/ui-config/user-buttons.json"
+    export DROPIN_DIR="/etc/systemd/system/brightlight.service.d"
+
+    export SITE="${BRIGHTLIGHT_SITE:-}"
     while [ $# -gt 0 ]; do
         case "$1" in
             --site) SITE="${2:-}"; shift 2 ;;
@@ -42,6 +51,8 @@ main() {
         exit 1
     fi
 
+    # Until the detached stage takes over, clean the work dir on any failure
+    export WORK
     WORK="$(mktemp -d)"
     trap 'rm -rf "${WORK}"' EXIT
 
@@ -51,59 +62,90 @@ main() {
     curl -fsSL --retry 4 --retry-delay 2 -o "${WORK}/brightlight-pi.tar.gz" "${TARBALL_URL}"
 
     # Preserve user-edited buttons across upgrades
-    if [ -f "${USER_BUTTONS}" ]; then
-        cp "${USER_BUTTONS}" "${WORK}/user-buttons.json"
+    if [ -f "${INSTALL_DIR}/${USER_BUTTONS_NAME}" ]; then
+        cp "${INSTALL_DIR}/${USER_BUTTONS_NAME}" "${WORK}/user-buttons.json"
         echo "Preserving existing user-buttons.json"
     fi
 
-    # Stop the service, but never let it stall the install: units installed
-    # before TimeoutStopSec was added can hang `systemctl stop` for minutes
-    # if the binary is wedged, so give it 15s then SIGKILL and move on
-    echo "Stopping brightlight service (if running)..."
-    if ! timeout 15 systemctl stop brightlight 2>/dev/null; then
-        echo "Service did not stop within 15s; killing it"
-        systemctl kill -s SIGKILL brightlight 2>/dev/null || true
-        sleep 1
-    fi
+    write_stage2 > "${WORK}/stage2.sh"
 
-    # --unlink-first so extraction still succeeds if the old binary is
-    # somehow running (overwriting a running executable in place fails
-    # with "Text file busy")
-    echo "Installing to ${INSTALL_DIR} ..."
-    mkdir -p "${INSTALL_DIR}"
-    tar -xz --unlink-first -f "${WORK}/brightlight-pi.tar.gz" -C "${INSTALL_DIR}"
-    chmod +x "${INSTALL_DIR}/brightlight"
+    # Hand work-dir ownership to the detached stage (it cleans up itself)
+    trap - EXIT
+    : > "${LOG}"
+    setsid bash "${WORK}/stage2.sh" </dev/null >>"${LOG}" 2>&1 &
+    STAGE2_PID=$!
 
-    if [ -f "${WORK}/user-buttons.json" ]; then
-        cp "${WORK}/user-buttons.json" "${USER_BUTTONS}"
-    fi
-
-    echo "Installing systemd service..."
-    cp "${INSTALL_DIR}/brightlight.service" /etc/systemd/system/brightlight.service
-
-    if [ -n "${SITE}" ]; then
-        echo "Setting site layout to '${SITE}'"
-        mkdir -p "${DROPIN_DIR}"
-        printf '[Service]\nEnvironment=BRIGHTLIGHT_SITE=%s\n' "${SITE}" > "${DROPIN_DIR}/site.conf"
-    elif [ -f "${DROPIN_DIR}/site.conf" ]; then
-        echo "Keeping existing site layout: $(grep -o 'BRIGHTLIGHT_SITE=.*' "${DROPIN_DIR}/site.conf")"
+    echo "Installing (detached; survives a dropped SSH session)..."
+    echo "Log: ${LOG}"
+    tail --pid="${STAGE2_PID}" -n +1 -f "${LOG}" 2>/dev/null || true
+    if wait "${STAGE2_PID}"; then
+        exit 0
     else
-        echo "No --site given; using built-in default (titania)"
+        echo "Install failed — see ${LOG}" >&2
+        exit 1
     fi
-
-    systemctl daemon-reload
-    systemctl enable brightlight
-    systemctl restart brightlight
-
-    IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
-    echo
-    echo "Brightlight installed and running."
-    echo "  Web UI:  http://${IP:-<pi-address>}:8080"
-    echo "  Status:  systemctl status brightlight"
-    echo "  Logs:    journalctl -u brightlight -f"
 }
 
-# Wrapped in a function and invoked at the very end so that when the script
-# is streamed via `curl | bash` nothing executes until it has downloaded in
+# The part that must not die with the SSH session: stopping the old service,
+# replacing the files and restarting. Runs via setsid with all state passed
+# in the environment (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE).
+write_stage2() {
+    cat <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'rm -rf "${WORK}"' EXIT
+
+# Stop the service, but never let it stall the install: a binary wedged in
+# uninterruptible USB I/O can hang `systemctl stop` (and shrug off SIGKILL),
+# so bound the wait and carry on — extraction below copes with it running
+echo "Stopping brightlight service (if running)..."
+if ! timeout 15 systemctl stop brightlight 2>/dev/null; then
+    echo "Service did not stop within 15s; killing it"
+    systemctl kill -s SIGKILL brightlight 2>/dev/null || true
+    sleep 1
+fi
+
+# Remove the old binary first so extraction still succeeds if it is somehow
+# still running (writing over a running executable in place would fail with
+# "Text file busy"; GNU tar also unlinks regular files before extracting,
+# but be explicit rather than rely on it)
+echo "Installing to ${INSTALL_DIR} ..."
+mkdir -p "${INSTALL_DIR}"
+rm -f "${INSTALL_DIR}/brightlight"
+tar -xzf "${WORK}/brightlight-pi.tar.gz" -C "${INSTALL_DIR}"
+chmod +x "${INSTALL_DIR}/brightlight"
+
+if [ -f "${WORK}/user-buttons.json" ]; then
+    cp "${WORK}/user-buttons.json" "${INSTALL_DIR}/${USER_BUTTONS_NAME}"
+fi
+
+echo "Installing systemd service..."
+cp "${INSTALL_DIR}/brightlight.service" /etc/systemd/system/brightlight.service
+
+if [ -n "${SITE}" ]; then
+    echo "Setting site layout to '${SITE}'"
+    mkdir -p "${DROPIN_DIR}"
+    printf '[Service]\nEnvironment=BRIGHTLIGHT_SITE=%s\n' "${SITE}" > "${DROPIN_DIR}/site.conf"
+elif [ -f "${DROPIN_DIR}/site.conf" ]; then
+    echo "Keeping existing site layout: $(grep -o 'BRIGHTLIGHT_SITE=.*' "${DROPIN_DIR}/site.conf")"
+else
+    echo "No --site given; using built-in default (titania)"
+fi
+
+systemctl daemon-reload
+systemctl enable brightlight
+systemctl restart brightlight
+
+IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+echo
+echo "Brightlight installed and running."
+echo "  Web UI:  http://${IP:-<pi-address>}:8080"
+echo "  Status:  systemctl status brightlight"
+echo "  Logs:    journalctl -u brightlight -f"
+EOF
+}
+
+# Wrapped in functions invoked at the very end so that when the script is
+# streamed via `curl | bash` nothing executes until it has downloaded in
 # full — a dropped connection part-way can't run half an install
 main "$@"
