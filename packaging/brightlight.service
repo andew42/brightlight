@@ -9,6 +9,9 @@ WorkingDirectory=/opt/brightlight
 ExecStart=/opt/brightlight/brightlight
 Restart=always
 RestartSec=5
+# Don't let a wedged binary (e.g. blocked on USB serial) stall
+# `systemctl stop` for the 90s default before SIGKILL
+TimeoutStopSec=10
 
 [Install]
 WantedBy=multi-user.target

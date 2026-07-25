@@ -13,7 +13,7 @@
     /* Dead area below the bottom button row so the iOS swipe-up home
        gesture doesn't trigger a button (.App's safe-area-inset-bottom
        alone isn't enough — the swipe registers a touch above it) */
-    padding-bottom: 38px;
+    padding-bottom: 76px;
     background-color: purple;
 }
 
