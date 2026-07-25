@@ -86,29 +86,26 @@ main() {
     fi
 }
 
-# The part that must not die with the SSH session: stopping the old service,
-# replacing the files and restarting. Runs via setsid with all state passed
-# in the environment (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE).
+# The part that must not die with the SSH session: replacing the files and
+# restarting the service. Runs via setsid with all state passed in the
+# environment (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE).
+#
+# Ordering matters: killing a brightlight binary wedged in uninterruptible
+# USB serial I/O has been seen to freeze the whole kernel (dwc_otg IRQ
+# storm — on a Pi 2B the Ethernet and everything else goes with it, and
+# un-synced writes are lost on the power cycle). So install and sync ALL
+# files BEFORE touching the running service, and arm the hardware watchdog
+# around the restart so a frozen kernel hard-resets into the new install
+# instead of sitting dead until someone pulls the plug.
 write_stage2() {
     cat <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 trap 'rm -rf "${WORK}"' EXIT
 
-# Stop the service, but never let it stall the install: a binary wedged in
-# uninterruptible USB I/O can hang `systemctl stop` (and shrug off SIGKILL),
-# so bound the wait and carry on — extraction below copes with it running
-echo "Stopping brightlight service (if running)..."
-if ! timeout 15 systemctl stop brightlight 2>/dev/null; then
-    echo "Service did not stop within 15s; killing it"
-    systemctl kill -s SIGKILL brightlight 2>/dev/null || true
-    sleep 1
-fi
-
-# Remove the old binary first so extraction still succeeds if it is somehow
-# still running (writing over a running executable in place would fail with
-# "Text file busy"; GNU tar also unlinks regular files before extracting,
-# but be explicit rather than rely on it)
+# Install everything first, with the old service still running. The old
+# binary is unlinked (not overwritten) so the running process is untouched;
+# it keeps executing the old inode until we restart it below
 echo "Installing to ${INSTALL_DIR} ..."
 mkdir -p "${INSTALL_DIR}"
 rm -f "${INSTALL_DIR}/brightlight"
@@ -134,7 +131,41 @@ fi
 
 systemctl daemon-reload
 systemctl enable brightlight
-systemctl restart brightlight
+
+# Everything the new install needs is now on disk — flush it (log included)
+# so nothing is lost even if restarting the old service freezes the kernel
+echo "Files installed. Restarting the service..."
+echo "(If the Pi freezes or reboots at this point the install has still"
+echo " completed — after the reboot it will be running the new version)"
+sync
+
+# Arm the hardware watchdog: opening /dev/watchdog starts a ~15s countdown
+# that hard-resets the Pi unless petted, and a background petter keeps it
+# at bay. If killing the wedged old process freezes the kernel, the petter
+# freezes too and the watchdog reboots us into the new install
+WD_PET=""
+if [ -w /dev/watchdog ]; then
+    exec 3>/dev/watchdog
+    ( while true; do printf '.' >&3; sleep 5; done ) &
+    WD_PET=$!
+fi
+
+if ! timeout 30 systemctl restart brightlight; then
+    echo "Service restart timed out (old process wedged); forcing a reboot"
+    sync
+    # Stop petting but leave the watchdog armed: if even the forced reboot
+    # freezes, it hard-resets the Pi within ~15s anyway
+    [ -n "${WD_PET}" ] && kill "${WD_PET}" 2>/dev/null
+    systemctl --force --force reboot || echo b > /proc/sysrq-trigger
+    exit 0
+fi
+
+# Healthy restart — disarm the watchdog ('V' magic close stops the countdown)
+if [ -n "${WD_PET}" ]; then
+    kill "${WD_PET}" 2>/dev/null || true
+    printf 'V' >&3
+    exec 3>&-
+fi
 
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 echo
