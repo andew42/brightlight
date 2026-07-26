@@ -16,11 +16,9 @@
 # site is given the existing choice (or the built-in default, titania) is kept.
 #
 # The install itself runs detached (setsid) once the download completes, so a
-# dropped SSH connection can't kill it part-way: on a Pi 2B the Ethernet is on
-# the USB bus, and a wedged USB serial port can take the network (and this
-# session) down while the old service is being stopped. Progress is logged to
-# /var/log/brightlight-install.log — check it after reconnecting if the
-# session drops.
+# dropped SSH connection can't kill it part-way and leave a half-applied
+# upgrade. Progress is logged to /var/log/brightlight-install.log — check it
+# after reconnecting if the session drops.
 
 set -euo pipefail
 
@@ -90,13 +88,10 @@ main() {
 # restarting the service. Runs via setsid with all state passed in the
 # environment (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE).
 #
-# Ordering matters: killing a brightlight binary wedged in uninterruptible
-# USB serial I/O has been seen to freeze the whole kernel (dwc_otg IRQ
-# storm — on a Pi 2B the Ethernet and everything else goes with it, and
-# un-synced writes are lost on the power cycle). So install and sync ALL
-# files BEFORE touching the running service, and arm the hardware watchdog
-# around the restart so a frozen kernel hard-resets into the new install
-# instead of sitting dead until someone pulls the plug.
+# Ordering matters: install and sync ALL files while the old service is
+# still running, and only restart it once the upgrade is complete on disk.
+# That way an interrupted restart leaves the new version installed and
+# starting on the next boot, rather than a half-applied upgrade.
 write_stage2() {
     cat <<'EOF'
 #!/usr/bin/env bash
@@ -133,42 +128,18 @@ systemctl daemon-reload
 systemctl enable brightlight
 
 # Everything the new install needs is now on disk — flush it (log included)
-# so nothing is lost even if restarting the old service freezes the kernel
+# before restarting, so the upgrade is durable whatever the restart does
 echo "Files installed. Restarting the service..."
-echo "(If the Pi freezes or reboots at this point the install has still"
-echo " completed — after the reboot it will be running the new version)"
 sync
 
-# Arm the hardware watchdog: opening /dev/watchdog starts a ~15s countdown
-# that hard-resets the Pi unless petted, and a background petter keeps it
-# at bay. If killing the wedged old process freezes the kernel, the petter
-# freezes too and the watchdog reboots us into the new install.
-# The open fails with EBUSY when something already owns the watchdog
-# (e.g. systemd's RuntimeWatchdogSec) — that's fine: the existing owner
-# provides the same freeze protection, so continue without it
-WD_PET=""
-if { exec 3>/dev/watchdog; } 2>/dev/null; then
-    ( while true; do printf '.' >&3; sleep 5; done ) &
-    WD_PET=$!
-else
-    echo "Hardware watchdog unavailable (absent or already in use); continuing without it"
-fi
-
+# Bound the restart so the install can't sit here indefinitely. The service
+# is already enabled and the new files are in place, so a restart that does
+# not complete still leaves the Pi running the new version after a reboot
 if ! timeout 30 systemctl restart brightlight; then
-    echo "Service restart timed out (old process wedged); forcing a reboot"
-    sync
-    # Stop petting but leave the watchdog armed: if even the forced reboot
-    # freezes, it hard-resets the Pi within ~15s anyway
-    [ -n "${WD_PET}" ] && kill "${WD_PET}" 2>/dev/null
-    systemctl --force --force reboot || echo b > /proc/sysrq-trigger
-    exit 0
-fi
-
-# Healthy restart — disarm the watchdog ('V' magic close stops the countdown)
-if [ -n "${WD_PET}" ]; then
-    kill "${WD_PET}" 2>/dev/null || true
-    printf 'V' >&3
-    exec 3>&-
+    echo "Service restart did not complete within 30s."
+    echo "The upgrade is installed; reboot the Pi to start the new version:"
+    echo "  sudo reboot"
+    exit 1
 fi
 
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
