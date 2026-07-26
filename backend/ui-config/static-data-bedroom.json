@@ -42,7 +42,8 @@
       {"key":141, "type":"colour", "label":"Background", "value":{"r":48, "g":0, "b":64}},
       {"key":142, "type":"range", "label":"Speed", "min":1, "max":25, "value":22},
       {"key":143, "type":"range", "label":"Blobs", "min":1, "max":12, "value":5},
-      {"key":144, "type":"range", "label":"Blob Size", "min":1, "max":25, "value":12}
+      {"key":144, "type":"range", "label":"Blob Size Min", "min":1, "max":25, "value":8},
+      {"key":145, "type":"range", "label":"Blob Size Max", "min":1, "max":25, "value":16}
     ]},
     {"name":"Life", "params":[
       {"key":120, "type":"colour", "label":"Colour", "value":{"r":128, "g":128, "b":128}},

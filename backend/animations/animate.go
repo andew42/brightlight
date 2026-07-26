@@ -220,16 +220,20 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 		if err == nil {
 			blobCount, err = seg.Params.asRange(3)
 		}
-		var blobSize int
+		var sizeMin int
 		if err == nil {
-			blobSize, err = seg.Params.asRange(4)
+			sizeMin, err = seg.Params.asRange(4)
 		}
-		if err == nil && (speed < 1 || blobCount < 1 || blobSize < 1) {
+		var sizeMax int
+		if err == nil {
+			sizeMax, err = seg.Params.asRange(5)
+		}
+		if err == nil && (speed < 1 || blobCount < 1 || sizeMin < 1 || sizeMax < 1) {
 			err = errors.New("bad speed, blob count or blob size parameters")
 		}
 		if err == nil {
 			*animators = append(*animators,
-				segActionAndAnimator{seg, newLava(blobColour, background, speed, blobCount, blobSize)})
+				segActionAndAnimator{seg, newLava(blobColour, background, speed, blobCount, sizeMin, sizeMax)})
 		} else {
 			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
