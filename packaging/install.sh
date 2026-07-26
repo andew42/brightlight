@@ -19,6 +19,11 @@
 # dropped SSH connection can't kill it part-way and leave a half-applied
 # upgrade. Progress is logged to /var/log/brightlight-install.log — check it
 # after reconnecting if the session drops.
+#
+# The last step is a reboot rather than a service restart: restarting in place
+# proved unreliable (the old process can hold the Teensy serial port open), and
+# the Pi comes back in a known state with the service started from boot. The
+# SSH session ends with the reboot — that is expected, not a failure.
 
 set -euo pipefail
 
@@ -85,12 +90,12 @@ main() {
 }
 
 # The part that must not die with the SSH session: replacing the files and
-# restarting the service. Runs via setsid with all state passed in the
-# environment (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE).
+# rebooting. Runs via setsid with all state passed in the environment
+# (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE).
 #
 # Ordering matters: install and sync ALL files while the old service is
-# still running, and only restart it once the upgrade is complete on disk.
-# That way an interrupted restart leaves the new version installed and
+# still running, and only reboot once the upgrade is complete on disk.
+# That way an interrupted reboot leaves the new version installed and
 # starting on the next boot, rather than a half-applied upgrade.
 write_stage2() {
     cat <<'EOF'
@@ -128,26 +133,29 @@ systemctl daemon-reload
 systemctl enable brightlight
 
 # Everything the new install needs is now on disk — flush it (log included)
-# before restarting, so the upgrade is durable whatever the restart does
-echo "Files installed. Restarting the service..."
+# before rebooting, so the upgrade is durable whatever the reboot does
+echo "Files installed."
 sync
-
-# Bound the restart so the install can't sit here indefinitely. The service
-# is already enabled and the new files are in place, so a restart that does
-# not complete still leaves the Pi running the new version after a reboot
-if ! timeout 30 systemctl restart brightlight; then
-    echo "Service restart did not complete within 30s."
-    echo "The upgrade is installed; reboot the Pi to start the new version:"
-    echo "  sudo reboot"
-    exit 1
-fi
 
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 echo
-echo "Brightlight installed and running."
+echo "Brightlight installed. Rebooting to start the new version."
+echo "Your SSH session will drop; the Pi should be back in under a minute."
 echo "  Web UI:  http://${IP:-<pi-address>}:8080"
 echo "  Status:  systemctl status brightlight"
 echo "  Logs:    journalctl -u brightlight -f"
+
+# Let the foreground session's tail flush the lines above to the terminal
+# before the system goes down
+sleep 2
+
+# The service is enabled, so the new version starts from boot. If the reboot
+# request itself fails the upgrade is still fully installed on disk
+if ! systemctl reboot; then
+    echo "Reboot request failed. The upgrade is installed; reboot to start it:"
+    echo "  sudo reboot"
+    exit 1
+fi
 EOF
 }
 

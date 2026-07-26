@@ -14,6 +14,11 @@ This installs everything to `/opt/brightlight`, sets up the `brightlight`
 systemd service so it starts on boot, and preserves `user-buttons.json`
 across upgrades.
 
+The installer finishes by rebooting the Pi rather than restarting the service
+in place, which proved unreliable. The SSH session drops when it goes down —
+that is the normal end of a successful install, not a failure. The Pi comes
+back with the new version running.
+
 ### Site selection
 
 One build drives both installations. Select which hardware layout a Pi runs
