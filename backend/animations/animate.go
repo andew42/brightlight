@@ -205,7 +205,7 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}
 
-	case "Lava Lamp":
+	case "Lava":
 		var err error
 		blobColour, err := seg.Params.asColour(0)
 		var background framebuffer.Rgb
@@ -220,12 +220,16 @@ func appendAnimatorsForAction(animators *[]segActionAndAnimator, seg SegmentActi
 		if err == nil {
 			blobCount, err = seg.Params.asRange(3)
 		}
-		if err == nil && (speed < 1 || blobCount < 1) {
-			err = errors.New("bad speed or blob count parameters")
+		var blobSize int
+		if err == nil {
+			blobSize, err = seg.Params.asRange(4)
+		}
+		if err == nil && (speed < 1 || blobCount < 1 || blobSize < 1) {
+			err = errors.New("bad speed, blob count or blob size parameters")
 		}
 		if err == nil {
 			*animators = append(*animators,
-				segActionAndAnimator{seg, newLava(blobColour, background, speed, blobCount)})
+				segActionAndAnimator{seg, newLava(blobColour, background, speed, blobCount, blobSize)})
 		} else {
 			slog.Warn("Bad animation parameter", "params", seg.Params, "error", err.Error())
 		}

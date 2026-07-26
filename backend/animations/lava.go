@@ -8,7 +8,7 @@ import (
 	"github.com/andew42/brightlight/segment"
 )
 
-// Lava lamp effect: distinct blobs of one colour drift slowly through a
+// Lava effect: distinct blobs of one colour drift slowly through a
 // background colour, merging and separating like wax in a lava lamp.
 // Each blob's position and size are driven by summed sine waves with
 // randomised frequencies and phases. The blobs contribute to a
@@ -42,7 +42,24 @@ func toFloat64Rgb(c framebuffer.Rgb) float64Rgb {
 	return float64Rgb{float64(c.Red), float64(c.Green), float64(c.Blue)}
 }
 
-func newLava(blobColour framebuffer.Rgb, background framebuffer.Rgb, speed int, blobCount int) *lava {
+// Speed 1..10 maps exponentially onto a drift rate. 10 is the fastest and
+// matches what used to be speed 5; 1 is ten times slower than the old
+// slowest setting so the lamp can be made to creep.
+const (
+	lavaSlowestRate = 0.02
+	lavaFastestRate = 1.0
+)
+
+func lavaSpeedRate(speed int) float64 {
+	if speed < 1 {
+		speed = 1
+	} else if speed > 10 {
+		speed = 10
+	}
+	return lavaSlowestRate * math.Pow(lavaFastestRate/lavaSlowestRate, float64(speed-1)/9)
+}
+
+func newLava(blobColour framebuffer.Rgb, background framebuffer.Rgb, speed int, blobCount int, blobSize int) *lava {
 
 	blobs := make([]lavaBlob, blobCount)
 	for i := range blobs {
@@ -60,10 +77,10 @@ func newLava(blobColour framebuffer.Rgb, background framebuffer.Rgb, speed int, 
 	return &lava{
 		blobColour: toFloat64Rgb(blobColour),
 		background: toFloat64Rgb(background),
-		// speed 1..10 scaled so mid values take tens of seconds per drift cycle
-		speed: float64(speed) * 0.2,
-		// Base blob radius as a fraction of the segment, smaller with more blobs
-		radius: 0.5 / float64(blobCount),
+		speed:      lavaSpeedRate(speed),
+		// Base blob radius as a fraction of the segment, smaller with more
+		// blobs, scaled by blob size 1..10 (5 is the natural size)
+		radius: 0.5 / float64(blobCount) * float64(blobSize) / 5.0,
 		blobs:  blobs,
 	}
 }
