@@ -42,21 +42,31 @@ func toFloat64Rgb(c framebuffer.Rgb) float64Rgb {
 	return float64Rgb{float64(c.Red), float64(c.Green), float64(c.Blue)}
 }
 
-// Speed 1..10 maps exponentially onto a drift rate. 10 is the fastest and
-// matches what used to be speed 5; 1 is ten times slower than the old
-// slowest setting so the lamp can be made to creep.
+// Both sliders run 1..25. Speed maps exponentially onto a drift rate,
+// 25 being the fastest, so the bottom of the slider is a barely
+// perceptible creep. Blob size scales the base radius linearly, with
+// lavaNaturalSize giving the natural radius for the blob count.
 const (
-	lavaSlowestRate = 0.02
+	lavaSliderSteps = 25
+	lavaSlowestRate = 0.002
 	lavaFastestRate = 1.0
+	lavaNaturalSize = 12.0
 )
 
-func lavaSpeedRate(speed int) float64 {
-	if speed < 1 {
-		speed = 1
-	} else if speed > 10 {
-		speed = 10
+func clampSlider(v int) int {
+	if v < 1 {
+		return 1
 	}
-	return lavaSlowestRate * math.Pow(lavaFastestRate/lavaSlowestRate, float64(speed-1)/9)
+	if v > lavaSliderSteps {
+		return lavaSliderSteps
+	}
+	return v
+}
+
+func lavaSpeedRate(speed int) float64 {
+	speed = clampSlider(speed)
+	return lavaSlowestRate * math.Pow(lavaFastestRate/lavaSlowestRate,
+		float64(speed-1)/float64(lavaSliderSteps-1))
 }
 
 func newLava(blobColour framebuffer.Rgb, background framebuffer.Rgb, speed int, blobCount int, blobSize int) *lava {
@@ -79,8 +89,8 @@ func newLava(blobColour framebuffer.Rgb, background framebuffer.Rgb, speed int, 
 		background: toFloat64Rgb(background),
 		speed:      lavaSpeedRate(speed),
 		// Base blob radius as a fraction of the segment, smaller with more
-		// blobs, scaled by blob size 1..10 (5 is the natural size)
-		radius: 0.5 / float64(blobCount) * float64(blobSize) / 5.0,
+		// blobs, scaled by the blob size slider
+		radius: 0.5 / float64(blobCount) * float64(clampSlider(blobSize)) / lavaNaturalSize,
 		blobs:  blobs,
 	}
 }
