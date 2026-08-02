@@ -1,43 +1,39 @@
 package servers
 
 import (
-	"crypto/subtle"
 	"encoding/json"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/andew42/brightlight/animations"
 )
 
-// Alexa voice control endpoints, served over HTTPS on a separate port with
-// a separate mux so only these two routes are ever exposed through the
-// router. The feature is opt-in: if BRIGHTLIGHT_ALEXA_TOKEN is unset the
-// listener is not started at all.
+// Alexa voice control. The Alexa service calls this endpoint directly (there
+// is no Lambda), so it is the one part of brightlight reachable from the
+// internet — a reverse proxy terminates TLS and forwards the single route
+// below. It gets its own port and mux so nothing else can ever be exposed by
+// a proxy misconfiguration, and requests are only acted on when they carry a
+// valid Amazon signature and our skill id.
 //
-//	POST /alexa/RunButton {"button":"sweet shop"} -> runs the button
-//	GET  /alexa/Buttons                           -> lists button names
+//	POST /alexa/skill   <- Alexa request envelope, speech response back
+//
+// The feature is opt-in and fails closed: without BRIGHTLIGHT_ALEXA_SKILL_ID
+// there is nothing to bind requests to our skill, so the listener does not
+// start at all.
 
-// StartAlexaServer Start the Alexa HTTPS listener if configured.
+// StartAlexaServer Start the Alexa listener if configured.
 // uiConfigDir is the filesystem path to the ui-config directory.
 func StartAlexaServer(uiConfigDir string) {
 
-	token := os.Getenv("BRIGHTLIGHT_ALEXA_TOKEN")
-	if token == "" {
-		slog.Info("BRIGHTLIGHT_ALEXA_TOKEN not set, Alexa endpoint disabled")
-		return
-	}
-	if len(token) < 32 {
-		slog.Warn("BRIGHTLIGHT_ALEXA_TOKEN is short, use at least 32 random characters")
-	}
-
-	certPath := os.Getenv("BRIGHTLIGHT_ALEXA_CERT")
-	keyPath := os.Getenv("BRIGHTLIGHT_ALEXA_KEY")
-	if certPath == "" || keyPath == "" {
-		slog.Error("BRIGHTLIGHT_ALEXA_CERT or BRIGHTLIGHT_ALEXA_KEY not set, Alexa endpoint disabled")
+	skillId := os.Getenv("BRIGHTLIGHT_ALEXA_SKILL_ID")
+	if skillId == "" {
+		slog.Info("BRIGHTLIGHT_ALEXA_SKILL_ID not set, Alexa endpoint disabled")
 		return
 	}
 
@@ -47,29 +43,13 @@ func StartAlexaServer(uiConfigDir string) {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/alexa/RunButton", requireAlexaToken(token, getRunButtonHandler(uiConfigDir)))
-	mux.HandleFunc("/alexa/Buttons", requireAlexaToken(token, getButtonsHandler(uiConfigDir)))
+	mux.HandleFunc("/alexa/skill", getSkillHandler(uiConfigDir, skillId, newAlexaVerifier()))
 
 	go func() {
-		slog.Info("serving Alexa endpoint", "port", port)
-		err := http.ListenAndServeTLS(":"+port, certPath, keyPath, mux)
+		slog.Info("serving Alexa endpoint", "port", port, "skillId", skillId)
+		err := http.ListenAndServe(":"+port, mux)
 		slog.Error("Alexa server exited", "err", err)
 	}()
-}
-
-// Reject requests without the expected bearer token
-func requireAlexaToken(token string, handler http.HandlerFunc) http.HandlerFunc {
-
-	expected := []byte("Bearer " + token)
-	return func(w http.ResponseWriter, r *http.Request) {
-		supplied := []byte(r.Header.Get("Authorization"))
-		if subtle.ConstantTimeCompare(supplied, expected) != 1 {
-			slog.Warn("Alexa request with bad token", "remote", r.RemoteAddr)
-			http.Error(w, "unauthorized", 401)
-			return
-		}
-		handler(w, r)
-	}
 }
 
 // The button file also contains user segments which we ignore here
@@ -178,8 +158,67 @@ func findButtonByName(buttons []animations.Button, spoken string) *animations.Bu
 	return &buttons[best]
 }
 
-// Handle POST /alexa/RunButton {"button":"name"}
-func getRunButtonHandler(uiConfigDir string) http.HandlerFunc {
+// The parts of an Alexa request envelope we act on. The application id
+// appears under session for a spoken interaction and under context for
+// requests that arrive outside one, so both are read.
+type alexaEnvelope struct {
+	Session struct {
+		Application struct {
+			ApplicationId string `json:"applicationId"`
+		} `json:"application"`
+	} `json:"session"`
+	Context struct {
+		System struct {
+			Application struct {
+				ApplicationId string `json:"applicationId"`
+			} `json:"application"`
+		} `json:"System"`
+	} `json:"context"`
+	Request struct {
+		Type      string    `json:"type"`
+		Timestamp time.Time `json:"timestamp"`
+		Intent    struct {
+			Name  string `json:"name"`
+			Slots map[string]struct {
+				Value string `json:"value"`
+			} `json:"slots"`
+		} `json:"intent"`
+	} `json:"request"`
+}
+
+func (e alexaEnvelope) applicationId() string {
+
+	if id := e.Session.Application.ApplicationId; id != "" {
+		return id
+	}
+	return e.Context.System.Application.ApplicationId
+}
+
+type alexaSpeech struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
+type alexaResponse struct {
+	Version  string `json:"version"`
+	Response struct {
+		// A pointer so SessionEndedRequest can answer without speech
+		OutputSpeech     *alexaSpeech `json:"outputSpeech,omitempty"`
+		ShouldEndSession bool         `json:"shouldEndSession"`
+	} `json:"response"`
+}
+
+func speak(text string, endSession bool) alexaResponse {
+
+	var r alexaResponse
+	r.Version = "1.0"
+	r.Response.OutputSpeech = &alexaSpeech{Type: "PlainText", Text: text}
+	r.Response.ShouldEndSession = endSession
+	return r
+}
+
+// Handle POST /alexa/skill, the endpoint registered with the Alexa skill
+func getSkillHandler(uiConfigDir string, skillId string, verifier *alexaVerifier) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -188,44 +227,112 @@ func getRunButtonHandler(uiConfigDir string) http.HandlerFunc {
 			return
 		}
 
-		var request struct {
-			Button string
-		}
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024)).Decode(&request); err != nil {
-			slog.Warn("RunButton bad body", "err", err.Error())
+		// The signature covers the exact bytes Amazon sent, so the body is
+		// read whole and checked before anything is unmarshalled from it
+		body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 64*1024))
+		if err != nil {
+			slog.Warn("Alexa request body unreadable", "err", err.Error())
 			http.Error(w, "bad request", 400)
 			return
 		}
 
-		buttons, err := loadButtons(uiConfigDir)
-		if err != nil {
-			slog.Error("RunButton failed to load buttons", "err", err.Error())
-			http.Error(w, "failed to load buttons", 500)
+		if err = verifier.verify(r.Header.Get("SignatureCertChainUrl"),
+			r.Header.Get("Signature-256"), body); err != nil {
+			slog.Warn("Alexa request failed signature check", "remote", r.RemoteAddr, "err", err.Error())
+			http.Error(w, "unauthorized", 401)
 			return
 		}
 
-		button := findButtonByName(buttons, request.Button)
-		if button == nil {
-			slog.Info("RunButton no matching button", "button", request.Button)
-			http.Error(w, "button not found", 404)
+		var envelope alexaEnvelope
+		if err = json.Unmarshal(body, &envelope); err != nil {
+			slog.Warn("Alexa request bad body", "err", err.Error())
+			http.Error(w, "bad request", 400)
 			return
 		}
-		slog.Info("RunButton called", "heard", request.Button, "matched", button.Name)
 
-		// Run the animation and keep UI button pads in sync
-		animations.RunAnimations(button.Segments)
-		updateActiveButtonKey(button.Key)
+		// A signature only proves the request came from Amazon; anyone can
+		// aim their own skill at this URL, so the application id is what
+		// says it came from ours
+		if envelope.applicationId() != skillId {
+			slog.Warn("Alexa request from unexpected skill", "skillId", envelope.applicationId())
+			http.Error(w, "unauthorized", 401)
+			return
+		}
 
+		if err = checkAlexaTimestamp(envelope.Request.Timestamp, verifier.now()); err != nil {
+			slog.Warn("Alexa request timestamp rejected", "err", err.Error())
+			http.Error(w, "unauthorized", 401)
+			return
+		}
+
+		response, _ := json.Marshal(handleAlexaRequest(uiConfigDir, envelope))
 		w.Header().Set("Content-Type", "application/json")
-		response, _ := json.Marshal(struct{ Matched string }{button.Name})
 		if _, err = w.Write(response); err != nil {
-			slog.Warn("RunButton failed to write response", "err", err.Error())
+			slog.Warn("Alexa failed to write response", "err", err.Error())
 		}
 	}
 }
 
-// Handle GET /alexa/Buttons returning a JSON array of button names
-func getButtonsHandler(uiConfigDir string) http.HandlerFunc {
+// Turn a verified request into the speech Alexa should say back
+func handleAlexaRequest(uiConfigDir string, envelope alexaEnvelope) alexaResponse {
+
+	switch envelope.Request.Type {
+
+	case "LaunchRequest":
+		return speak("Which light setting would you like?", false)
+
+	case "IntentRequest":
+		switch envelope.Request.Intent.Name {
+
+		case "RunButtonIntent":
+			spoken := envelope.Request.Intent.Slots["buttonName"].Value
+			if spoken == "" {
+				return speak("Which light setting would you like?", false)
+			}
+			return runSpokenButton(uiConfigDir, spoken)
+
+		case "AMAZON.HelpIntent":
+			return speak("Say the name of a light setting, for example rainbow.", false)
+
+		default: // AMAZON.StopIntent, AMAZON.CancelIntent etc.
+			return speak("Goodbye.", true)
+		}
+
+	default: // SessionEndedRequest must not include speech
+		var r alexaResponse
+		r.Version = "1.0"
+		r.Response.ShouldEndSession = true
+		return r
+	}
+}
+
+// Find the button matching what was heard and run it
+func runSpokenButton(uiConfigDir string, spoken string) alexaResponse {
+
+	buttons, err := loadButtons(uiConfigDir)
+	if err != nil {
+		slog.Error("Alexa failed to load buttons", "err", err.Error())
+		return speak("I couldn't read the light settings.", true)
+	}
+
+	button := findButtonByName(buttons, spoken)
+	if button == nil {
+		slog.Info("Alexa no matching button", "heard", spoken)
+		return speak("I couldn't find a light setting called "+spoken+".", true)
+	}
+	slog.Info("Alexa run button", "heard", spoken, "matched", button.Name)
+
+	// Run the animation and keep UI button pads in sync
+	animations.RunAnimations(button.Segments)
+	updateActiveButtonKey(button.Key)
+	return speak("OK, "+button.Name+".", true)
+}
+
+// GetAlexaButtonsHandler Handle GET /api/AlexaButtons returning a JSON array
+// of button names to paste into the skill's slot values. It lives on the LAN
+// server rather than the Alexa listener so nothing but the skill route is
+// ever reachable from the internet.
+func GetAlexaButtonsHandler(uiConfigDir string) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 

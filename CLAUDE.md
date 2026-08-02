@@ -6,7 +6,7 @@ A domestic LED lighting controller. A Go web server runs on a Raspberry Pi and
 drives WS2811 pixel-addressable LED strips via a Teensy 3.x microcontroller
 connected over USB serial. A React web app (served by the Go server) lets the
 user choose and configure lighting animations. An optional Alexa custom skill
-(AWS Lambda) provides voice control of the configured buttons.
+calling the server directly provides voice control of the configured buttons.
 
 ## Repository layout
 
@@ -33,8 +33,7 @@ brightlight/
 │   ├── stats/         Performance statistics
 │   └── ui-config/     Button/segment config JSON (served via /api/ui-config)
 ├── alexa/             Alexa voice control (see alexa/readme.md)
-│   ├── interaction-model.json  Custom skill interaction model
-│   └── lambda/        AWS Lambda (Go module, aws-lambda-go) calling the server
+│   └── interaction-model.json  Custom skill interaction model
 ├── firmware/          Arduino/Teensy C firmware (OctoWS2811)
 ├── packaging/         Pi install: systemd unit + install.sh (bundled by CI)
 ├── deploy/            Staging area for Pi deployment artefacts (generated)
@@ -53,7 +52,7 @@ brightlight/
 | Frontend | React 19, React Router 7, Vite 8 (semantic-ui removed) |
 | Backend | Go 1.26, stdlib only (log/slog, net/http with SSE) — zero external deps |
 | Hardware | Raspberry Pi 2B (Linux ARMv7), Teensy 3.x, WS2811 LED strips |
-| Voice | Alexa custom skill → AWS Lambda (separate Go module, aws-lambda-go) |
+| Voice | Alexa custom skill → HTTPS endpoint on the Go server (no Lambda, no AWS) |
 | Build | Vite (frontend), cross-compiled Go GOOS=linux GOARCH=arm GOARM=7 (backend) |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`) → rolling `latest` GitHub release |
 
@@ -76,10 +75,11 @@ When `BRIGHTLIGHT` is unset (development) static content is not served — use
 the Vite dev server, which proxies `/api` to `http://localhost:8080` — and
 button config is read from `ui-config/` relative to the working directory.
 
-The Alexa endpoint is opt-in via env vars (see `alexa/readme.md`): it starts
-only when `BRIGHTLIGHT_ALEXA_TOKEN` is set, needs `BRIGHTLIGHT_ALEXA_CERT` /
-`BRIGHTLIGHT_ALEXA_KEY` (TLS cert/key paths), and listens on its own HTTPS
-port (`BRIGHTLIGHT_ALEXA_PORT`, default 8443).
+The Alexa endpoint is opt-in (see `alexa/readme.md`): it starts only when
+`BRIGHTLIGHT_ALEXA_SKILL_ID` is set, and listens on its own plain-HTTP port
+(`BRIGHTLIGHT_ALEXA_PORT`, default 8443) with TLS terminated by the Caddy
+reverse proxy in front of it. Fail-closed is deliberate: the skill id is what
+binds a request to our skill, so without it there is nothing to check.
 
 ## How to build
 
@@ -117,13 +117,15 @@ All API routes are under `/api`. The push channels use Server-Sent Events
 | `/api/Stats` | SSE | Push performance stats |
 | `/api/option/` | POST | Set server options |
 
-The Alexa endpoints live on a separate opt-in HTTPS listener (default port
-8443, bearer-token auth — see `backend/servers/alexa.go`):
+`/api/AlexaButtons` (GET) lists button names for pasting into the skill's slot
+values; it is on the LAN server so it is never exposed to the internet.
+
+The skill endpoint itself lives on a separate opt-in listener (default port
+8443 — see `backend/servers/alexa.go`), which serves exactly one route:
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/alexa/RunButton` | POST | Run a button by spoken name (`{"button":"rainbow"}`) |
-| `/alexa/Buttons` | GET | List button names (for skill slot values) |
+| `/alexa/skill` | POST | Alexa request envelope in, speech response out |
 
 ## Key gotchas and past decisions
 
@@ -166,14 +168,26 @@ Reorganised from flat layout into `frontend/`, `backend/`, `deploy/` to allow
 opening each part as a separate IntelliJ project. Previously `ui2/` was the
 frontend and all Go files lived at the repo root.
 
-### Alexa voice control (July 2026)
-Voice control goes Alexa → custom skill → AWS Lambda (`alexa/lambda/`, its own
-Go module with the repo's only external dep, `aws-lambda-go`) → HTTPS + bearer
-token + pinned self-signed cert → `/alexa/RunButton` on the brightlight box.
-The backend module itself remains stdlib-only. Spoken names are fuzzy-matched
-against button names in `user-buttons.json` (fallback `default-buttons.json`).
-The listener is disabled unless `BRIGHTLIGHT_ALEXA_TOKEN` is set. Setup steps
-in `alexa/readme.md`; design discussion in `docs/alexa-integration-plan.md`.
+### Alexa voice control (July 2026, revised August 2026)
+Voice control goes Alexa → custom skill → HTTPS straight to
+`bedroom-lights.elms.andrewandlaura.com/alexa/skill`, where the site's Caddy
+reverse proxy terminates TLS and forwards that one path to the Pi.
+The original design put an AWS Lambda in front holding a bearer token and a
+pinned self-signed cert; that existed only because the box had no trusted-CA
+certificate, so Caddy made it redundant and `alexa/lambda/` was deleted along
+with `aws-lambda-go` — the repo has no external Go dependencies again.
+
+Two checks replace the bearer token and **both** are required. Amazon's request
+signature (`backend/servers/alexasignature.go`: cert chain URL validation,
+chain verify, `echo-api.amazon.com` SAN, `Signature-256` over the raw body,
+150s replay window) proves a request came from Amazon; `BRIGHTLIGHT_ALEXA_SKILL_ID`
+proves it came from *our* skill, since anyone can point their own skill at the
+URL and Amazon signs those too. Verify before unmarshalling — the signature
+covers the exact bytes sent — and don't let the proxy rewrite the body.
+
+Spoken names are fuzzy-matched against button names in `user-buttons.json`
+(fallback `default-buttons.json`). Setup steps in `alexa/readme.md`; design
+discussion and the removal rationale in `docs/alexa-integration-plan.md`.
 
 ### CI pipeline and one-command Pi install (July 2026)
 `.github/workflows/build.yml` builds backend (ARMv7, GOARM=7 — the target is a

@@ -98,9 +98,10 @@ func main() {
 	http.HandleFunc("/api/FrameBuffer", servers.FrameBufferHandler)
 	http.HandleFunc("/api/Stats", servers.StatsHandler)
 	http.HandleFunc("/api/option/", servers.OptionHandler)
+	http.HandleFunc("/api/AlexaButtons", servers.GetAlexaButtonsHandler(uiConfigDir))
 
-	// Alexa voice control endpoint (HTTPS on its own port, disabled unless
-	// BRIGHTLIGHT_ALEXA_TOKEN is set)
+	// Alexa voice control endpoint (its own port, reached from the internet
+	// via a reverse proxy, disabled unless BRIGHTLIGHT_ALEXA_SKILL_ID is set)
 	servers.StartAlexaServer(uiConfigDir)
 
 	// Set up static content serving (skipped when BRIGHTLIGHT is unset — Vite serves the frontend)
