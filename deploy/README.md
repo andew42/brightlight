@@ -32,7 +32,22 @@ curl -fsSL https://github.com/andew42/brightlight/releases/latest/download/insta
 The server reads the `BRIGHTLIGHT_SITE` environment variable at startup: it
 selects the strip/segment layout compiled into the binary and which
 `static-data-<site>.json` / `default-buttons-<site>.json` variants are served
-to the UI. Useful commands afterwards:
+to the UI.
+
+### Alexa voice control
+
+Off unless a skill id is configured. Enable it the same way, with
+`--alexa-skill-id` (also stored in a drop-in and kept across upgrades);
+`--no-alexa` turns it back off:
+
+```bash
+curl -fsSL https://github.com/andew42/brightlight/releases/latest/download/install.sh | sudo bash -s -- --alexa-skill-id amzn1.ask.skill.xxxx
+```
+
+The skill calls the Pi directly through the site's Caddy reverse proxy — see
+`alexa/readme.md` for the skill, DNS and Caddy setup.
+
+Useful commands afterwards:
 
 ```bash
 systemctl status brightlight     # service state

@@ -15,6 +15,14 @@
 # The choice is stored in a systemd drop-in and kept across upgrades; when no
 # site is given the existing choice (or the built-in default, titania) is kept.
 #
+# Alexa voice control is enabled by passing the skill id (or a
+# BRIGHTLIGHT_ALEXA_SKILL_ID env var), and disabled again with --no-alexa:
+#
+#   curl -fsSL .../install.sh | sudo bash -s -- --alexa-skill-id amzn1.ask.skill.xxxx
+#
+# This is also stored in a drop-in and kept across upgrades. The endpoint only
+# starts when the skill id is set, so leaving it out leaves voice control off.
+#
 # The install itself runs detached (setsid) once the download completes, so a
 # dropped SSH connection can't kill it part-way and leave a half-applied
 # upgrade. Progress is logged to /var/log/brightlight-install.log — check it
@@ -37,15 +45,30 @@ main() {
     export DROPIN_DIR="/etc/systemd/system/brightlight.service.d"
 
     export SITE="${BRIGHTLIGHT_SITE:-}"
+    export ALEXA_SKILL_ID="${BRIGHTLIGHT_ALEXA_SKILL_ID:-}"
+    export NO_ALEXA=0
     while [ $# -gt 0 ]; do
         case "$1" in
             --site) SITE="${2:-}"; shift 2 ;;
             --site=*) SITE="${1#*=}"; shift ;;
+            --alexa-skill-id) ALEXA_SKILL_ID="${2:-}"; shift 2 ;;
+            --alexa-skill-id=*) ALEXA_SKILL_ID="${1#*=}"; shift ;;
+            --no-alexa) NO_ALEXA=1; shift ;;
             *) echo "Unknown option: $1" >&2; exit 1 ;;
         esac
     done
     if [ -n "${SITE}" ] && [ "${SITE}" != "titania" ] && [ "${SITE}" != "bedroom" ]; then
         echo "Invalid --site '${SITE}' (expected titania or bedroom)" >&2
+        exit 1
+    fi
+    if [ -n "${ALEXA_SKILL_ID}" ] && [ "${NO_ALEXA}" = "1" ]; then
+        echo "Pass either --alexa-skill-id or --no-alexa, not both" >&2
+        exit 1
+    fi
+    # A mistyped id fails closed but only shows up as refused voice commands,
+    # so reject anything that clearly isn't a skill id up front
+    if [ -n "${ALEXA_SKILL_ID}" ] && [ "${ALEXA_SKILL_ID#amzn1.ask.skill.}" = "${ALEXA_SKILL_ID}" ]; then
+        echo "Invalid --alexa-skill-id '${ALEXA_SKILL_ID}' (expected amzn1.ask.skill.…)" >&2
         exit 1
     fi
 
@@ -91,7 +114,8 @@ main() {
 
 # The part that must not die with the SSH session: replacing the files and
 # rebooting. Runs via setsid with all state passed in the environment
-# (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE).
+# (WORK, INSTALL_DIR, USER_BUTTONS_NAME, DROPIN_DIR, SITE, ALEXA_SKILL_ID,
+# NO_ALEXA).
 #
 # Ordering matters: install and sync ALL files while the old service is
 # still running, and only reboot once the upgrade is complete on disk.
@@ -127,6 +151,20 @@ elif [ -f "${DROPIN_DIR}/site.conf" ]; then
     echo "Keeping existing site layout: $(grep -o 'BRIGHTLIGHT_SITE=.*' "${DROPIN_DIR}/site.conf")"
 else
     echo "No --site given; using built-in default (titania)"
+fi
+
+if [ -n "${ALEXA_SKILL_ID}" ]; then
+    echo "Enabling Alexa voice control for skill ${ALEXA_SKILL_ID}"
+    mkdir -p "${DROPIN_DIR}"
+    printf '[Service]\nEnvironment=BRIGHTLIGHT_ALEXA_SKILL_ID=%s\n' \
+        "${ALEXA_SKILL_ID}" > "${DROPIN_DIR}/alexa.conf"
+elif [ "${NO_ALEXA}" = "1" ]; then
+    echo "Disabling Alexa voice control"
+    rm -f "${DROPIN_DIR}/alexa.conf"
+elif [ -f "${DROPIN_DIR}/alexa.conf" ]; then
+    echo "Keeping existing Alexa config: $(grep -o 'BRIGHTLIGHT_ALEXA_SKILL_ID=.*' "${DROPIN_DIR}/alexa.conf")"
+else
+    echo "No --alexa-skill-id given; Alexa voice control disabled"
 fi
 
 systemctl daemon-reload

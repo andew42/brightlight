@@ -49,7 +49,9 @@ root. It performs the same steps as CI and stages the artefacts in `deploy/`
    curl -fsSL https://github.com/andew42/brightlight/releases/latest/download/install.sh | sudo bash
    ```
    Append `-s -- --site bedroom` to select the hardware site layout
-   (default `titania`; the choice is remembered across upgrades).
+   (default `titania`; the choice is remembered across upgrades), and
+   `--alexa-skill-id amzn1.ask.skill.xxxx` to enable Alexa voice control
+   (see `alexa/readme.md`).
 
 This downloads the latest CI build, installs it to `/opt/brightlight` and sets
 up the `brightlight` systemd service so it starts on boot. Re-run the same

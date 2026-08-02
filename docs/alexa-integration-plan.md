@@ -204,8 +204,10 @@ pinned self-signed certificate existed. So:
 1. Single room for now? If Titania/other rooms need their own skill later, we can add a
    second invocation name and skill id, or a room slot — but v1 assumes one brightlight
    instance.
-2. Should the installer write the `BRIGHTLIGHT_ALEXA_SKILL_ID` drop-in (as it does for
-   `--site`) rather than leaving it a manual step in `alexa/readme.md`?
+2. ~~Should the installer write the `BRIGHTLIGHT_ALEXA_SKILL_ID` drop-in (as it does for
+   `--site`) rather than leaving it a manual step in `alexa/readme.md`?~~ Yes — done:
+   `--alexa-skill-id <id>` writes `alexa.conf` and `--no-alexa` removes it, both kept
+   across upgrades.
 
 ## Size as built
 

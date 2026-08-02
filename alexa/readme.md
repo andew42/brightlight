@@ -50,24 +50,32 @@ not in the skill store and cannot be enabled by anyone else.
 
 ## 2. Configure brightlight
 
-Set the skill id in a systemd drop-in on the Pi (alongside the site drop-in
-written by the installer, so it survives upgrades):
+Pass the skill id to the installer, which stores it in a systemd drop-in and
+keeps it across upgrades (the same way it handles `--site`):
 
-```sh
-sudo mkdir -p /etc/systemd/system/brightlight.service.d
-printf '[Service]\nEnvironment=BRIGHTLIGHT_ALEXA_SKILL_ID=amzn1.ask.skill.your-skill-id\n' \
-  | sudo tee /etc/systemd/system/brightlight.service.d/alexa.conf
-sudo systemctl daemon-reload && sudo systemctl restart brightlight
+```bash
+curl -fsSL https://github.com/andew42/brightlight/releases/latest/download/install.sh | sudo bash -s -- --alexa-skill-id amzn1.ask.skill.your-skill-id
 ```
+
+To turn voice control off again, re-run the installer with `--no-alexa`.
+Running it with neither flag keeps whatever is already configured.
 
 | Variable | Value |
 |---|---|
 | `BRIGHTLIGHT_ALEXA_SKILL_ID` | skill id from step 1; unset disables the endpoint |
 | `BRIGHTLIGHT_ALEXA_PORT` | optional, default 8443 |
 
-Check the log says `serving Alexa endpoint`:
+To set it without reinstalling, write the drop-in directly:
 
-```sh
+```bash
+printf '[Service]\nEnvironment=BRIGHTLIGHT_ALEXA_SKILL_ID=amzn1.ask.skill.your-skill-id\n' | sudo tee /etc/systemd/system/brightlight.service.d/alexa.conf
+```
+
+then `sudo systemctl daemon-reload && sudo systemctl restart brightlight`.
+
+Either way, check the log says `serving Alexa endpoint`:
+
+```bash
 journalctl -u brightlight -n 20
 ```
 

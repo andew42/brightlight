@@ -76,7 +76,9 @@ the Vite dev server, which proxies `/api` to `http://localhost:8080` — and
 button config is read from `ui-config/` relative to the working directory.
 
 The Alexa endpoint is opt-in (see `alexa/readme.md`): it starts only when
-`BRIGHTLIGHT_ALEXA_SKILL_ID` is set, and listens on its own plain-HTTP port
+`BRIGHTLIGHT_ALEXA_SKILL_ID` is set — via `packaging/install.sh
+--alexa-skill-id <id>`, which writes its own drop-in the same way `--site`
+does (`--no-alexa` removes it) — and listens on its own plain-HTTP port
 (`BRIGHTLIGHT_ALEXA_PORT`, default 8443) with TLS terminated by the Caddy
 reverse proxy in front of it. Fail-closed is deliberate: the skill id is what
 binds a request to our skill, so without it there is nothing to check.
