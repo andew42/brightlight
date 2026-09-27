@@ -122,8 +122,10 @@ All API routes are under `/api`. The push channels use Server-Sent Events
 `/api/AlexaButtons` (GET) lists button names as JSON for pasting into the
 skill's slot values, and `/api/AlexaButtons.html` serves the same names as a
 page with a copy button, the console steps, and a warning for names that
-cannot be reached by voice. Both are on the LAN server so they are never
-exposed to the internet.
+cannot be reached by voice. `/api/Log` returns the recent log lines as JSON and
+`/api/Log.html` shows them on a filterable, auto-refreshing page. All are on
+the LAN server so they are never exposed to the internet — a log carries
+addresses and the configured skill id.
 
 The skill endpoint itself lives on a separate opt-in listener (default port
 8443 — see `backend/servers/alexa.go`), which serves exactly one route:
@@ -206,6 +208,18 @@ that plainly exists, check the slot list before suspecting the matcher, and
 read the Pi's own log (`journalctl -u brightlight | grep -i alexa`) — it prints
 the value that actually arrived as `heard`. `/api/AlexaButtons.html` exists to
 make that paste a one-click job.
+
+**The log is teed to memory, not read back from journald.** `main` wraps slog's
+writer in an `io.MultiWriter` over stdout and `servers.LogWriter()`, a
+1000-line ring buffer behind a mutex, which `/api/Log.html` renders. Reading
+journald instead would mean shelling out to `journalctl`, giving the service
+journal access, and having nothing to show in development where there is no
+systemd. The trade is deliberate and has two edges worth knowing: the view holds
+only recent lines and is **empty after a restart**, so a crash loop is still a
+`journalctl -u brightlight` job. The tee must be installed before the first
+slog call or the startup lines — site, content path, driver failures, the Alexa
+enable/disable line — are missing from exactly the view somebody opens to
+diagnose startup.
 
 **Every reader of a per-site config file goes through `siteVariantPath`.**
 `default-buttons.json` and `static-data.json` ship in `-titania` and `-bedroom`

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log/slog"
 	"mime"
 	"net/http"
@@ -54,7 +55,11 @@ func (d LoggedRedirectingDir) Open(path string) (http.File, error) {
 // Main
 func main() {
 
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
+	// Tee the log into an in-memory ring buffer as well as stdout so /api/Log
+	// can serve it without anyone logging into the Pi. Set before the first
+	// slog call or the startup lines are missing from the web view.
+	slog.SetDefault(slog.New(slog.NewTextHandler(
+		io.MultiWriter(os.Stdout, servers.LogWriter()), nil)))
 
 	// Report what are we running on
 	slog.Info("environment", "gover", runtime.Version(), "goos", runtime.GOOS, "goarch", runtime.GOARCH)
@@ -100,6 +105,8 @@ func main() {
 	http.HandleFunc("/api/option/", servers.OptionHandler)
 	http.HandleFunc("/api/AlexaButtons", servers.GetAlexaButtonsHandler(uiConfigDir))
 	http.HandleFunc("/api/AlexaButtons.html", servers.GetAlexaButtonsPageHandler(uiConfigDir))
+	http.HandleFunc("/api/Log", servers.LogHandler)
+	http.HandleFunc("/api/Log.html", servers.LogPageHandler)
 
 	// Alexa voice control endpoint (its own port, reached from the internet
 	// via a reverse proxy, disabled unless BRIGHTLIGHT_ALEXA_SKILL_ID is set)

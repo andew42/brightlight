@@ -163,7 +163,14 @@ The console's log shows the **speech-to-text transcript**, which is not what
 the skill receives — that is the slot value after Alexa's NLU has resolved it
 against the list above. A transcript reading back the new name perfectly is
 therefore no evidence the skill was given it. The Pi logs what actually
-arrived:
+arrived. Easiest from the LAN, with `alexa` typed into the filter box:
+
+```
+http://<pi-address>:8080/api/Log.html
+```
+
+That view holds only recent lines and is empty after a restart, so for older
+history log onto the Pi:
 
 ```sh
 journalctl -u brightlight | grep -i alexa
