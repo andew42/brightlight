@@ -6,10 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/andew42/brightlight/animations"
+	"github.com/andew42/brightlight/config"
 )
 
 func namedButtons(names ...string) []animations.Button {
@@ -241,5 +245,88 @@ func TestEnvelopeApplicationId(t *testing.T) {
 	both.Context.System.Application.ApplicationId = "other"
 	if both.applicationId() != testSkillId {
 		t.Error("session application id should win when both are present")
+	}
+}
+
+func TestButtonNamesSkipsBlankAndFlagsCollisions(t *testing.T) {
+
+	dir := t.TempDir()
+	content := `{"buttons":[
+		{"key":1,"name":"Sweet Shop"},
+		{"key":2,"name":""},
+		{"key":3,"name":"sweet shop!"},
+		{"key":4,"name":"Two Tone"},
+		{"key":5,"name":"2 tone"},
+		{"key":6,"name":"Rainbow"}]}`
+	if err := os.WriteFile(filepath.Join(dir, "user-buttons.json"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	names, unreachable, err := buttonNames(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// The blank name is dropped; every other name is still offered as a slot
+	// value, including the ones that collide
+	want := []string{"Sweet Shop", "sweet shop!", "Two Tone", "2 tone", "Rainbow"}
+	if len(names) != len(want) {
+		t.Fatalf("got %v, want %v", names, want)
+	}
+	for i := range want {
+		if names[i] != want[i] {
+			t.Errorf("name %d: got %q, want %q", i, names[i], want[i])
+		}
+	}
+
+	// canonicaliseButtonName folds punctuation, case and number words, so the
+	// second of each pair can never win a match and is reported
+	if len(unreachable) != 2 {
+		t.Fatalf("expected 2 unreachable names, got %v", unreachable)
+	}
+	for i, prefix := range []string{"sweet shop!", "2 tone"} {
+		if !strings.HasPrefix(unreachable[i], prefix) {
+			t.Errorf("unreachable %d: got %q, want prefix %q", i, unreachable[i], prefix)
+		}
+	}
+}
+
+// Write a button file holding one named button
+func writeButtonFile(t *testing.T, path string, name string) {
+
+	t.Helper()
+	content := fmt.Sprintf(`{"buttons":[{"key":1,"name":%q}]}`, name)
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestLoadButtonsPrefersUserThenSiteDefaults(t *testing.T) {
+
+	original := config.Site
+	config.Site = "bedroom"
+	t.Cleanup(func() { config.Site = original })
+
+	dir := t.TempDir()
+	writeButtonFile(t, filepath.Join(dir, "default-buttons.json"), "Generic Default")
+	writeButtonFile(t, filepath.Join(dir, "default-buttons-bedroom.json"), "Bedroom Default")
+
+	// No user buttons: the site's defaults must win over the generic ones, or
+	// voice control answers about a button set the UI is not showing
+	buttons, err := loadButtons(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(buttons) != 1 || buttons[0].Name != "Bedroom Default" {
+		t.Errorf("site defaults not used, got %v", buttons)
+	}
+
+	// User buttons are not per-site and outrank both
+	writeButtonFile(t, filepath.Join(dir, "user-buttons.json"), "Renamed By User")
+	if buttons, err = loadButtons(dir); err != nil {
+		t.Fatal(err)
+	}
+	if len(buttons) != 1 || buttons[0].Name != "Renamed By User" {
+		t.Errorf("user buttons should win, got %v", buttons)
 	}
 }

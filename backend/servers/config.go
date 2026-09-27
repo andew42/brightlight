@@ -11,6 +11,31 @@ import (
 	"github.com/andew42/brightlight/config"
 )
 
+// Files that ship in a per-site variant. The frontend and the Alexa matcher
+// both ask for the generic name and must be given the same file, or voice
+// control matches against a different button set than the UI displays.
+var siteVariantFiles = map[string]bool{
+	"static-data.json":     true,
+	"default-buttons.json": true,
+}
+
+// siteVariantPath resolves a ui-config file name to its site-specific variant
+// (e.g. default-buttons-bedroom.json) when one exists for config.Site,
+// otherwise to the generic name. Every reader of these files goes through
+// here: a second copy of this rule would not fail, it would quietly serve the
+// wrong site's buttons.
+func siteVariantPath(dir string, name string) string {
+
+	if siteVariantFiles[name] {
+		variant := strings.TrimSuffix(name, ".json") + "-" + config.Site + ".json"
+		variantPath := filepath.Join(dir, variant)
+		if _, err := os.Stat(variantPath); err == nil {
+			return variantPath
+		}
+	}
+	return filepath.Join(dir, name)
+}
+
 // GetConfigHandler Handle HTTP requests to read and write ui-config files.
 // uiConfigDir is the filesystem path to the ui-config directory.
 func GetConfigHandler(uiConfigDir string) func(http.ResponseWriter, *http.Request) {
@@ -34,14 +59,7 @@ func GetConfigHandler(uiConfigDir string) func(http.ResponseWriter, *http.Reques
 			// The frontend always requests the generic file names; serve the
 			// site-specific variant (e.g. static-data-bedroom.json) when one
 			// exists for the configured site (BRIGHTLIGHT_SITE)
-			name := filepath.Base(fullPath)
-			if name == "static-data.json" || name == "default-buttons.json" {
-				variant := strings.TrimSuffix(name, ".json") + "-" + config.Site + ".json"
-				variantPath := filepath.Join(filepath.Dir(fullPath), variant)
-				if _, err := os.Stat(variantPath); err == nil {
-					fullPath = variantPath
-				}
-			}
+			fullPath = siteVariantPath(filepath.Dir(fullPath), filepath.Base(fullPath))
 
 			slog.Info("configHandler GET called", "FullPath", fullPath)
 			content, err := os.ReadFile(fullPath)

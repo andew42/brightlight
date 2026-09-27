@@ -2,6 +2,7 @@ package servers
 
 import (
 	"encoding/json"
+	"html/template"
 	"io"
 	"log/slog"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"unicode"
 
 	"github.com/andew42/brightlight/animations"
+	"github.com/andew42/brightlight/config"
 )
 
 // Alexa voice control. The Alexa service calls this endpoint directly (there
@@ -57,12 +59,16 @@ type buttonFileDef struct {
 	Buttons []animations.Button
 }
 
-// Load buttons, preferring user buttons over defaults
+// Load buttons, preferring user buttons over defaults. The defaults go
+// through siteVariantPath for the same reason the config server's GET does:
+// on a bedroom site the generic default-buttons.json is a different button
+// set from the one the UI is showing, so matching against it would answer
+// about lights this site does not have.
 func loadButtons(uiConfigDir string) ([]animations.Button, error) {
 
 	content, err := os.ReadFile(filepath.Join(uiConfigDir, "user-buttons.json"))
 	if err != nil {
-		if content, err = os.ReadFile(filepath.Join(uiConfigDir, "default-buttons.json")); err != nil {
+		if content, err = os.ReadFile(siteVariantPath(uiConfigDir, "default-buttons.json")); err != nil {
 			return nil, err
 		}
 	}
@@ -336,23 +342,128 @@ func GetAlexaButtonsHandler(uiConfigDir string) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		buttons, err := loadButtons(uiConfigDir)
+		names, _, err := buttonNames(uiConfigDir)
 		if err != nil {
 			slog.Error("Buttons failed to load buttons", "err", err.Error())
 			http.Error(w, "failed to load buttons", 500)
 			return
 		}
 
-		names := make([]string, 0, len(buttons))
-		for _, b := range buttons {
-			if b.Name != "" {
-				names = append(names, b.Name)
-			}
-		}
 		w.Header().Set("Content-Type", "application/json")
 		response, _ := json.Marshal(names)
 		if _, err = w.Write(response); err != nil {
 			slog.Warn("Buttons failed to write response", "err", err.Error())
+		}
+	}
+}
+
+// buttonNames returns the speakable button names and those that cannot be
+// reached by voice. A blank name has nothing to say, and two names sharing a
+// canonical form are indistinguishable to findButtonByName, which returns the
+// first — so the page says so rather than letting one button look broken.
+func buttonNames(uiConfigDir string) (names []string, unreachable []string, err error) {
+
+	buttons, err := loadButtons(uiConfigDir)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	seen := make(map[string]string, len(buttons))
+	for _, b := range buttons {
+		if b.Name == "" {
+			continue
+		}
+		names = append(names, b.Name)
+		canonical := canonicaliseButtonName(b.Name)
+		if first, clash := seen[canonical]; clash {
+			unreachable = append(unreachable, b.Name+" (sounds like "+first+")")
+			continue
+		}
+		seen[canonical] = b.Name
+	}
+	return names, unreachable, nil
+}
+
+// The developer console's slot-value bulk editor takes one value per line, so
+// that is what the textarea holds. Kept deliberately plain: this is served by
+// the LAN server and read on a phone while the console is open on a laptop.
+var alexaButtonsPage = template.Must(template.New("alexaButtons").Parse(`<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alexa slot values</title>
+<style>
+ :root { color-scheme: light dark }
+ body { font: 16px system-ui, sans-serif; margin: 0; padding: 20px; max-width: 46rem }
+ h1 { font-size: 1.25rem; margin: 0 0 .25rem }
+ p { margin: .5rem 0; line-height: 1.45 }
+ .muted { opacity: .7; font-size: .9rem }
+ textarea { width: 100%; box-sizing: border-box; min-height: 20rem; margin-top: .75rem;
+            font: 14px ui-monospace, monospace; padding: .6rem }
+ button { font: inherit; padding: .5rem 1rem; cursor: pointer }
+ ol { padding-left: 1.4rem } li { margin: .3rem 0 }
+ .warn { border-left: 3px solid #c60; padding: .1rem 0 .1rem .7rem; margin: 1rem 0 }
+</style></head><body>
+<h1>Alexa slot values</h1>
+<p class="muted">{{len .Names}} button names, site <strong>{{.Site}}</strong>, from
+{{.Source}}. This page is LAN-only and is never reachable from the internet.</p>
+
+<button id="copy">Copy all</button> <span id="done" class="muted"></span>
+<textarea id="values" readonly spellcheck="false">{{range .Names}}{{.}}
+{{end}}</textarea>
+
+{{if .Unreachable}}<div class="warn"><strong>Not reachable by voice</strong>
+<p class="muted">These collide with another button once punctuation and case are
+ignored, so the first one always wins. Rename one to use both by voice.</p>
+<ul>{{range .Unreachable}}<li>{{.}}</li>{{end}}</ul></div>{{end}}
+
+<p><strong>To update the skill</strong></p>
+<ol>
+ <li>Open the skill in the Alexa developer console, then
+     <em>Build &rarr; Interaction Model &rarr; Slot Types &rarr; BUTTON_NAME</em>.</li>
+ <li>Choose <em>Bulk Edit</em>, replace everything with the list above, and Save.</li>
+ <li>Press <em>Build Model</em> and wait for it to finish — until that completes
+     Alexa still resolves against the previous names.</li>
+</ol>
+<p class="muted">Renaming a button takes effect on this server at once; the slot
+list is a separate copy held by Amazon, which is why it has to be pasted again.</p>
+
+<script>
+ document.getElementById('copy').addEventListener('click', async () => {
+   const area = document.getElementById('values');
+   try { await navigator.clipboard.writeText(area.value); }
+   catch { area.select(); document.execCommand('copy'); }
+   document.getElementById('done').textContent = 'copied';
+ });
+</script>
+</body></html>`))
+
+// GetAlexaButtonsPageHandler Handle GET /api/AlexaButtons.html, the same names
+// as the JSON endpoint but as a page with a copy button and the console steps,
+// so updating the skill after a rename is paste-once rather than hand-typed.
+func GetAlexaButtonsPageHandler(uiConfigDir string) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		names, unreachable, err := buttonNames(uiConfigDir)
+		if err != nil {
+			slog.Error("Buttons page failed to load buttons", "err", err.Error())
+			http.Error(w, "failed to load buttons", 500)
+			return
+		}
+
+		source := "user-buttons.json"
+		if _, err = os.Stat(filepath.Join(uiConfigDir, "user-buttons.json")); err != nil {
+			source = filepath.Base(siteVariantPath(uiConfigDir, "default-buttons.json"))
+		}
+
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err = alexaButtonsPage.Execute(w, struct {
+			Names       []string
+			Unreachable []string
+			Site        string
+			Source      string
+		}{names, unreachable, config.Site, source}); err != nil {
+			slog.Warn("Buttons page failed to write response", "err", err.Error())
 		}
 	}
 }

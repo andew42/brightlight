@@ -129,18 +129,50 @@ build the model, then test from the console's **Test** tab or a real Echo.
 
 ## 5. Keeping button names recognisable
 
-The `BUTTON_NAME` slot values are recognition hints, not a closed list.
-When you add or rename buttons, fetch the current names from the LAN and
-paste them into the slot values in the developer console for best
-recognition. Unlisted names usually still work if they are ordinary English
-words.
+The `BUTTON_NAME` slot values are recognition hints rather than a closed list,
+but they are hints Alexa leans on heavily: an unlisted name is as likely to be
+snapped to the nearest listed one, or to miss the intent altogether, as it is
+to arrive intact. **So treat renaming a button as a two-part job** — the server
+picks the new name up at once, Amazon does not.
+
+Open this page on the LAN and press *Copy all*:
+
+```
+http://<pi-address>:8080/api/AlexaButtons.html
+```
+
+It lists the current button names one per line, ready for the slot value
+**Bulk Edit** box, and flags any names that cannot be reached by voice because
+they collide with another button once case and punctuation are ignored. Then in
+the developer console: *Build → Interaction Model → Slot Types → BUTTON_NAME →
+Bulk Edit*, replace the values, Save, and press **Build Model**. Until that
+build finishes Alexa is still resolving against the previous names.
+
+The same names are available as JSON for scripting:
 
 ```sh
 curl http://<pi-address>:8080/api/AlexaButtons
 ```
 
-This listing is deliberately on the LAN server rather than the Alexa
-listener, so it is not exposed to the internet.
+Both are deliberately on the LAN server rather than the Alexa listener, so
+neither is exposed to the internet.
+
+### When a button exists but Alexa cannot find it
+
+The console's log shows the **speech-to-text transcript**, which is not what
+the skill receives — that is the slot value after Alexa's NLU has resolved it
+against the list above. A transcript reading back the new name perfectly is
+therefore no evidence the skill was given it. The Pi logs what actually
+arrived:
+
+```sh
+journalctl -u brightlight | grep -i alexa
+```
+
+`Alexa run button heard=<x> matched=<y>` on a hit, `Alexa no matching button
+heard=<x>` on a miss. If `heard` is the new name, the slot passed it through
+and the fault is in the matching; if it is an old name or empty, the slot list
+needs rebuilding.
 
 ## Troubleshooting
 

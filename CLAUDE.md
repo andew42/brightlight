@@ -119,8 +119,11 @@ All API routes are under `/api`. The push channels use Server-Sent Events
 | `/api/Stats` | SSE | Push performance stats |
 | `/api/option/` | POST | Set server options |
 
-`/api/AlexaButtons` (GET) lists button names for pasting into the skill's slot
-values; it is on the LAN server so it is never exposed to the internet.
+`/api/AlexaButtons` (GET) lists button names as JSON for pasting into the
+skill's slot values, and `/api/AlexaButtons.html` serves the same names as a
+page with a copy button, the console steps, and a warning for names that
+cannot be reached by voice. Both are on the LAN server so they are never
+exposed to the internet.
 
 The skill endpoint itself lives on a separate opt-in listener (default port
 8443 — see `backend/servers/alexa.go`), which serves exactly one route:
@@ -190,6 +193,28 @@ covers the exact bytes sent — and don't let the proxy rewrite the body.
 Spoken names are fuzzy-matched against button names in `user-buttons.json`
 (fallback `default-buttons.json`). Setup steps in `alexa/readme.md`; design
 discussion and the removal rationale in `docs/alexa-integration-plan.md`.
+
+**Renaming a button in the UI is only half the change, and the half that shows.**
+The server picks the new name up immediately — `loadButtons` re-reads
+`user-buttons.json` on every request — but the `BUTTON_NAME` slot values are a
+separate copy held by Amazon, and until that is pasted in and the model rebuilt
+Alexa resolves speech against the old names. The symptom is misleading: the
+developer console's log shows the *speech-to-text transcript*, so it can show
+the new name read back perfectly while the post-NLU slot value handed to the
+skill is an old name or nothing. So when voice control cannot find a button
+that plainly exists, check the slot list before suspecting the matcher, and
+read the Pi's own log (`journalctl -u brightlight | grep -i alexa`) — it prints
+the value that actually arrived as `heard`. `/api/AlexaButtons.html` exists to
+make that paste a one-click job.
+
+**Every reader of a per-site config file goes through `siteVariantPath`.**
+`default-buttons.json` and `static-data.json` ship in `-titania` and `-bedroom`
+variants, and the Alexa matcher's fallback used to read the *generic*
+`default-buttons.json` while the config server's GET resolved the variant — so
+on a bedroom site with no `user-buttons.json`, voice control matched against a
+different button set from the one on screen. The rule now lives in one function
+that both call, because a second copy of it would not fail, it would quietly
+answer about another site's lights.
 
 ### CI pipeline and one-command Pi install (July 2026)
 `.github/workflows/build.yml` builds backend (ARMv7, GOARM=7 — the target is a
